@@ -1600,11 +1600,11 @@ class CharacterController(BaseController):
         Delete a character
     get_character_by_id(character_id: int)
         Get a character by id
-    get_character_count_by_user_id(user_id: int)
+    get_character_count()
         Get character count associated with a user
-    get_all_characters_by_user_id(user_id: int)
+    get_all_characters()
         Get all characters associated with a user
-    get_characters_page_by_user_id(user_id: int, page: int, per_page: int)
+    get_characters_page(page: int, per_page: int)
         Get a single page of characters from the database associated with a user
     get_character_count_by_story_id(story_id: int)
         Get character count associated with a story
@@ -1612,7 +1612,7 @@ class CharacterController(BaseController):
         Get a list of characters by story id
     get_characters_page_by_story_id(story_id: int, page: int, per_page: int)
         Get a single page of characters by story id
-    search_characters_by_user_id(user_id: int, search: str)
+    search_characters(search: str)
         Search for characters by title, first name, middle name, last name, nickname, and description belonging to a \
         specific user
     search_characters_by_story_id(story_id: int, search: str)
@@ -1922,13 +1922,8 @@ class CharacterController(BaseController):
             ).first()
             return character if character else None
 
-    def get_character_count_by_user_id(self, user_id: int) -> int:
+    def get_character_count(self) -> int:
         """Get character count associated with a user
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -1938,16 +1933,11 @@ class CharacterController(BaseController):
 
         with self._session as session:
             return session.query(func.count(Character.id)).filter(
-                Character.user_id == user_id, Character.user_id == self._owner.id
+                Character.user_id == self._owner.id
             ).scalar()
 
-    def get_all_characters_by_user_id(self, user_id: int) -> list:
+    def get_all_characters(self) -> list:
         """Get all characters associated with a user
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -1957,16 +1947,14 @@ class CharacterController(BaseController):
 
         with self._session as session:
             return session.query(Character).filter(
-                Character.user_id == user_id, Character.user_id == self._owner.id
+                Character.user_id == self._owner.id
             ).all()
 
-    def get_characters_page_by_user_id(self, user_id: int, page: int, per_page: int) -> list:
+    def get_characters_page(self, page: int, per_page: int) -> list:
         """Get a single page of characters from the database associated with a user
 
         Parameters
         ----------
-        user_id : int
-            The id of the user
         page : int
             The page number
         per_page : int
@@ -1980,7 +1968,9 @@ class CharacterController(BaseController):
 
         with self._session as session:
             offset = (page - 1) * per_page
-            return session.query(Character).filter(Character.user_id == user_id).offset(offset).limit(per_page).all()
+            return session.query(Character).filter(
+                Character.user_id == self._owner.id
+            ).offset(offset).limit(per_page).all()
 
     def get_character_count_by_story_id(self, story_id: int) -> int:
         """Get character count associated with a story
@@ -2056,14 +2046,12 @@ class CharacterController(BaseController):
                     Character.id == character_story.character_id, Character.user_id == self._owner.id
                 ).first()
 
-    def search_characters_by_user_id(self, user_id: int, search: str) -> list:
+    def search_characters(self, search: str) -> list:
         """Search for characters by title, first name, middle name, last name, nickname, and description belonging to \
         a specific user
 
         Parameters
         ----------
-        user_id : int
-            The id of the user
         search : str
             The search string
 
@@ -2078,7 +2066,7 @@ class CharacterController(BaseController):
                 or_(Character.title.like(f'%{search}%'), Character.first_name.like(f'%{search}%'),
                     Character.middle_name.like(f'%{search}%'), Character.last_name.like(f'%{search}%'),
                     Character.nickname.like(f'%{search}%'), Character.description.like(f'%{search}%')),
-                Character.user_id == user_id
+                Character.user_id == self._owner.id
             ).all()
 
     def search_characters_by_story_id(self, story_id: int, search: str) -> list | None:
