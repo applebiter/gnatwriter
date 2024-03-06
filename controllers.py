@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 import uuid
 from models import *
 
+
 def hash_password(password):
     """Hash a password, return hashed password"""
 
@@ -110,14 +111,12 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
-            activity = session.query(Activity).filter(Activity.id == activity_id).first()
+            activity = session.query(Activity).filter(
+                Activity.id == activity_id, Activity.user_id == self._owner.id
+            ).first()
+            return activity if activity else None
 
-            if activity:
-                return activity
-
-            return None
-
-    def get_all_activities_by_user_id(self, user_id: int) -> list:
+    def get_activities_by_user_id(self, user_id: int) -> list:
         """Get all activities associated with a user, sorted by created date with most recent first
 
         Parameters
@@ -132,7 +131,9 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Activity).filter(Activity.user_id == user_id).order_by(Activity.created.desc()).all()
+            return session.query(Activity).filter(
+                Activity.user_id == user_id, Activity.user_id == self._owner.id
+            ).order_by(Activity.created.desc()).all()
 
     def get_activities_page_by_user_id(self, user_id: int, page: int, per_page: int) -> list:
         """Get a single page of activities associated with a user, sorted by created date with most recent first
@@ -175,38 +176,6 @@ class ActivityController(BaseController):
         with self._session as session:
             return session.query(func.count(Activity.id)).filter(Activity.user_id == user_id).scalar()
 
-    def get_all_activities(self) -> list:
-        """Get all activities in the database, sorted by created date with most recent first
-
-        Returns
-        -------
-        list
-            A list of activity objects
-        """
-
-        with self._session as session:
-            return session.query(Activity).order_by(Activity.created.desc()).all()
-
-    def get_activities_page(self, page: int, per_page: int) -> list:
-        """Get a single page of activities from the database, sorted by created date with most recent first
-
-        Parameters
-        ----------
-        page : int
-            The page number
-        per_page : int
-            The number of rows per page
-
-        Returns
-        -------
-        list
-            A list of activity objects
-        """
-
-        with self._session as session:
-            offset = (page - 1) * per_page
-            return session.query(Activity).order_by(Activity.created.desc()).offset(offset).limit(per_page).all()
-
     def search_activities(self, search: str) -> list:
         """Search for activities by summary
 
@@ -222,7 +191,9 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Activity).filter(Activity.summary.like(f'%{search}%')).all()
+            return session.query(Activity).filter(
+                Activity.summary.like(f'%{search}%'), Activity.user_id == self._owner.id
+            ).all()
 
 
 class AuthorController(BaseController):
@@ -340,7 +311,9 @@ class AuthorController(BaseController):
         with self._session as session:
 
             try:
-                author = session.query(Author).filter(Author.id == author_id).first()
+                author = session.query(Author).filter(
+                    Author.id == author_id, Author.user_id == self._owner.id
+                ).first()
 
                 if not author:
                     raise ValueError('Author not found.')
@@ -390,7 +363,9 @@ class AuthorController(BaseController):
         with self._session as session:
 
             try:
-                author = session.query(Author).filter(Author.id == author_id).first()
+                author = session.query(Author).filter(
+                    Author.id == author_id, Author.user_id == self._owner.id
+                ).first()
 
                 if not author:
                     raise ValueError('Author not found.')
@@ -429,7 +404,9 @@ class AuthorController(BaseController):
         with self._session as session:
 
             try:
-                author = session.query(Author).filter(Author.id == author_id).first()
+                author = session.query(Author).filter(
+                    Author.id == author_id, Author.user_id == self._owner.id
+                ).first()
 
                 if not author:
                     raise ValueError('Author not found.')
@@ -464,7 +441,9 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
-            author = session.query(Author).filter(Author.id == author_id).first()
+            author = session.query(Author).filter(
+                Author.id == author_id, Author.user_id == self._owner.id
+            ).first()
             return author if author else None
 
     def get_author_by_name(self, name: str) -> Type[Author] | None:
@@ -482,7 +461,9 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
-            author = session.query(Author).filter(Author.name == name).first()
+            author = session.query(Author).filter(
+                Author.name == name, Author.user_id == self._owner.id
+            ).first()
             return author if author else None
 
     def get_author_count_by_user_id(self, user_id: int) -> int:
@@ -555,12 +536,10 @@ class AuthorController(BaseController):
             A list of author objects or None if the story is not found
         """
         with self._session as session:
-            story = session.query(Story).filter(Story.id == story_id).first()
-
-            if not story:
-                raise ValueError('Story not found.')
-
-            return story.authors
+            story = session.query(Story).filter(
+                Story.id == story_id, Story.user_id == self._owner.id
+            ).first()
+            return story.authors if story else None
 
     def search_authors(self, search: str) -> list | None:
         """Search for authors by name
@@ -577,7 +556,9 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Author).filter(Author.name.like(f'%{search}%')).all()
+            return session.query(Author).filter(
+                Author.name.like(f'%{search}%'), Author.user_id == self._owner.id
+            ).all()
 
 
 class BibliographyController(BaseController):
@@ -652,7 +633,8 @@ class BibliographyController(BaseController):
         with self._session as session:
             try:
                 title_exists = session.query(Bibliography).filter(
-                    Bibliography.title == title, Bibliography.story_id == story_id
+                    Bibliography.title == title, Bibliography.story_id == story_id,
+                    Bibliography.user_id == self._owner.id
                 ).first()
 
                 if title_exists:
@@ -707,7 +689,9 @@ class BibliographyController(BaseController):
 
         with self._session as session:
             try:
-                bibliography = session.query(Bibliography).filter(Bibliography.id == bibliography_id).first()
+                bibliography = session.query(Bibliography).filter(
+                    Bibliography.id == bibliography_id, Bibliography.user_id == self._owner.id
+                ).first()
 
                 if not bibliography:
                     raise ValueError('Bibliography not found.')
@@ -759,7 +743,9 @@ class BibliographyController(BaseController):
         with self._session as session:
 
             try:
-                bibliography = session.query(Bibliography).filter(Bibliography.id == bibliography_id).first()
+                bibliography = session.query(Bibliography).filter(
+                    Bibliography.id == bibliography_id, Bibliography.user_id == self._owner.id
+                ).first()
 
                 if not bibliography:
                     raise ValueError('Bibliography not found.')
@@ -796,7 +782,9 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
-            bibliography = session.query(Bibliography).filter(Bibliography.id == bibliography_id).first()
+            bibliography = session.query(Bibliography).filter(
+                Bibliography.id == bibliography_id, Bibliography.user_id == self._owner.id
+            ).first()
             return bibliography if bibliography else None
 
     def get_bibliography_by_title(self, title: str) -> Type[Bibliography] | None:
@@ -814,7 +802,9 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
-            bibliography = session.query(Bibliography).filter(Bibliography.title == title).first()
+            bibliography = session.query(Bibliography).filter(
+                Bibliography.title == title, Bibliography.user_id == self._owner.id
+            ).first()
             return bibliography if bibliography else None
 
     def get_bibliography_count_by_user_id(self, user_id: int) -> int:
@@ -890,12 +880,10 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
-            story = session.query(Story).filter(Story.id == story_id).first()
-
-            if not story:
-                raise ValueError('Story not found.')
-
-            return story.bibliographies
+            bibliographies = session.query(Bibliography).filter(
+                Bibliography.story_id == story_id, Bibliography.user_id == self._owner.id
+            ).all()
+            return bibliographies if bibliographies else None
 
     def get_bibliographies_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list | None:
         """Get a single page of bibliographies associated with a story from the database
@@ -916,13 +904,11 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
-            story = session.query(Story).filter(Story.id == story_id).first()
-
-            if not story:
-                raise ValueError('Story not found.')
-
             offset = (page - 1) * per_page
-            return story.bibliographies[offset:offset + per_page]
+            bibliographies = session.query(Bibliography).filter(
+                Bibliography.story_id == story_id, Bibliography.user_id == self._owner.id
+            ).offset(offset).limit(per_page).all()
+            return bibliographies if bibliographies else None
 
     def search_bibliographies_by_user_id(self, user_id: int, search: str) -> list:
         """Search for bibliographies by title associated with a user
@@ -963,7 +949,8 @@ class BibliographyController(BaseController):
 
         with self._session as session:
             return session.query(Bibliography).filter(
-                Bibliography.story_id == story_id, Bibliography.title.like(f'%{search}%')
+                Bibliography.story_id == story_id, Bibliography.title.like(f'%{search}%'),
+                Bibliography.user_id == self._owner.id
             ).all()
 
 
@@ -1041,13 +1028,15 @@ class ChapterController(BaseController):
         with self._session as session:
             try:
                 title_exists = session.query(Chapter).filter(
-                    Chapter.title == title, Chapter.story_id == story_id
+                    Chapter.title == title, Chapter.story_id == story_id, Chapter.user_id == self._owner.id
                 ).first()
 
                 if title_exists:
                     raise Exception('This story already has a chapter with the same title.')
 
-                position = session.query(func.max(Chapter.position)).filter(Chapter.story_id == story_id).scalar()
+                position = session.query(func.max(Chapter.position)).filter(
+                    Chapter.story_id == story_id, Chapter.user_id == self._owner.id
+                ).scalar()
                 position = int(position) + 1 if position else 1
                 created = datetime.now()
                 modified = created
@@ -1090,13 +1079,16 @@ class ChapterController(BaseController):
 
         with self._session as session:
             try:
-                chapter = session.query(Chapter).filter(Chapter.id == chapter_id).first()
+                chapter = session.query(Chapter).filter(
+                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                ).first()
 
                 if not chapter:
                     raise ValueError('Chapter not found.')
 
                 title_exists = session.query(Chapter).filter(
-                    Chapter.title == title, Chapter.story_id == chapter.story_id
+                    Chapter.title == title, Chapter.story_id == chapter.story_id,
+                    Chapter.user_id == self._owner.id
                 ).first()
 
                 if title_exists:
@@ -1144,34 +1136,50 @@ class ChapterController(BaseController):
 
         with self._session as session:
             try:
-                chapter = session.query(Chapter).filter(Chapter.id == chapter_id).first()
+                chapter = session.query(Chapter).filter(
+                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                ).first()
 
                 if not chapter:
                     raise ValueError('Chapter not found.')
 
                 for scene in chapter.scenes:
                     for link_scene in scene.links:
-                        session.query(LinkNote).filter(LinkNote.link_id == link_scene.link_id).delete()
-                        session.query(Link).filter(Link.id == link_scene.link_id).delete()
+                        session.query(LinkNote).filter(
+                            LinkNote.link_id == link_scene.link_id, LinkNote.user_id == self._owner.id
+                        ).delete()
+                        session.query(Link).filter(
+                            Link.id == link_scene.link_id, Link.user_id == self._owner.id
+                        ).delete()
                         session.delete(link_scene)
                     for note_scene in scene.notes:
-                        session.query(LinkNote).filter(LinkNote.note_id == note_scene.note_id).delete()
-                        session.query(Note).filter(Note.id == note_scene.note_id).delete()
+                        session.query(LinkNote).filter(
+                            LinkNote.note_id == note_scene.note_id, LinkNote.user_id == self._owner.id
+                        ).delete()
+                        session.query(Note).filter(
+                            Note.id == note_scene.note_id, Note.user_id == self._owner.id
+                        ).delete()
                         session.delete(note_scene)
                     session.delete(scene)
 
                 for link in chapter.links:
-                    session.query(LinkNote).filter(LinkNote.link_id == link.link_id).delete()
+                    session.query(LinkNote).filter(
+                        LinkNote.link_id == link.link_id, LinkNote.user_id == self._owner.id
+                    ).delete()
                     session.query(Link).filter(Link.id == link.link_id).delete()
                     session.delete(link)
 
                 for note in chapter.notes:
-                    session.query(LinkNote).filter(LinkNote.note_id == note.note_id).delete()
-                    session.query(Note).filter(Note.id == note.note_id).delete()
+                    session.query(LinkNote).filter(
+                        LinkNote.note_id == note.note_id, LinkNote.user_id == self._owner.id
+                    ).delete()
+                    session.query(Note).filter(
+                        Note.id == note.note_id, Note.user_id == self._owner.id
+                    ).delete()
                     session.delete(note)
 
                 siblings = session.query(Chapter).filter(
-                    Chapter.story_id == chapter.story_id,
+                    Chapter.story_id == chapter.story_id, Chapter.user_id == self._owner.id,
                     Chapter.position > chapter.position
                 ).all()
 
@@ -1220,7 +1228,9 @@ class ChapterController(BaseController):
 
         with self._session as session:
             try:
-                chapter = session.query(Chapter).filter(Chapter.id == chapter_id).first()
+                chapter = session.query(Chapter).filter(
+                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                ).first()
 
                 if not chapter:
                     raise ValueError('Chapter not found.')
@@ -1229,7 +1239,7 @@ class ChapterController(BaseController):
                     raise ValueError('Position must be greater than 0.')
 
                 highest_position = session.query(func.max(Chapter.position)).filter(
-                    Chapter.story_id == chapter.story_id
+                    Chapter.story_id == chapter.story_id, Chapter.user_id == self._owner.id
                 ).scalar()
 
                 if position > highest_position:
@@ -1240,9 +1250,8 @@ class ChapterController(BaseController):
 
                 if position < chapter.position:
                     siblings = session.query(Chapter).filter(
-                        Chapter.story_id == chapter.story_id,
-                        Chapter.position >= position,
-                        Chapter.position < chapter.position
+                        Chapter.story_id == chapter.story_id, Chapter.user_id == self._owner.id,
+                        Chapter.position >= position, Chapter.position < chapter.position
                     ).all()
 
                     for sibling in siblings:
@@ -1252,9 +1261,8 @@ class ChapterController(BaseController):
 
                 else:
                     siblings = session.query(Chapter).filter(
-                        Chapter.story_id == chapter.story_id,
-                        Chapter.position > chapter.position,
-                        Chapter.position <= position
+                        Chapter.story_id == chapter.story_id, Chapter.user_id == self._owner.id,
+                        Chapter.position > chapter.position, Chapter.position <= position
                     ).all()
 
                     for sibling in siblings:
@@ -1294,7 +1302,9 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
-            chapter = session.query(Chapter).filter(Chapter.id == chapter_id).first()
+            chapter = session.query(Chapter).filter(
+                Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+            ).first()
             return chapter if chapter else None
 
     def get_chapters_by_user_id(self, user_id: int) -> list | None:
@@ -1315,7 +1325,7 @@ class ChapterController(BaseController):
 
         with self._session as session:
             return session.query(Chapter).filter(
-                Chapter.user_id == user_id
+                Chapter.user_id == user_id, Chapter.user_id == self._owner.id
             ).order_by(Chapter.story_id, Chapter.position).all()
 
     def get_chapters_page_by_user_id(self, user_id: int, page: int, per_page: int) -> list | None:
@@ -1378,7 +1388,9 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Chapter).filter(Chapter.story_id == story_id).order_by(Chapter.position).all()
+            return session.query(Chapter).filter(
+                Chapter.story_id == story_id, Chapter.user_id == self._owner.id
+            ).order_by(Chapter.position).all()
 
     def get_chapters_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list | None:
         """Get a single page of chapters associated with a story from the database
@@ -1403,7 +1415,7 @@ class ChapterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Chapter).filter(
-                Chapter.story_id == story_id
+                Chapter.story_id == story_id, Chapter.user_id == self._owner.id
             ).order_by(Chapter.position).offset(offset).limit(per_page).all()
 
     def get_chapter_count_by_story_id(self, story_id: int) -> int:
@@ -1421,7 +1433,9 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Chapter.id)).filter(Chapter.story_id == story_id).scalar()
+            return session.query(func.count(Chapter.id)).filter(
+                Chapter.story_id == story_id, Chapter.user_id == self._owner.id
+            ).scalar()
 
     def search_chapters_by_user_id(self, user_id: int, search: str) -> list:
         """Search for chapters by title and description belonging to a specific user
@@ -1464,7 +1478,7 @@ class ChapterController(BaseController):
         with self._session as session:
             return session.query(Chapter).filter(
                 or_(Chapter.title.like(f'%{search}%'), Chapter.description.like(f'%{search}%')),
-                Chapter.story_id == story_id
+                Chapter.story_id == story_id, Chapter.user_id == self._owner.id
             ).all()
 
     def append_links_to_chapter(self, chapter_id: int, links: list) -> Type[Chapter]:
@@ -1485,7 +1499,9 @@ class ChapterController(BaseController):
 
         with self._session as session:
             try:
-                chapter = session.query(Chapter).filter(Chapter.id == chapter_id).first()
+                chapter = session.query(Chapter).filter(
+                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                ).first()
 
                 if not chapter:
                     raise ValueError('Chapter not found.')
@@ -1529,7 +1545,7 @@ class ChapterController(BaseController):
 
         with self._session as session:
             return session.query(Link).join(ChapterLink, Link.id == ChapterLink.link_id).filter(
-                ChapterLink.chapter_id == chapter_id
+                ChapterLink.chapter_id == chapter_id, ChapterLink.user_id == self._owner.id
             ).all()
 
     def append_notes_to_chapter(self, chapter_id: int, notes: list) -> Type[Chapter]:
@@ -1550,13 +1566,17 @@ class ChapterController(BaseController):
 
         with self._session as session:
             try:
-                chapter = session.query(Chapter).filter(Chapter.id == chapter_id).first()
+                chapter = session.query(Chapter).filter(
+                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                ).first()
 
                 if not chapter:
                     raise ValueError('Chapter not found.')
 
                 for note_id in notes:
-                    note = session.query(Note).filter(Note.id == note_id).first()
+                    note = session.query(Note).filter(
+                        Note.id == note_id, Note.user_id == self._owner.id
+                    ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
@@ -1594,7 +1614,7 @@ class ChapterController(BaseController):
 
         with self._session as session:
             return session.query(Note).join(ChapterNote, Note.id == ChapterNote.note_id).filter(
-                ChapterNote.chapter_id == chapter_id
+                ChapterNote.chapter_id == chapter_id, ChapterNote.user_id == self._owner.id
             ).all()
 
 
@@ -1813,7 +1833,9 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character = session.query(Character).filter(Character.id == character_id).first()
+                character = session.query(Character).filter(
+                    Character.id == character_id, Character.user_id == self._owner.id
+                ).first()
 
                 if not character:
                     raise ValueError('Character not found.')
@@ -1866,23 +1888,35 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character = session.query(Character).filter(Character.id == character_id).first()
+                character = session.query(Character).filter(
+                    Character.id == character_id, Character.user_id == self._owner.id
+                ).first()
 
                 if not character:
                     raise ValueError('Character not found.')
 
                 for link in character.links:
-                    session.query(LinkNote).filter(LinkNote.link_id == link.link_id).delete()
-                    session.query(Link).filter(Link.id == link.link_id).delete()
+                    session.query(LinkNote).filter(
+                        LinkNote.link_id == link.link_id, LinkNote.user_id == self._owner.id
+                    ).delete()
+                    session.query(Link).filter(
+                        Link.id == link.link_id, Link.user_id == self._owner.id
+                    ).delete()
                     session.delete(link)
 
                 for note in character.notes:
-                    session.query(LinkNote).filter(LinkNote.note_id == note.note_id).delete()
-                    session.query(Note).filter(Note.id == note.note_id).delete()
+                    session.query(LinkNote).filter(
+                        LinkNote.note_id == note.note_id, LinkNote.user_id == self._owner.id
+                    ).delete()
+                    session.query(Note).filter(
+                        Note.id == note.note_id, Note.user_id == self._owner.id
+                    ).delete()
                     session.delete(note)
 
                 for image in character.images:
-                    session.query(Image).filter(Image.id == image.id).delete()
+                    session.query(Image).filter(
+                        Image.id == image.id, Image.user_id == self._owner.id
+                    ).delete()
                     session.delete(image)
 
                 for character_relationship in character.character_relationships:
@@ -1892,7 +1926,9 @@ class CharacterController(BaseController):
                     session.delete(trait)
 
                 for event in character.events:
-                    session.query(CharacterEvent).filter(CharacterEvent.event_id == event.id).delete()
+                    session.query(CharacterEvent).filter(
+                        CharacterEvent.event_id == event.id, CharacterEvent.user_id == self._owner.id
+                    ).delete()
 
                 activity = Activity(user_id=self._owner.id, summary=f'Character {character.__str__} deleted by \
                     {self._owner.username}', created=datetime.now())
@@ -1923,7 +1959,9 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
-            character = session.query(Character).filter(Character.id == character_id).first()
+            character = session.query(Character).filter(
+                Character.id == character_id, Character.user_id == self._owner.id
+            ).first()
             return character if character else None
 
     def get_character_count_by_user_id(self, user_id: int) -> int:
@@ -1941,7 +1979,9 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Character.id)).filter(Character.user_id == user_id).scalar()
+            return session.query(func.count(Character.id)).filter(
+                Character.user_id == user_id, Character.user_id == self._owner.id
+            ).scalar()
 
     def get_all_characters_by_user_id(self, user_id: int) -> list:
         """Get all characters associated with a user
@@ -1958,7 +1998,9 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Character).filter(Character.user_id == user_id).all()
+            return session.query(Character).filter(
+                Character.user_id == user_id, Character.user_id == self._owner.id
+            ).all()
 
     def get_characters_page_by_user_id(self, user_id: int, page: int, per_page: int) -> list:
         """Get a single page of characters from the database associated with a user
@@ -2000,7 +2042,7 @@ class CharacterController(BaseController):
 
         with self._session as session:
             return session.query(func.count(CharacterStory.character_id)).filter(
-                CharacterStory.story_id == story_id
+                CharacterStory.story_id == story_id, CharacterStory.user_id == self._owner.id
             ).scalar()
 
     def get_characters_by_story_id(self, story_id: int) -> list:
@@ -2020,8 +2062,12 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
-            for character_story in session.query(CharacterStory).filter(CharacterStory.story_id == story_id).all():
-                yield session.query(Character).filter(Character.id == character_story.character_id).first()
+            for character_story in session.query(CharacterStory).filter(
+                    CharacterStory.story_id == story_id, CharacterStory.user_id == self._owner.id
+            ).all():
+                yield session.query(Character).filter(
+                    Character.id == character_story.character_id, Character.user_id == self._owner.id
+                ).first()
 
     def get_characters_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
         """Get a single page of characters by story id
@@ -2046,9 +2092,11 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             for character_story in session.query(CharacterStory).filter(
-                    CharacterStory.story_id == story_id
+                    CharacterStory.story_id == story_id, CharacterStory.user_id == self._owner.id
             ).offset(offset).limit(per_page).all():
-                yield session.query(Character).filter(Character.id == character_story.character_id).first()
+                yield session.query(Character).filter(
+                    Character.id == character_story.character_id, Character.user_id == self._owner.id
+                ).first()
 
     def search_characters_by_user_id(self, user_id: int, search: str) -> list:
         """Search for characters by title, first name, middle name, last name, nickname, and description belonging to \
@@ -2097,7 +2145,7 @@ class CharacterController(BaseController):
                 or_(Character.title.like(f'%{search}%'), Character.first_name.like(f'%{search}%'),
                     Character.middle_name.like(f'%{search}%'), Character.last_name.like(f'%{search}%'),
                     Character.nickname.like(f'%{search}%'), Character.description.like(f'%{search}%')),
-                CharacterStory.story_id == story_id
+                CharacterStory.story_id == story_id, CharacterStory.user_id == self._owner.id
             ).all()
 
     def create_relationship(self, parent_id: int, related_id: int, relationship_type: str, description: str = None,
@@ -2140,18 +2188,23 @@ class CharacterController(BaseController):
                 if parent_id == related_id:
                     raise ValueError('Parent and related character ids must be different.')
 
-                parent = session.query(Character).filter(Character.id == parent_id).first()
+                parent = session.query(Character).filter(
+                    Character.id == parent_id, Character.user_id == self._owner.id
+                ).first()
 
                 if not parent:
                     raise ValueError('Parent character not found.')
 
-                related = session.query(Character).filter(Character.id == related_id).first()
+                related = session.query(Character).filter(
+                    Character.id == related_id, Character.user_id == self._owner.id
+                ).first()
 
                 if not related:
                     raise ValueError('Related character not found.')
 
                 position = session.query(func.max(CharacterRelationship.position)).filter(
-                    CharacterRelationship.parent_id == parent_id
+                    CharacterRelationship.parent_id == parent_id,
+                    CharacterRelationship.user_id == self._owner.id
                 ).scalar()
 
                 position = 1 if not position else position + 1
@@ -2209,7 +2262,7 @@ class CharacterController(BaseController):
         with self._session as session:
             try:
                 character_relationship = session.query(CharacterRelationship).filter(
-                    CharacterRelationship.id == relationship_id
+                    CharacterRelationship.id == relationship_id, CharacterRelationship.user_id == self._owner.id
                 ).first()
 
                 if not character_relationship:
@@ -2262,7 +2315,7 @@ class CharacterController(BaseController):
         with self._session as session:
             try:
                 character_relationship = session.query(CharacterRelationship).filter(
-                    CharacterRelationship.id == relationship_id
+                    CharacterRelationship.id == relationship_id, CharacterRelationship.user_id == self._owner.id
                 ).first()
 
                 if not character_relationship:
@@ -2278,7 +2331,8 @@ class CharacterController(BaseController):
                     for sibling in session.query(CharacterRelationship).filter(
                         CharacterRelationship.parent_id == character_relationship.parent_id,
                         CharacterRelationship.position >= position,
-                        CharacterRelationship.position < character_relationship.position
+                        CharacterRelationship.position < character_relationship.position,
+                        CharacterRelationship.user_id == self._owner.id
                     ).all():
                         sibling.position += 1
 
@@ -2286,7 +2340,7 @@ class CharacterController(BaseController):
                     for sibling in session.query(CharacterRelationship).filter(
                         CharacterRelationship.parent_id == character_relationship.parent_id,
                         CharacterRelationship.position > character_relationship.position,
-                        CharacterRelationship.position <= position
+                        CharacterRelationship.position <= position, CharacterRelationship.user_id == self._owner.id
                     ).all():
                         sibling.position -= 1
 
@@ -2326,7 +2380,7 @@ class CharacterController(BaseController):
         with self._session as session:
             try:
                 character_relationship = session.query(CharacterRelationship).filter(
-                    CharacterRelationship.id == relationship_id
+                    CharacterRelationship.id == relationship_id, CharacterRelationship.user_id == self._owner.id
                 ).first()
 
                 if not character_relationship:
@@ -2334,7 +2388,8 @@ class CharacterController(BaseController):
 
                 for sibling in session.query(CharacterRelationship).filter(
                     CharacterRelationship.parent_id == character_relationship.parent_id,
-                    CharacterRelationship.position > character_relationship.position
+                    CharacterRelationship.position > character_relationship.position,
+                    CharacterRelationship.user_id == self._owner.id
                 ).all():
                     sibling.position -= 1
 
@@ -2368,7 +2423,7 @@ class CharacterController(BaseController):
 
         with self._session as session:
             character_relationship = session.query(CharacterRelationship).filter(
-                CharacterRelationship.id == relationship_id
+                CharacterRelationship.id == relationship_id, CharacterRelationship.user_id == self._owner.id
             ).first()
             return character_relationship if character_relationship else None
 
@@ -2388,7 +2443,7 @@ class CharacterController(BaseController):
 
         with self._session as session:
             return session.query(CharacterRelationship).filter(
-                CharacterRelationship.parent_id == parent_id
+                CharacterRelationship.parent_id == parent_id, CharacterRelationship.user_id == self._owner.id
             ).all()
 
     def get_relationships_page_by_character_id(self, parent_id: int, page: int, per_page: int) -> list:
@@ -2412,7 +2467,7 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(CharacterRelationship).filter(
-                CharacterRelationship.parent_id == parent_id
+                CharacterRelationship.parent_id == parent_id, CharacterRelationship.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def create_trait(self, character_id: int, name: str, magnitude: int) -> CharacterTrait:
@@ -2441,13 +2496,16 @@ class CharacterController(BaseController):
                 if not character_id or not name or not magnitude:
                     raise ValueError('Character id, name, and magnitude must be provided.')
 
-                character = session.query(Character).filter(Character.id == character_id).first()
+                character = session.query(Character).filter(
+                    Character.id == character_id, Character.user_id == self._owner.id
+                ).first()
 
                 if not character:
                     raise ValueError('Character not found.')
 
                 position = session.query(func.max(CharacterTrait.position)).filter(
-                    CharacterTrait.character_id == character_id).scalar()
+                    CharacterTrait.character_id == character_id, CharacterTrait.user_id == self._owner.id
+                ).scalar()
 
                 position = 1 if not position else position + 1
                 created = datetime.now()
@@ -2490,7 +2548,9 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character_trait = session.query(CharacterTrait).filter(CharacterTrait.id == trait_id).first()
+                character_trait = session.query(CharacterTrait).filter(
+                    CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
+                ).first()
 
                 if not character_trait:
                     raise ValueError('Character trait not found.')
@@ -2537,7 +2597,9 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character_trait = session.query(CharacterTrait).filter(CharacterTrait.id == trait_id).first()
+                character_trait = session.query(CharacterTrait).filter(
+                    CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
+                ).first()
 
                 if not character_trait:
                     raise ValueError('Character trait not found.')
@@ -2546,7 +2608,8 @@ class CharacterController(BaseController):
                     raise ValueError('Position must be greater than 0.')
 
                 highest_position = session.query(func.max(CharacterTrait.position)).filter(
-                    CharacterTrait.character_id == character_trait.character_id
+                    CharacterTrait.character_id == character_trait.character_id,
+                    CharacterTrait.user_id == self._owner.id
                 ).scalar()
 
                 if position > highest_position:
@@ -2558,7 +2621,7 @@ class CharacterController(BaseController):
                 if position < character_trait.position:
                     siblings = session.query(CharacterTrait).filter(
                         CharacterTrait.character_id == character_trait.character_id,
-                        CharacterTrait.position >= position,
+                        CharacterTrait.position >= position, CharacterTrait.user_id == self._owner.id,
                         CharacterTrait.position < character_trait.position
                     ).all()
 
@@ -2571,7 +2634,7 @@ class CharacterController(BaseController):
                     siblings = session.query(CharacterTrait).filter(
                         CharacterTrait.character_id == character_trait.character_id,
                         CharacterTrait.position > character_trait.position,
-                        CharacterTrait.position <= position
+                        CharacterTrait.position <= position, CharacterTrait.user_id == self._owner.id
                     ).all()
 
                     for sibling in siblings:
@@ -2613,14 +2676,16 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character_trait = session.query(CharacterTrait).filter(CharacterTrait.id == trait_id).first()
+                character_trait = session.query(CharacterTrait).filter(
+                    CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
+                ).first()
 
                 if not character_trait:
                     raise ValueError('Character trait not found.')
 
                 for sibling in session.query(CharacterTrait).filter(
                     CharacterTrait.character_id == character_trait.character_id,
-                    CharacterTrait.position > character_trait.position
+                    CharacterTrait.position > character_trait.position, CharacterTrait.user_id == self._owner.id
                 ).all():
                     sibling.position -= 1
                     sibling.created = datetime.strptime(str(sibling.created), datetime_format)
@@ -2655,7 +2720,9 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
-            character_trait = session.query(CharacterTrait).filter(CharacterTrait.id == trait_id).first()
+            character_trait = session.query(CharacterTrait).filter(
+                CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
+            ).first()
             return character_trait if character_trait else None
 
     def get_traits_by_character_id(self, character_id: int) -> list:
@@ -2673,7 +2740,9 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(CharacterTrait).filter(CharacterTrait.character_id == character_id).all()
+            return session.query(CharacterTrait).filter(
+                CharacterTrait.character_id == character_id, CharacterTrait.user_id == self._owner.id
+            ).all()
 
     def get_traits_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
         """Get a single page of character traits by character id
@@ -2695,7 +2764,9 @@ class CharacterController(BaseController):
 
         with self._session as session:
             offset = (page - 1) * per_page
-            return session.query(CharacterTrait).filter(CharacterTrait.character_id == character_id).offset(
+            return session.query(CharacterTrait).filter(
+                CharacterTrait.character_id == character_id, CharacterTrait.user_id == self._owner.id
+            ).offset(
                 offset).limit(per_page).all()
 
     def append_events_to_character(self, character_id: int, events: list) -> Type[Character]:
@@ -2716,13 +2787,17 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character = session.query(Character).filter(Character.id == character_id).first()
+                character = session.query(Character).filter(
+                    Character.id == character_id, Character.user_id == self._owner.id
+                ).first()
 
                 if not character:
                     raise ValueError('Character not found.')
 
                 for event_id in events:
-                    event = session.query(Event).filter(Event.id == event_id).first()
+                    event = session.query(Event).filter(
+                        Event.id == event_id, Event.user_id == self._owner.id
+                    ).first()
 
                     if not event:
                         raise ValueError('Event not found.')
@@ -2763,9 +2838,11 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_event in session.query(CharacterEvent).filter(
-                CharacterEvent.character_id == character_id
+                CharacterEvent.character_id == character_id, CharacterEvent.user_id == self._owner.id
             ).all():
-                yield session.query(Event).filter(Event.id == character_event.event_id).first()
+                yield session.query(Event).filter(
+                    Event.id == character_event.event_id, Event.user_id == self._owner.id
+                ).first()
 
     def get_events_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
         """Get a single page of events associated with a character from the database
@@ -2788,7 +2865,7 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(CharacterEvent).filter(
-                CharacterEvent.character_id == character_id
+                CharacterEvent.character_id == character_id, CharacterEvent.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_links_to_character(self, character_id: int, links: list) -> Type[Character]:
@@ -2809,13 +2886,17 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character = session.query(Character).filter(Character.id == character_id).first()
+                character = session.query(Character).filter(
+                    Character.id == character_id, Character.user_id == self._owner.id
+                ).first()
 
                 if not character:
                     raise ValueError('Character not found.')
 
                 for link_id in links:
-                    link = session.query(Link).filter(Link.id == link_id).first()
+                    link = session.query(Link).filter(
+                        Link.id == link_id, Link.user_id == self._owner.id
+                    ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
@@ -2853,9 +2934,11 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_link in session.query(CharacterLink).filter(
-                CharacterLink.character_id == character_id
+                CharacterLink.character_id == character_id, CharacterLink.user_id == self._owner.id
             ).all():
-                yield session.query(Link).filter(Link.id == character_link.link_id).first()
+                yield session.query(Link).filter(
+                    Link.id == character_link.link_id, Link.user_id == self._owner.id
+                ).first()
 
     def get_links_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
         """Get a single page of links associated with a character from the database
@@ -2878,7 +2961,7 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(CharacterLink).filter(
-                CharacterLink.character_id == character_id
+                CharacterLink.character_id == character_id, CharacterLink.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_notes_to_character(self, character_id: int, notes: list) -> Type[Character]:
@@ -2899,13 +2982,17 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character = session.query(Character).filter(Character.id == character_id).first()
+                character = session.query(Character).filter(
+                    Character.id == character_id, Character.user_id == self._owner.id
+                ).first()
 
                 if not character:
                     raise ValueError('Character not found.')
 
                 for note_id in notes:
-                    note = session.query(Note).filter(Note.id == note_id).first()
+                    note = session.query(Note).filter(
+                        Note.id == note_id, Note.user_id == self._owner.id
+                    ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
@@ -2943,9 +3030,11 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_note in session.query(CharacterNote).filter(
-                CharacterNote.character_id == character_id
+                CharacterNote.character_id == character_id, CharacterNote.user_id == self._owner.id
             ).all():
-                yield session.query(Note).filter(Note.id == character_note.note_id).first()
+                yield session.query(Note).filter(
+                    Note.id == character_note.note_id, Note.user_id == self._owner.id
+                ).first()
 
     def get_notes_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
         """Get a single page of notes associated with a character from the database
@@ -2968,7 +3057,7 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(CharacterNote).filter(
-                CharacterNote.character_id == character_id
+                CharacterNote.character_id == character_id, CharacterNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_images_to_character(self, character_id: int, images: list) -> Type[Character]:
@@ -2993,19 +3082,23 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character = session.query(Character).filter(Character.id == character_id).first()
+                character = session.query(Character).filter(
+                    Character.id == character_id, Character.user_id == self._owner.id
+                ).first()
 
                 if not character:
                     raise ValueError('Character not found.')
 
                 for image_id in images:
-                    image = session.query(Image).filter(Image.id == image_id).first()
+                    image = session.query(Image).filter(
+                        Image.id == image_id, Image.user_id == self._owner.id
+                    ).first()
 
                     if not image:
                         raise ValueError('Image not found.')
 
                     position = session.query(func.max(CharacterImage.position)).filter(
-                        CharacterImage.character_id == character_id
+                        CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
                     ).scalar()
 
                     position = 1 if not position else position + 1
@@ -3056,7 +3149,9 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character_image = session.query(CharacterImage).filter(CharacterImage.id == image_id).first()
+                character_image = session.query(CharacterImage).filter(
+                    CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id
+                ).first()
 
                 if not character_image:
                     raise ValueError('Character image not found.')
@@ -3065,7 +3160,8 @@ class CharacterController(BaseController):
                     raise ValueError('Position must be greater than 0.')
 
                 highest_position = session.query(func.max(CharacterImage.position)).filter(
-                    CharacterImage.character_id == character_image.character_id
+                    CharacterImage.character_id == character_image.character_id,
+                    CharacterImage.user_id == self._owner.id
                 ).scalar()
 
                 if position > highest_position:
@@ -3077,7 +3173,7 @@ class CharacterController(BaseController):
                 if position < character_image.position:
                     siblings = session.query(CharacterImage).filter(
                         CharacterImage.character_id == character_image.character_id,
-                        CharacterImage.position >= position,
+                        CharacterImage.position >= position, CharacterImage.user_id == self._owner.id,
                         CharacterImage.position < character_image.position
                     ).all()
 
@@ -3090,7 +3186,7 @@ class CharacterController(BaseController):
                     siblings = session.query(CharacterImage).filter(
                         CharacterImage.character_id == character_image.character_id,
                         CharacterImage.position > character_image.position,
-                        CharacterImage.position <= position
+                        CharacterImage.position <= position, CharacterImage.user_id == self._owner.id
                     ).all()
 
                     for sibling in siblings:
@@ -3137,7 +3233,9 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character_image = session.query(CharacterImage).filter(CharacterImage.id == image_id).first()
+                character_image = session.query(CharacterImage).filter(
+                    CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id
+                ).first()
 
                 if not character_image:
                     raise ValueError('Character image not found.')
@@ -3147,7 +3245,8 @@ class CharacterController(BaseController):
 
                 if is_default:
                     for sibling in session.query(CharacterImage).filter(
-                        CharacterImage.character_id == character_image.character_id
+                        CharacterImage.character_id == character_image.character_id,
+                        CharacterImage.user_id == self._owner.id
                     ).all():
                         sibling.is_default = False
                         sibling.modified = datetime.now()
@@ -3188,15 +3287,19 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character_image = session.query(CharacterImage).filter(CharacterImage.id == image_id).first()
-                image = session.query(Image).filter(Image.id == character_image.image_id).first()
+                character_image = session.query(CharacterImage).filter(
+                    CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id
+                ).first()
+                image = session.query(Image).filter(
+                    Image.id == character_image.image_id, Image.user_id == self._owner.id
+                ).first()
 
                 if not character_image:
                     raise ValueError('Character image not found.')
 
                 for sibling in session.query(CharacterImage).filter(
                     CharacterImage.character_id == character_image.character_id,
-                    CharacterImage.position > character_image.position
+                    CharacterImage.position > character_image.position, CharacterImage.user_id == self._owner.id
                 ).all():
                     sibling.position -= 1
                     sibling.created = datetime.strptime(str(sibling.created), datetime_format)
@@ -3233,7 +3336,7 @@ class CharacterController(BaseController):
 
         with self._session as session:
             return session.query(func.count(CharacterImage.id)).filter(
-                CharacterImage.character_id == character_id
+                CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
             ).scalar()
 
     def get_images_by_character_id(self, character_id: int) -> list:
@@ -3254,9 +3357,11 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_image in session.query(CharacterImage).filter(
-                CharacterImage.character_id == character_id
+                CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
             ).order_by(CharacterImage.position).all():
-                yield session.query(Image).filter(Image.id == character_image.image_id).first()
+                yield session.query(Image).filter(
+                    Image.id == character_image.image_id, Image.user_id == self._owner.id
+                ).first()
 
     def get_images_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
         """Get a single page of images associated with a character from the database
@@ -3281,9 +3386,11 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             for character_image in session.query(CharacterImage).filter(
-                CharacterImage.character_id == character_id
+                CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
             ).order_by(CharacterImage.position).offset(offset).limit(per_page).all():
-                yield session.query(Image).filter(Image.id == character_image.image_id).first()
+                yield session.query(Image).filter(
+                    Image.id == character_image.image_id, Image.user_id == self._owner.id
+                ).first()
 
 
 class EventController(BaseController):
@@ -3310,6 +3417,14 @@ class EventController(BaseController):
         Get all events associated with an owner
     get_events_page_by_user_id(owner_id: int, page: int, per_page: int)
         Get a single page of events associated with an owner from the database
+    append_characters_to_event(event_id: int, characters: list)
+        Append characters to an event
+    get_characters_by_event_id(event_id: int)
+        Get all characters associated with an event
+    append_locations_to_event(event_id: int, locations: list)
+        Append locations to an event
+    get_locations_by_event_id(event_id: int)
+        Get all locations associated with an event
     append_links_to_event(event_id: int, links: list)
         Append links to an event
     get_links_by_event_id(event_id: int)
@@ -3500,6 +3615,167 @@ class EventController(BaseController):
             return session.query(Event).filter(
                 Event.owner_id == owner_id
             ).offset(offset).limit(per_page).all()
+
+    def append_characters_to_event(self, event_id: int, characters: list) -> Type[Event]:
+        """Append characters to an event
+
+        Parameters
+        ----------
+        event_id : int
+            The id of the event
+        characters : list
+            A list of character ids
+
+        Returns
+        -------
+        Event
+            The updated event object
+        """
+
+        with self._session as session:
+            try:
+                event = session.query(Event).filter(
+                    Event.id == event_id, Event.user_id == self._owner.id
+                ).first()
+
+                if not event:
+                    raise ValueError('Event not found.')
+
+                for character_id in characters:
+                    character = session.query(Character).filter(
+                        Character.id == character_id, Character.user_id == self._owner.id
+                    ).first()
+
+                    if not character:
+                        raise ValueError('Character not found.')
+
+                    character_event = CharacterEvent(user_id=self._owner.id, event_id=event_id,
+                                                     character_id=character_id, created=datetime.now())
+
+                    activity = Activity(user_id=self._owner.id, summary=f'Character {character.__str__} associated with\
+                                         event {event.title[:50]} by {self._owner.username}', created=datetime.now())
+
+                    session.add(character_event)
+                    session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return event
+
+    def get_characters_by_event_id(self, event_id: int) -> list:
+        """Get all characters associated with an event
+
+        Parameters
+        ----------
+        event_id : int
+            The id of the event
+
+        Returns
+        -------
+        list
+            A list of character objects
+        """
+
+        with self._session as session:
+            for character_event in session.query(CharacterEvent).filter(
+                CharacterEvent.event_id == event_id, CharacterEvent.user_id == self._owner.id
+            ).all():
+                yield session.query(Character).filter(Character.id == character_event.character_id).first()
+
+    def get_characters_page_by_event_id(self, event_id: int, page: int, per_page: int) -> list:
+        """Get a single page of characters associated with an event from the database
+
+        Parameters
+        ----------
+        event_id : int
+            The id of the event
+        page : int
+            The page number
+        per_page : int
+            The number of rows per page
+
+        Returns
+        -------
+        list
+            A list of character objects
+        """
+
+        with self._session as session:
+            offset = (page - 1) * per_page
+            for character_event in session.query(CharacterEvent).filter(
+                CharacterEvent.event_id == event_id, CharacterEvent.user_id == self._owner.id
+            ).offset(offset).limit(per_page).all():
+                yield session.query(Character).filter(Character.id == character_event.character_id).first()
+
+    def append_locations_to_event(self, event_id: int, locations: list) -> Type[Event]:
+        """Append locations to an event
+
+        Parameters
+        ----------
+        event_id : int
+            The id of the event
+        locations : list
+            A list of location ids
+
+        Returns
+        -------
+        Event
+            The updated event object
+        """
+
+        with self._session as session:
+            try:
+                event = session.query(Event).filter(Event.id == event_id).first()
+
+                if not event:
+                    raise ValueError('Event not found.')
+
+                for location_id in locations:
+                    location = session.query(Location).filter(Location.id == location_id).first()
+
+                    if not location:
+                        raise ValueError('Location not found.')
+
+                    event_location = EventLocation(user_id=self._owner.id, event_id=event_id, location_id=location_id,
+                                                   created=datetime.now())
+
+                    activity = Activity(user_id=self._owner.id, summary=f'Location {location.name[:50]} associated with\
+                                         event {event.title[:50]} by {self._owner.username}', created=datetime.now())
+
+                    session.add(event_location)
+                    session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return event
+
+    def get_locations_by_event_id(self, event_id: int) -> list:
+        """Get all locations associated with an event
+
+        Parameters
+        ----------
+        event_id : int
+            The id of the event
+
+        Returns
+        -------
+        list
+            A list of location objects
+        """
+
+        with self._session as session:
+            for event_location in session.query(EventLocation).filter(
+                EventLocation.event_id == event_id, EventLocation.user_id == self._owner.id
+            ).all():
+                yield session.query(Location).filter(Location.id == event_location.location_id).first()
 
     def append_links_to_event(self, event_id: int, links: list) -> Type[Event]:
         """Append links to an event
