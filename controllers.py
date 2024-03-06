@@ -126,13 +126,11 @@ class ActivityController(BaseController):
                 Activity.user_id == self._owner.id
             ).order_by(Activity.created.desc()).all()
 
-    def get_activities_page(self, user_id: int, page: int, per_page: int) -> list:
+    def get_activities_page(self, page: int, per_page: int) -> list:
         """Get a single page of activities associated with a user, sorted by created date with most recent first
 
         Parameters
         ----------
-        user_id : int
-            The id of the user
         page : int
             The page number
         per_page : int
@@ -147,16 +145,11 @@ class ActivityController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Activity).filter(
-                Activity.user_id == user_id
+                Activity.user_id == self._owner.id
             ).order_by(Activity.created.desc()).offset(offset).limit(per_page).all()
 
-    def get_activity_count(self, user_id: int) -> int:
+    def get_activity_count(self) -> int:
         """Get activity count associated with a user
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -165,7 +158,7 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Activity.id)).filter(Activity.user_id == user_id).scalar()
+            return session.query(func.count(Activity.id)).filter(Activity.user_id == self._owner.id).scalar()
 
     def search_activities(self, search: str) -> list:
         """Search for activities by summary
@@ -3359,10 +3352,10 @@ class EventController(BaseController):
         Update an event
     delete_event(event_id: int)
         Delete an event
-    get_events_by_user_id(owner_id: int)
-        Get all events associated with an owner
-    get_events_page_by_user_id(owner_id: int, page: int, per_page: int)
-        Get a single page of events associated with an owner from the database
+    get_events()
+        Get all events associated with a user
+    get_events_page(page: int, per_page: int)
+        Get a single page of events associated with a user from the database
     append_characters_to_event(event_id: int, characters: list)
         Append characters to an event
     get_characters_by_event_id(event_id: int)
@@ -3523,13 +3516,8 @@ class EventController(BaseController):
                 session.commit()
                 return True
 
-    def get_events_by_user_id(self, owner_id: int) -> list:
-        """Get all events associated with an owner
-
-        Parameters
-        ----------
-        owner_id : int
-            The id of the owner
+    def get_events(self) -> list:
+        """Get all events associated with a user
 
         Returns
         -------
@@ -3539,16 +3527,14 @@ class EventController(BaseController):
 
         with self._session as session:
             return session.query(Event).filter(
-                Event.user_id == owner_id, Event.user_id == self._owner.id
+                Event.user_id == self._owner.id
             ).all()
 
-    def get_events_page_by_user_id(self, owner_id: int, page: int, per_page: int) -> list:
-        """Get a single page of events associated with an owner from the database
+    def get_events_page(self, page: int, per_page: int) -> list:
+        """Get a single page of events associated with a user from the database
 
         Parameters
         ----------
-        owner_id : int
-            The id of the owner
         page : int
             The page number
         per_page : int
@@ -3563,7 +3549,7 @@ class EventController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Event).filter(
-                Event.owner_id == owner_id, Event.user_id == self._owner.id
+                Event.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_characters_to_event(self, event_id: int, characters: list) -> Type[Event]:
@@ -3948,9 +3934,9 @@ class ImageController(BaseController):
         Update an image
     delete_image(image_id: int)
         Delete an image
-    get_images_by_user_id(owner_id: int)
+    get_images()
         Get all images associated with a user
-    get_images_page_by_user_id(owner_id: int, page: int, per_page: int)
+    get_images_page(page: int, per_page: int)
         Get a single page of images associated with a user from the database
     search_images_by_caption(search: str)
         Search for images by caption
@@ -4094,7 +4080,7 @@ class ImageController(BaseController):
                 session.commit()
                 return True
 
-    def get_images_by_user_id(self) -> list:
+    def get_images(self) -> list:
         """Get all images associated with a user
 
         Returns
@@ -4108,7 +4094,7 @@ class ImageController(BaseController):
                 Image.user_id == self._owner.id
             ).all()
 
-    def get_images_page_by_user_id(self, page: int, per_page: int) -> list:
+    def get_images_page(self, page: int, per_page: int) -> list:
         """Get a single page of images associated with a user from the database
 
         Parameters
@@ -4270,10 +4256,10 @@ class LinkController(BaseController):
         Delete a link
     get_link_by_id(link_id: int)
         Get a link by id
-    get_links_by_owner_id(owner_id: int)
-        Get all links associated with an owner
-    get_links_page_by_owner_id(owner_id: int, page: int, per_page: int)
-        Get a single page of links associated with an owner from the database
+    get_links()
+        Get all links associated with a user
+    get_links_page(page: int, per_page: int)
+        Get a single page of links associated with a user from the database
     search_links_by_title(search: str)
         Search for links by title
     append_notes_to_link(link_id: int, notes: list)
@@ -4347,7 +4333,9 @@ class LinkController(BaseController):
 
         with self._session as session:
             try:
-                link = session.query(Link).filter(Link.id == link_id).first()
+                link = session.query(Link).filter(
+                    Link.id == link_id, Link.user_id == self._owner.id
+                ).first()
 
                 if not link:
                     raise ValueError('Link not found.')
@@ -4386,7 +4374,9 @@ class LinkController(BaseController):
 
         with self._session as session:
             try:
-                link = session.query(Link).filter(Link.id == link_id).first()
+                link = session.query(Link).filter(
+                    Link.id == link_id, Link.user_id == self._owner.id
+                ).first()
 
                 if not link:
                     raise ValueError('Link not found.')
@@ -4421,7 +4411,9 @@ class LinkController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Link).filter(Link.id == link_id).first()
+            return session.query(Link).filter(
+                Link.id == link_id, Link.user_id == self._owner.id
+            ).first()
 
     def get_links_by_story_id(self, story_id: int) -> list:
         """Get all links associated with a story
@@ -4441,15 +4433,12 @@ class LinkController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Link).join(LinkStory).filter(LinkStory.story_id == story_id).all()
+            return session.query(Link).join(LinkStory).filter(
+                LinkStory.story_id == story_id, LinkStory.user_id == self._owner.id
+            ).all()
 
-    def get_links_by_owner_id(self, owner_id: int) -> list:
+    def get_links(self) -> list:
         """Get all links associated with an owner
-
-        Parameters
-        ----------
-        owner_id : int
-            The id of the owner
 
         Returns
         -------
@@ -4458,15 +4447,13 @@ class LinkController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Link).filter(Link.owner_id == owner_id).all()
+            return session.query(Link).filter(Link.user_id == self._owner.id).all()
 
-    def get_links_page_by_owner_id(self, owner_id: int, page: int, per_page: int) -> list:
+    def get_links_page(self, page: int, per_page: int) -> list:
         """Get a single page of links associated with an owner from the database
 
         Parameters
         ----------
-        owner_id : int
-            The id of the owner
         page : int
             The page number
         per_page : int
@@ -4480,9 +4467,7 @@ class LinkController(BaseController):
 
         with self._session as session:
             offset = (page - 1) * per_page
-            return session.query(Link).filter(
-                Link.owner_id == owner_id
-            ).offset(offset).limit(per_page).all()
+            return session.query(Link).filter(Link.user_id == self._owner.id).offset(offset).limit(per_page).all()
 
     def search_links_by_title(self, search: str) -> list:
         """Search for links by title
@@ -4499,7 +4484,9 @@ class LinkController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Link).filter(Link.title.like(f'%{search}%')).all()
+            return session.query(Link).filter(
+                Link.title.like(f'%{search}%'), Link.user_id == self._owner.id
+            ).all()
 
     def append_notes_to_link(self, link_id: int, notes: list) -> Type[Link]:
         """Append notes to a link
@@ -4519,18 +4506,23 @@ class LinkController(BaseController):
 
         with self._session as session:
             try:
-                link = session.query(Link).filter(Link.id == link_id).first()
+                link = session.query(Link).filter(
+                    Link.id == link_id, Link.user_id == self._owner.id
+                ).first()
 
                 if not link:
                     raise ValueError('Link not found.')
 
                 for note_id in notes:
-                    note = session.query(Note).filter(Note.id == note_id).first()
+                    note = session.query(Note).filter(
+                        Note.id == note_id, Note.user_id == self._owner.id
+                    ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
 
-                    link_note = LinkNote(user_id=self._owner.id, link_id=link_id, note_id=note_id, created=datetime.now())
+                    link_note = LinkNote(user_id=self._owner.id, link_id=link_id, note_id=note_id,
+                                         created=datetime.now())
 
                     activity = Activity(user_id=self._owner.id, summary=f'Note {note.title[:50]} associated with \
                                         link {link.title[:50]} by {self._owner.username}', created=datetime.now())
@@ -4562,9 +4554,11 @@ class LinkController(BaseController):
 
         with self._session as session:
             for link_note in session.query(LinkNote).filter(
-                LinkNote.link_id == link_id
+                LinkNote.link_id == link_id, LinkNote.user_id == self._owner.id
             ).all():
-                yield session.query(Note).filter(Note.id == link_note.note_id).first()
+                yield session.query(Note).filter(
+                    Note.id == link_note.note_id, Note.user_id == self._owner.id
+                ).first()
 
     def get_notes_page_by_link_id(self, link_id: int, page: int, per_page: int) -> list:
         """Get a single page of notes associated with a link from the database
@@ -4587,7 +4581,7 @@ class LinkController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(LinkNote).filter(
-                LinkNote.link_id == link_id
+                LinkNote.link_id == link_id, LinkNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
 
@@ -4613,9 +4607,9 @@ class LocationController(BaseController):
         Update a location
     delete_location(location_id: int)
         Delete a location
-    get_locations_by_user_id(owner_id: int)
+    get_locations()
         Get all locations associated with a user
-    get_locations_page_by_user_id(owner_id: int, page: int, per_page: int)
+    get_locations_page(page: int, per_page: int)
         Get a single page of locations associated with a user from the database
     search_locations_by_title_and_description(search: str)
         Search for locations by title and description
@@ -4746,7 +4740,9 @@ class LocationController(BaseController):
 
         with self._session as session:
             try:
-                location = session.query(Location).filter(Location.id == location_id).first()
+                location = session.query(Location).filter(
+                    Location.id == location_id, Location.user_id == self._owner.id
+                ).first()
 
                 if not location:
                     raise ValueError('Location not found.')
@@ -4792,7 +4788,9 @@ class LocationController(BaseController):
 
         with self._session as session:
             try:
-                location = session.query(Location).filter(Location.id == location_id).first()
+                location = session.query(Location).filter(
+                    Location.id == location_id, Location.user_id == self._owner.id
+                ).first()
 
                 if not location:
                     raise ValueError('Location not found.')
@@ -4812,13 +4810,8 @@ class LocationController(BaseController):
                 session.commit()
                 return True
 
-    def get_locations_by_user_id(self, user_id: int) -> list:
+    def get_locations(self) -> list:
         """Get all locations associated with an owner
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -4827,15 +4820,13 @@ class LocationController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Location).filter(Location.user_id == user_id).all()
+            return session.query(Location).filter(Location.user_id == self._owner.id).all()
 
-    def get_locations_page_by_user_id(self, user_id: int, page: int, per_page: int) -> list:
+    def get_locations_page(self, page: int, per_page: int) -> list:
         """Get a single page of locations associated with an owner from the database
 
         Parameters
         ----------
-        user_id : int
-            The id of the user
         page : int
             The page number
         per_page : int
@@ -4850,7 +4841,7 @@ class LocationController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Location).filter(
-                Location.user_id == user_id
+                Location.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def search_locations_by_title_and_description(self, search: str) -> list:
@@ -4869,6 +4860,7 @@ class LocationController(BaseController):
 
         with self._session as session:
             return session.query(Location).filter(
+                Location.user_id == self._owner.id,
                 or_(Location.title.like(f'%{search}%'), Location.description.like(f'%{search}%'))
             ).all()
 
@@ -4887,7 +4879,9 @@ class LocationController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Location).filter(Location.address.like(f'%{search}%')).all()
+            return session.query(Location).filter(
+                Location.address.like(f'%{search}%'), Location.user_id == self._owner.id
+            ).all()
 
     def search_locations_by_city(self, search: str) -> list:
         """Search for locations by city
@@ -4904,7 +4898,9 @@ class LocationController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Location).filter(Location.city.like(f'%{search}%')).all()
+            return session.query(Location).filter(
+                Location.city.like(f'%{search}%'), Location.user_id == self._owner.id
+            ).all()
 
     def search_locations_by_state(self, search: str) -> list:
         """Search for locations by state
@@ -4921,7 +4917,9 @@ class LocationController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Location).filter(Location.state.like(f'%{search}%')).all()
+            return session.query(Location).filter(
+                Location.state.like(f'%{search}%'), Location.user_id == self._owner.id
+            ).all()
 
     def search_locations_by_country(self, search: str) -> list:
         """Search for locations by country
@@ -4938,7 +4936,9 @@ class LocationController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Location).filter(Location.country.like(f'%{search}%')).all()
+            return session.query(Location).filter(
+                Location.country.like(f'%{search}%'), Location.user_id == self._owner.id
+            ).all()
 
     def search_locations_by_zip_code(self, search: str) -> list:
         """Search for locations by zip code
@@ -4955,7 +4955,9 @@ class LocationController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Location).filter(Location.zip_code.like(f'%{search}%')).all()
+            return session.query(Location).filter(
+                Location.zip_code.like(f'%{search}%'), Location.user_id == self._owner.id
+            ).all()
 
     def append_images_to_location(self, location_id: int, images: list) -> Type[Location]:
         """Append images to a location
@@ -4975,13 +4977,17 @@ class LocationController(BaseController):
 
         with self._session as session:
             try:
-                location = session.query(Location).filter(Location.id == location_id).first()
+                location = session.query(Location).filter(
+                    Location.id == location_id, Location.user_id == self._owner.id
+                ).first()
 
                 if not location:
                     raise ValueError('Location not found.')
 
                 for image_id in images:
-                    image = session.query(Image).filter(Image.id == image_id).first()
+                    image = session.query(Image).filter(
+                        Image.id == image_id, Image.user_id == self._owner.id
+                    ).first()
 
                     if not image:
                         raise ValueError('Image not found.')
@@ -5030,9 +5036,11 @@ class LocationController(BaseController):
 
         with self._session as session:
             for image_location in session.query(ImageLocation).filter(
-                ImageLocation.location_id == location_id
+                ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
             ).order_by(ImageLocation.position).all():
-                yield session.query(Image).filter(Image.id == image_location.image_id).first()
+                yield session.query(Image).filter(
+                    Image.id == image_location.image_id, Image.user_id == self._owner.id
+                ).first()
 
     def get_images_page_by_location_id(self, location_id: int, page: int, per_page: int) -> list:
         """Get a single page of images associated with a location from the database
@@ -5055,7 +5063,7 @@ class LocationController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(ImageLocation).filter(
-                ImageLocation.location_id == location_id
+                ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_links_to_location(self, location_id: int, links: list) -> Type[Location]:
@@ -5076,13 +5084,17 @@ class LocationController(BaseController):
 
         with self._session as session:
             try:
-                location = session.query(Location).filter(Location.id == location_id).first()
+                location = session.query(Location).filter(
+                    Location.id == location_id, Location.user_id == self._owner.id
+                ).first()
 
                 if not location:
                     raise ValueError('Location not found.')
 
                 for link_id in links:
-                    link = session.query(Link).filter(Link.id == link_id).first()
+                    link = session.query(Link).filter(
+                        Link.id == link_id, Link.user_id == self._owner.id
+                    ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
@@ -5121,9 +5133,11 @@ class LocationController(BaseController):
 
         with self._session as session:
             for link_location in session.query(LinkLocation).filter(
-                LinkLocation.location_id == location_id
+                LinkLocation.location_id == location_id, LinkLocation.user_id == self._owner.id
             ).all():
-                yield session.query(Link).filter(Link.id == link_location.link_id).first()
+                yield session.query(Link).filter(
+                    Link.id == link_location.link_id, Link.user_id == self._owner.id
+                ).first()
 
     def get_links_page_by_location_id(self, location_id: int, page: int, per_page: int) -> list:
         """Get a single page of links associated with a location from the database
@@ -5146,7 +5160,7 @@ class LocationController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(LinkLocation).filter(
-                LinkLocation.location_id == location_id
+                LinkLocation.location_id == location_id, LinkLocation.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_notes_to_location(self, location_id: int, notes: list) -> Type[Location]:
@@ -5167,13 +5181,17 @@ class LocationController(BaseController):
 
         with self._session as session:
             try:
-                location = session.query(Location).filter(Location.id == location_id).first()
+                location = session.query(Location).filter(
+                    Location.id == location_id, Location.user_id == self._owner.id
+                ).first()
 
                 if not location:
                     raise ValueError('Location not found.')
 
                 for note_id in notes:
-                    note = session.query(Note).filter(Note.id == note_id).first()
+                    note = session.query(Note).filter(
+                        Note.id == note_id, Note.user_id == self._owner.id
+                    ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
@@ -5212,9 +5230,11 @@ class LocationController(BaseController):
 
         with self._session as session:
             for location_note in session.query(LocationNote).filter(
-                LocationNote.location_id == location_id
+                LocationNote.location_id == location_id, LocationNote.user_id == self._owner.id
             ).all():
-                yield session.query(Note).filter(Note.id == location_note.note_id).first()
+                yield session.query(Note).filter(
+                    Note.id == location_note.note_id, Note.user_id == self._owner.id
+                ).first()
 
     def get_notes_page_by_location_id(self, location_id: int, page: int, per_page: int) -> list:
         """Get a single page of notes associated with a location from the database
@@ -5237,7 +5257,7 @@ class LocationController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(LocationNote).filter(
-                LocationNote.location_id == location_id
+                LocationNote.location_id == location_id, LocationNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
 
