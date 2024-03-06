@@ -5281,9 +5281,9 @@ class NoteController(BaseController):
         Update a note
     delete_note(note_id: int)
         Delete a note
-    get_notes_by_owner_id(owner_id: int)
+    get_notes()
         Get all notes associated with an owner
-    get_notes_page_by_owner_id(owner_id: int, page: int, per_page: int)
+    get_notes_page(page: int, per_page: int)
         Get a single page of notes associated with an owner from the database
     search_notes_by_title_and_content(search: str)
         Search for notes by title and content
@@ -5358,7 +5358,9 @@ class NoteController(BaseController):
 
         with self._session as session:
             try:
-                note = session.query(Note).filter(Note.id == note_id).first()
+                note = session.query(Note).filter(
+                    Note.id == note_id, Note.user_id == self._owner.id
+                ).first()
 
                 if not note:
                     raise ValueError('Note not found.')
@@ -5397,7 +5399,9 @@ class NoteController(BaseController):
 
         with self._session as session:
             try:
-                note = session.query(Note).filter(Note.id == note_id).first()
+                note = session.query(Note).filter(
+                    Note.id == note_id, Note.user_id == self._owner.id
+                ).first()
 
                 if not note:
                     raise ValueError('Note not found.')
@@ -5432,15 +5436,12 @@ class NoteController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Note).filter(Note.id == note_id).first()
+            return session.query(Note).filter(
+                Note.id == note_id, Note.user_id == self._owner.id
+            ).first()
 
-    def get_notes_by_owner_id(self, owner_id: int) -> list:
+    def get_notes(self) -> list:
         """Get all notes associated with an owner
-
-        Parameters
-        ----------
-        owner_id : int
-            The id of the owner
 
         Returns
         -------
@@ -5449,15 +5450,13 @@ class NoteController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Note).filter(Note.owner_id == owner_id).all()
+            return session.query(Note).filter(Note.user_id == self._owner.id).all()
 
-    def get_notes_page_by_owner_id(self, owner_id: int, page: int, per_page: int) -> list:
+    def get_notes_page(self, page: int, per_page: int) -> list:
         """Get a single page of notes associated with an owner from the database
 
         Parameters
         ----------
-        owner_id : int
-            The id of the owner
         page : int
             The page number
         per_page : int
@@ -5472,7 +5471,7 @@ class NoteController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Note).filter(
-                Note.owner_id == owner_id
+                Note.owner_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def search_notes_by_title_and_content(self, search: str) -> list:
@@ -5491,7 +5490,8 @@ class NoteController(BaseController):
 
         with self._session as session:
             return session.query(Note).filter(
-                or_(Note.title.like(f'%{search}%'), Note.content.like(f'%{search}%'))
+                or_(Note.title.like(f'%{search}%'), Note.content.like(f'%{search}%')),
+                Note.user_id == self._owner.id
             ).all()
 
     def append_links_to_note(self, note_id: int, links: list) -> Type[Note]:
@@ -5512,13 +5512,17 @@ class NoteController(BaseController):
 
         with self._session as session:
             try:
-                note = session.query(Note).filter(Note.id == note_id).first()
+                note = session.query(Note).filter(
+                    Note.id == note_id, Note.user_id == self._owner.id
+                ).first()
 
                 if not note:
                     raise ValueError('Note not found.')
 
                 for link_id in links:
-                    link = session.query(Link).filter(Link.id == link_id).first()
+                    link = session.query(Link).filter(
+                        Link.id == link_id, Link.user_id == self._owner.id
+                    ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
@@ -5556,9 +5560,11 @@ class NoteController(BaseController):
 
         with self._session as session:
             for link_note in session.query(LinkNote).filter(
-                LinkNote.note_id == note_id
+                LinkNote.note_id == note_id, LinkNote.user_id == self._owner.id
             ).all():
-                yield session.query(Link).filter(Link.id == link_note.link_id).first()
+                yield session.query(Link).filter(
+                    Link.id == link_note.link_id, Link.user_id == self._owner.id
+                ).first()
 
     def get_links_page_by_note_id(self, note_id: int, page: int, per_page: int) -> list:
         """Get a single page of links associated with a note from the database
@@ -5581,7 +5587,7 @@ class NoteController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(LinkNote).filter(
-                LinkNote.note_id == note_id
+                LinkNote.note_id == note_id, LinkNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
 
