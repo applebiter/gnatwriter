@@ -77,16 +77,12 @@ class ActivityController(BaseController):
     -------
     get_activity_by_id(activity_id: int)
         Get an activity by id
-    get_all_activities_by_user_id(user_id: int)
+    get_activities()
         Get all activities associated with a user, sorted by created date with most recent first
-    get_activities_page_by_user_id(user_id: int, page: int, per_page: int)
+    get_activities_page(user_id: int, page: int, per_page: int)
         Get a single page of activities associated with a user, sorted by created date with most recent first
-    get_activity_count_by_user_id()
+    get_activity_count()
         Get activity count associated with a user
-    get_all_activities()
-        Get all activities in the database, sorted by created date with most recent first
-    get_activities_page(page: int, per_page: int)
-        Get a single page of activities from the database, sorted by created date with most recent first
     search_activities(search: str)
         Search for activities by summary
     """
@@ -116,13 +112,8 @@ class ActivityController(BaseController):
             ).first()
             return activity if activity else None
 
-    def get_activities_by_user_id(self, user_id: int) -> list:
+    def get_activities(self) -> list:
         """Get all activities associated with a user, sorted by created date with most recent first
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -132,10 +123,10 @@ class ActivityController(BaseController):
 
         with self._session as session:
             return session.query(Activity).filter(
-                Activity.user_id == user_id, Activity.user_id == self._owner.id
+                Activity.user_id == self._owner.id
             ).order_by(Activity.created.desc()).all()
 
-    def get_activities_page_by_user_id(self, user_id: int, page: int, per_page: int) -> list:
+    def get_activities_page(self, user_id: int, page: int, per_page: int) -> list:
         """Get a single page of activities associated with a user, sorted by created date with most recent first
 
         Parameters
@@ -159,7 +150,7 @@ class ActivityController(BaseController):
                 Activity.user_id == user_id
             ).order_by(Activity.created.desc()).offset(offset).limit(per_page).all()
 
-    def get_activity_count_by_user_id(self, user_id: int) -> int:
+    def get_activity_count(self, user_id: int) -> int:
         """Get activity count associated with a user
 
         Parameters
@@ -222,14 +213,14 @@ class AuthorController(BaseController):
         Get an author by id
     get_author_by_name(name: str)
         Get an author by name
-    get_author_count_by_user_id()
+    get_author_count()
         Get author count associated with a user
-    get_all_authors_by_user_id()
+    get_all_authors()
         Get all authors associated with a user
-    get_authors_page_by_user_id(page: int, per_page: int)
+    get_authors_page(page: int, per_page: int)
         Get a single page of authors from the database associated with a user
     get_authors_by_story_id(story_id: int)
-        Get all authors associated with a story (through the AuthorStory(authors_stories) orm objects)
+        Get all authors associated with a story
     search_authors(search: str)
         Search for authors by name
     """
@@ -466,13 +457,8 @@ class AuthorController(BaseController):
             ).first()
             return author if author else None
 
-    def get_author_count_by_user_id(self, user_id: int) -> int:
+    def get_author_count(self) -> int:
         """Get author count associated with a user
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -481,9 +467,9 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Author.id)).filter(Author.user_id == user_id).scalar()
+            return session.query(func.count(Author.id)).filter(Author.user_id == self._owner.id).scalar()
 
-    def get_all_authors_by_user_id(self, user_id: int) -> list | None:
+    def get_all_authors(self) -> list | None:
         """Get all authors associated with a user
 
         Parameters
@@ -498,9 +484,9 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Author).filter(Author.user_id == user_id).all()
+            return session.query(Author).filter(Author.user_id == self._owner.id).all()
 
-    def get_authors_page_by_user_id(self, user_id: int, page: int, per_page: int) -> list | None:
+    def get_authors_page(self, page: int, per_page: int) -> list | None:
         """Get a single page of authors from the database associated with a user
 
         Parameters
@@ -520,7 +506,7 @@ class AuthorController(BaseController):
 
         with self._session as session:
             offset = (page - 1) * per_page
-            return session.query(Author).filter(Author.user_id == user_id).offset(offset).limit(per_page).all()
+            return session.query(Author).filter(Author.user_id == self._owner.id).offset(offset).limit(per_page).all()
 
     def get_authors_by_story_id(self, story_id: int) -> list | None:
         """Get all authors associated with a story
@@ -586,17 +572,17 @@ class BibliographyController(BaseController):
         Get a bibliography by id
     get_bibliography_by_title(title: str)
         Get a bibliography by title
-    get_bibliography_count_by_user_id()
+    get_bibliography_count()
         Get bibliography count associated with a user
-    get_all_bibliographies_by_user_id()
+    get_all_bibliographies()
         Get all bibliographies associated with a user
-    get_bibliographies_page_by_user_id(page: int, per_page: int)
+    get_bibliographies_page(page: int, per_page: int)
         Get a single page of bibliographies from the database associated with a user
     get_bibliographies_by_story_id(story_id: int)
         Get all bibliographies associated with a story
     get_bibliographies_page_by_story_id(story_id: int, page: int, per_page: int)
         Get a single page of bibliographies associated with a story from the database
-    search_bibliographies_by_user_id(user_id: int, search: str)
+    search_bibliographies(search: str)
         Search for bibliographies by title associated with a user
     search_bibliographies_by_story_id(story_id: int, search: str)
         Search for bibliographies by title associated with a story
@@ -807,13 +793,8 @@ class BibliographyController(BaseController):
             ).first()
             return bibliography if bibliography else None
 
-    def get_bibliography_count_by_user_id(self, user_id: int) -> int:
+    def get_bibliography_count(self) -> int:
         """Get bibliography count associated with a user
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -822,15 +803,10 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Bibliography.id)).filter(Bibliography.user_id == user_id).scalar()
+            return session.query(func.count(Bibliography.id)).filter(Bibliography.user_id == self._owner.id).scalar()
 
-    def get_all_bibliographies_by_user_id(self, user_id: int) -> list:
+    def get_all_bibliographies(self) -> list:
         """Get all bibliographies associated with a user
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -839,15 +815,13 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Bibliography).filter(Bibliography.user_id == user_id).all()
+            return session.query(Bibliography).filter(Bibliography.user_id == self._owner.id).all()
 
-    def get_bibliographies_page_by_user_id(self, user_id: int, page: int, per_page: int) -> list:
+    def get_bibliographies_page(self, page: int, per_page: int) -> list:
         """Get a single page of bibliographies from the database associated with a user
 
         Parameters
         ----------
-        user_id : int
-            The id of the user who owns the bibliographies
         page : int
             The page number
         per_page : int
@@ -862,7 +836,7 @@ class BibliographyController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Bibliography).filter(
-                Bibliography.user_id == user_id
+                Bibliography.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def get_bibliographies_by_story_id(self, story_id: int) -> list | None:
@@ -910,13 +884,11 @@ class BibliographyController(BaseController):
             ).offset(offset).limit(per_page).all()
             return bibliographies if bibliographies else None
 
-    def search_bibliographies_by_user_id(self, user_id: int, search: str) -> list:
+    def search_bibliographies(self, search: str) -> list:
         """Search for bibliographies by title associated with a user
 
         Parameters
         ----------
-        user_id : int
-            The id of the user
         search : str
             The search string
 
@@ -928,7 +900,7 @@ class BibliographyController(BaseController):
 
         with self._session as session:
             return session.query(Bibliography).filter(
-                Bibliography.title.like(f'%{search}%'), Bibliography.user_id == user_id
+                Bibliography.title.like(f'%{search}%'), Bibliography.user_id == self._owner.id
             ).all()
 
     def search_bibliographies_by_story_id(self, story_id: int, search: str) -> list | None:
@@ -976,11 +948,11 @@ class ChapterController(BaseController):
         Set the position of a chapter
     get_chapter_by_id(chapter_id: int)
         Get a chapter by id
-    get_all_chapters_by_user_id(user_id: int)
+    get_all_chapters()
         Get all chapters associated with a user
-    get_chapters_page_by_user_id(user_id: int, page: int, per_page: int)
+    get_chapters_page(page: int, per_page: int)
         Get a single page of chapters from the database associated with a user
-    get_chapter_count_by_user_id(user_id: int)
+    get_chapter_count()
         Get chapter count associated with a user
     get_all_chapters_by_story_id(story_id: int)
         Get all chapters associated with a story
@@ -988,7 +960,7 @@ class ChapterController(BaseController):
         Get a single page of chapters associated with a story from the database
     get_chapter_count_by_story_id(story_id: int)
         Get chapter count associated with a story
-    search_chapters_by_user_id(user_id: int, search: str)
+    search_chapters(search: str)
         Search for chapters by title and description belonging to a specific user
     search_chapters_by_story_id(story_id: int, search: str)
         Search for chapters by title and description belonging to a specific story
@@ -1307,15 +1279,10 @@ class ChapterController(BaseController):
             ).first()
             return chapter if chapter else None
 
-    def get_chapters_by_user_id(self, user_id: int) -> list | None:
+    def get_chapters(self) -> list | None:
         """Get all chapters associated with a user
 
         Chapters are sorted by story id and position.
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -1325,18 +1292,16 @@ class ChapterController(BaseController):
 
         with self._session as session:
             return session.query(Chapter).filter(
-                Chapter.user_id == user_id, Chapter.user_id == self._owner.id
+                Chapter.user_id == self._owner.id
             ).order_by(Chapter.story_id, Chapter.position).all()
 
-    def get_chapters_page_by_user_id(self, user_id: int, page: int, per_page: int) -> list | None:
+    def get_chapters_page(self, page: int, per_page: int) -> list | None:
         """Get a single page of chapters from the database associated with a user
 
         Chapters are sorted by story id and position.
 
         Parameters
         ----------
-        user_id : int
-            The id of the user who owns the chapters
         page : int
             The page number
         per_page : int
@@ -1351,16 +1316,11 @@ class ChapterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Chapter).filter(
-                Chapter.user_id == user_id
+                Chapter.user_id == self._owner.id
             ).order_by(Chapter.story_id, Chapter.position).offset(offset).limit(per_page).all()
 
-    def get_chapter_count_by_user_id(self, user_id: int) -> int:
+    def get_chapter_count(self) -> int:
         """Get chapter count associated with a user
-
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
 
         Returns
         -------
@@ -1369,7 +1329,7 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Chapter.id)).filter(Chapter.user_id == user_id).scalar()
+            return session.query(func.count(Chapter.id)).filter(Chapter.user_id == self._owner.id).scalar()
 
     def get_chapters_by_story_id(self, story_id: int) -> list | None:
         """Get all chapters associated with a story
@@ -1437,13 +1397,11 @@ class ChapterController(BaseController):
                 Chapter.story_id == story_id, Chapter.user_id == self._owner.id
             ).scalar()
 
-    def search_chapters_by_user_id(self, user_id: int, search: str) -> list:
+    def search_chapters(self, search: str) -> list:
         """Search for chapters by title and description belonging to a specific user
 
         Parameters
         ----------
-        user_id : int
-            The id of the user
         search : str
             The search string
 
@@ -1456,7 +1414,7 @@ class ChapterController(BaseController):
         with self._session as session:
             return session.query(Chapter).filter(
                 or_(Chapter.title.like(f'%{search}%'), Chapter.description.like(f'%{search}%')),
-                Chapter.user_id == user_id
+                Chapter.user_id == self._owner.id
             ).all()
 
     def search_chapters_by_story_id(self, story_id: int, search: str) -> list:
@@ -3555,7 +3513,9 @@ class EventController(BaseController):
 
         with self._session as session:
             try:
-                event = session.query(Event).filter(Event.id == event_id).first()
+                event = session.query(Event).filter(
+                    Event.id == event_id, Event.user_id == self._owner.id
+                ).first()
 
                 if not event:
                     raise ValueError('Event not found.')
@@ -3590,7 +3550,9 @@ class EventController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Event).filter(Event.user_id == owner_id).all()
+            return session.query(Event).filter(
+                Event.user_id == owner_id, Event.user_id == self._owner.id
+            ).all()
 
     def get_events_page_by_user_id(self, owner_id: int, page: int, per_page: int) -> list:
         """Get a single page of events associated with an owner from the database
@@ -3613,7 +3575,7 @@ class EventController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Event).filter(
-                Event.owner_id == owner_id
+                Event.owner_id == owner_id, Event.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_characters_to_event(self, event_id: int, characters: list) -> Type[Event]:
@@ -3709,7 +3671,9 @@ class EventController(BaseController):
             for character_event in session.query(CharacterEvent).filter(
                 CharacterEvent.event_id == event_id, CharacterEvent.user_id == self._owner.id
             ).offset(offset).limit(per_page).all():
-                yield session.query(Character).filter(Character.id == character_event.character_id).first()
+                yield session.query(Character).filter(
+                    Character.id == character_event.character_id, Character.user_id == self._owner.id
+                ).first()
 
     def append_locations_to_event(self, event_id: int, locations: list) -> Type[Event]:
         """Append locations to an event
@@ -3729,13 +3693,17 @@ class EventController(BaseController):
 
         with self._session as session:
             try:
-                event = session.query(Event).filter(Event.id == event_id).first()
+                event = session.query(Event).filter(
+                    Event.id == event_id, Event.user_id == self._owner.id
+                ).first()
 
                 if not event:
                     raise ValueError('Event not found.')
 
                 for location_id in locations:
-                    location = session.query(Location).filter(Location.id == location_id).first()
+                    location = session.query(Location).filter(
+                        Location.id == location_id, Location.user_id == self._owner.id
+                    ).first()
 
                     if not location:
                         raise ValueError('Location not found.')
@@ -3775,7 +3743,9 @@ class EventController(BaseController):
             for event_location in session.query(EventLocation).filter(
                 EventLocation.event_id == event_id, EventLocation.user_id == self._owner.id
             ).all():
-                yield session.query(Location).filter(Location.id == event_location.location_id).first()
+                yield session.query(Location).filter(
+                    Location.id == event_location.location_id, Location.user_id == self._owner.id
+                ).first()
 
     def append_links_to_event(self, event_id: int, links: list) -> Type[Event]:
         """Append links to an event
@@ -3795,13 +3765,17 @@ class EventController(BaseController):
 
         with self._session as session:
             try:
-                event = session.query(Event).filter(Event.id == event_id).first()
+                event = session.query(Event).filter(
+                    Event.id == event_id, Event.user_id == self._owner.id
+                ).first()
 
                 if not event:
                     raise ValueError('Event not found.')
 
                 for link_id in links:
-                    link = session.query(Link).filter(Link.id == link_id).first()
+                    link = session.query(Link).filter(
+                        Link.id == link_id, Link.user_id == self._owner.id
+                    ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
@@ -3839,9 +3813,11 @@ class EventController(BaseController):
 
         with self._session as session:
             for event_link in session.query(EventLink).filter(
-                EventLink.event_id == event_id
+                EventLink.event_id == event_id, EventLink.user_id == self._owner.id
             ).all():
-                yield session.query(Link).filter(Link.id == event_link.link_id).first()
+                yield session.query(Link).filter(
+                    Link.id == event_link.link_id, Link.user_id == self._owner.id
+                ).first()
 
     def get_links_page_by_event_id(self, event_id: int, page: int, per_page: int) -> list:
         """Get a single page of links associated with an event from the database
@@ -3864,7 +3840,7 @@ class EventController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(EventLink).filter(
-                EventLink.event_id == event_id
+                EventLink.event_id == event_id, EventLink.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_notes_to_event(self, event_id: int, notes: list) -> Type[Event]:
@@ -3885,13 +3861,17 @@ class EventController(BaseController):
 
         with self._session as session:
             try:
-                event = session.query(Event).filter(Event.id == event_id).first()
+                event = session.query(Event).filter(
+                    Event.id == event_id, Event.user_id == self._owner.id
+                ).first()
 
                 if not event:
                     raise ValueError('Event not found.')
 
                 for note_id in notes:
-                    note = session.query(Note).filter(Note.id == note_id).first()
+                    note = session.query(Note).filter(
+                        Note.id == note_id, Note.user_id == self._owner.id
+                    ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
@@ -3929,9 +3909,11 @@ class EventController(BaseController):
 
         with self._session as session:
             for event_note in session.query(EventNote).filter(
-                EventNote.event_id == event_id
+                EventNote.event_id == event_id, EventNote.user_id == self._owner.id
             ).all():
-                yield session.query(Note).filter(Note.id == event_note.note_id).first()
+                yield session.query(Note).filter(
+                    Note.id == event_note.note_id, Note.user_id == self._owner.id
+                ).first()
 
     def get_notes_page_by_event_id(self, event_id: int, page: int, per_page: int) -> list:
         """Get a single page of notes associated with an event from the database
@@ -3954,7 +3936,7 @@ class EventController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(EventNote).filter(
-                EventNote.event_id == event_id
+                EventNote.event_id == event_id, EventNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
 
@@ -3978,16 +3960,20 @@ class ImageController(BaseController):
         Update an image
     delete_image(image_id: int)
         Delete an image
-    get_images_by_owner_id(owner_id: int)
-        Get all images associated with an owner
-    get_images_page_by_owner_id(owner_id: int, page: int, per_page: int)
-        Get a single page of images associated with an owner from the database
+    get_images_by_user_id(owner_id: int)
+        Get all images associated with a user
+    get_images_page_by_user_id(owner_id: int, page: int, per_page: int)
+        Get a single page of images associated with a user from the database
     search_images_by_caption(search: str)
         Search for images by caption
     get_images_by_character_id(character_id: int)
         Get all images associated with a character
     get_images_page_by_character_id(character_id: int, page: int, per_page: int)
         Get a single page of images associated with a character from the database
+    get_images_by_location_id(location_id: int)
+        Get all images associated with a location
+    get_images_page_by_location_id(location_id: int, page: int, per_page: int)
+        Get a single page of images associated with a location from the database
     """
 
     def __init__(self, session: Session, owner: Type[User]):
@@ -4058,7 +4044,9 @@ class ImageController(BaseController):
 
         with self._session as session:
             try:
-                image = session.query(Image).filter(Image.id == image_id).first()
+                image = session.query(Image).filter(
+                    Image.id == image_id, Image.user_id == self._owner.id
+                ).first()
 
                 if not image:
                     raise ValueError('Image not found.')
@@ -4096,7 +4084,9 @@ class ImageController(BaseController):
 
         with self._session as session:
             try:
-                image = session.query(Image).filter(Image.id == image_id).first()
+                image = session.query(Image).filter(
+                    Image.id == image_id, Image.user_id == self._owner.id
+                ).first()
 
                 if not image:
                     raise ValueError('Image not found.')
@@ -4116,13 +4106,8 @@ class ImageController(BaseController):
                 session.commit()
                 return True
 
-    def get_images_by_owner_id(self, owner_id: int) -> list:
-        """Get all images associated with an owner
-
-        Parameters
-        ----------
-        owner_id : int
-            The id of the owner
+    def get_images_by_user_id(self) -> list:
+        """Get all images associated with a user
 
         Returns
         -------
@@ -4131,15 +4116,15 @@ class ImageController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Image).filter(Image.owner_id == owner_id).all()
+            return session.query(Image).filter(
+                Image.user_id == self._owner.id
+            ).all()
 
-    def get_images_page_by_owner_id(self, owner_id: int, page: int, per_page: int) -> list:
-        """Get a single page of images associated with an owner from the database
+    def get_images_page_by_user_id(self, page: int, per_page: int) -> list:
+        """Get a single page of images associated with a user from the database
 
         Parameters
         ----------
-        owner_id : int
-            The id of the owner
         page : int
             The page number
         per_page : int
@@ -4154,7 +4139,7 @@ class ImageController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Image).filter(
-                Image.owner_id == owner_id
+                Image.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def search_images_by_caption(self, search: str) -> list:
@@ -4172,7 +4157,9 @@ class ImageController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Image).filter(Image.caption.like(f'%{search}%')).all()
+            return session.query(Image).filter(
+                Image.caption.like(f'%{search}%'), Image.user_id == self._owner.id
+            ).all()
 
     def get_images_by_character_id(self, character_id: int) -> list:
         """Get all images associated with a character
@@ -4189,7 +4176,9 @@ class ImageController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Image).filter(Image.character_id == character_id).all()
+            return session.query(Image).filter(
+                Image.character_id == character_id, Image.user_id == self._owner.id
+            ).all()
 
     def get_images_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
         """Get a single page of images associated with a character from the database
@@ -4212,8 +4201,63 @@ class ImageController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Image).filter(
-                Image.character_id == character_id
+                Image.character_id == character_id, Image.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
+
+    def get_images_by_location_id(self, location_id: int) -> list:
+        """Get all images associated with a location
+
+        Images and Locations are associated through ImageLocation objects. This method will use yield to return the
+        images one at a time.
+
+        Parameters
+        ----------
+        location_id : int
+            The id of the location
+
+        Returns
+        -------
+        list
+            A list of image objects
+        """
+
+        with self._session as session:
+            for image_location in session.query(ImageLocation).filter(
+                ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
+            ).all():
+                yield session.query(Image).filter(
+                    Image.id == image_location.image_id, Image.user_id == self._owner.id
+                ).first()
+
+    def get_images_page_by_location_id(self, location_id: int, page: int, per_page: int) -> list:
+        """Get a single page of images associated with a location from the database
+
+        Images and Locations are associated through ImageLocation objects. This method will use yield to return the
+        images one at a time.
+
+        Parameters
+        ----------
+        location_id : int
+            The id of the location
+        page : int
+            The page number
+        per_page : int
+            The number of rows per page
+
+        Returns
+        -------
+        list
+            A list of image objects
+        """
+
+        with self._session as session:
+            offset = (page - 1) * per_page
+            for image_location in session.query(ImageLocation).filter(
+                ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
+            ).offset(offset).limit(per_page).all():
+                yield session.query(Image).filter(
+                    Image.id == image_location.image_id, Image.user_id == self._owner.id
+                ).first()
 
 
 class LinkController(BaseController):
