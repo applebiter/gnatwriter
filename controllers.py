@@ -1272,7 +1272,7 @@ class ChapterController(BaseController):
             ).first()
             return chapter if chapter else None
 
-    def get_chapters(self) -> list | None:
+    def get_all_chapters(self) -> list | None:
         """Get all chapters associated with a user
 
         Chapters are sorted by story id and position.
@@ -1288,7 +1288,7 @@ class ChapterController(BaseController):
                 Chapter.user_id == self._owner.id
             ).order_by(Chapter.story_id, Chapter.position).all()
 
-    def get_chapters_page(self, page: int, per_page: int) -> list | None:
+    def get_all_chapters_page(self, page: int, per_page: int) -> list | None:
         """Get a single page of chapters from the database associated with a user
 
         Chapters are sorted by story id and position.
@@ -1881,7 +1881,7 @@ class CharacterController(BaseController):
                         CharacterEvent.event_id == event.id, CharacterEvent.user_id == self._owner.id
                     ).delete()
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character {character.__str__} deleted by \
+                activity = Activity(user_id=self._owner.id, summary=f'{character.__str__} deleted by \
                     {self._owner.username}', created=datetime.now())
 
                 session.delete(character)
