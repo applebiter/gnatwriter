@@ -1110,16 +1110,17 @@ class ChapterController(BaseController):
 
                 for scene in chapter.scenes:
                     for link_scene in scene.links:
-                        session.query(LinkNote).filter(
-                            LinkNote.link_id == link_scene.link_id, LinkNote.user_id == self._owner.id
+                        # delete the LinkScene objects
+                        session.query(LinkScene).filter(
+                            LinkScene.link_id == link_scene.link_id, LinkScene.user_id == self._owner.id
                         ).delete()
                         session.query(Link).filter(
                             Link.id == link_scene.link_id, Link.user_id == self._owner.id
                         ).delete()
                         session.delete(link_scene)
                     for note_scene in scene.notes:
-                        session.query(LinkNote).filter(
-                            LinkNote.note_id == note_scene.note_id, LinkNote.user_id == self._owner.id
+                        session.query(NoteScene).filter(
+                            NoteScene.note_id == note_scene.note_id, NoteScene.user_id == self._owner.id
                         ).delete()
                         session.query(Note).filter(
                             Note.id == note_scene.note_id, Note.user_id == self._owner.id
@@ -1128,15 +1129,15 @@ class ChapterController(BaseController):
                     session.delete(scene)
 
                 for link in chapter.links:
-                    session.query(LinkNote).filter(
-                        LinkNote.link_id == link.link_id, LinkNote.user_id == self._owner.id
+                    session.query(ChapterLink).filter(
+                        ChapterLink.link_id == link.link_id, ChapterLink.user_id == self._owner.id
                     ).delete()
                     session.query(Link).filter(Link.id == link.link_id).delete()
                     session.delete(link)
 
                 for note in chapter.notes:
-                    session.query(LinkNote).filter(
-                        LinkNote.note_id == note.note_id, LinkNote.user_id == self._owner.id
+                    session.query(ChapterNote).filter(
+                        ChapterNote.note_id == note.note_id, ChapterNote.user_id == self._owner.id
                     ).delete()
                     session.query(Note).filter(
                         Note.id == note.note_id, Note.user_id == self._owner.id
@@ -1847,8 +1848,8 @@ class CharacterController(BaseController):
                     raise ValueError('Character not found.')
 
                 for link in character.links:
-                    session.query(LinkNote).filter(
-                        LinkNote.link_id == link.link_id, LinkNote.user_id == self._owner.id
+                    session.query(CharacterLink).filter(
+                        CharacterLink.link_id == link.link_id, CharacterLink.user_id == self._owner.id
                     ).delete()
                     session.query(Link).filter(
                         Link.id == link.link_id, Link.user_id == self._owner.id
@@ -1856,8 +1857,8 @@ class CharacterController(BaseController):
                     session.delete(link)
 
                 for note in character.notes:
-                    session.query(LinkNote).filter(
-                        LinkNote.note_id == note.note_id, LinkNote.user_id == self._owner.id
+                    session.query(CharacterNote).filter(
+                        CharacterNote.note_id == note.note_id, CharacterNote.user_id == self._owner.id
                     ).delete()
                     session.query(Note).filter(
                         Note.id == note.note_id, Note.user_id == self._owner.id
@@ -4262,12 +4263,6 @@ class LinkController(BaseController):
         Get a single page of links associated with a user from the database
     search_links_by_title(search: str)
         Search for links by title
-    append_notes_to_link(link_id: int, notes: list)
-        Append notes to a link
-    get_notes_by_link_id(link_id: int)
-        Get all notes associated with a link
-    get_notes_page_by_link_id(link_id: int, page: int, per_page: int)
-        Get a single page of notes associated with a link from the database
     """
 
     def __init__(self, session: Session, owner: Type[User]):
@@ -4487,102 +4482,6 @@ class LinkController(BaseController):
             return session.query(Link).filter(
                 Link.title.like(f'%{search}%'), Link.user_id == self._owner.id
             ).all()
-
-    def append_notes_to_link(self, link_id: int, notes: list) -> Type[Link]:
-        """Append notes to a link
-
-        Parameters
-        ----------
-        link_id : int
-            The id of the link
-        notes : list
-            A list of note ids
-
-        Returns
-        -------
-        Link
-            The updated link object
-        """
-
-        with self._session as session:
-            try:
-                link = session.query(Link).filter(
-                    Link.id == link_id, Link.user_id == self._owner.id
-                ).first()
-
-                if not link:
-                    raise ValueError('Link not found.')
-
-                for note_id in notes:
-                    note = session.query(Note).filter(
-                        Note.id == note_id, Note.user_id == self._owner.id
-                    ).first()
-
-                    if not note:
-                        raise ValueError('Note not found.')
-
-                    link_note = LinkNote(user_id=self._owner.id, link_id=link_id, note_id=note_id,
-                                         created=datetime.now())
-
-                    activity = Activity(user_id=self._owner.id, summary=f'Note {note.title[:50]} associated with \
-                                        link {link.title[:50]} by {self._owner.username}', created=datetime.now())
-
-                    session.add(link_note)
-                    session.add(activity)
-
-            except Exception as e:
-                session.rollback()
-                raise e
-
-            else:
-                session.commit()
-                return link
-
-    def get_notes_by_link_id(self, link_id: int) -> list:
-        """Get all notes associated with a link
-
-        Parameters
-        ----------
-        link_id : int
-            The id of the link
-
-        Returns
-        -------
-        list
-            A list of note objects
-        """
-
-        with self._session as session:
-            for link_note in session.query(LinkNote).filter(
-                LinkNote.link_id == link_id, LinkNote.user_id == self._owner.id
-            ).all():
-                yield session.query(Note).filter(
-                    Note.id == link_note.note_id, Note.user_id == self._owner.id
-                ).first()
-
-    def get_notes_page_by_link_id(self, link_id: int, page: int, per_page: int) -> list:
-        """Get a single page of notes associated with a link from the database
-
-        Parameters
-        ----------
-        link_id : int
-            The id of the link
-        page : int
-            The page number
-        per_page : int
-            The number of rows per page
-
-        Returns
-        -------
-        list
-            A list of note objects
-        """
-
-        with self._session as session:
-            offset = (page - 1) * per_page
-            return session.query(LinkNote).filter(
-                LinkNote.link_id == link_id, LinkNote.user_id == self._owner.id
-            ).offset(offset).limit(per_page).all()
 
 
 class LocationController(BaseController):
@@ -5287,12 +5186,6 @@ class NoteController(BaseController):
         Get a single page of notes associated with an owner from the database
     search_notes_by_title_and_content(search: str)
         Search for notes by title and content
-    append_links_to_note(note_id: int, links: list)
-        Append links to a note
-    get_links_by_note_id(note_id: int)
-        Get all links associated with a note
-    get_links_page_by_note_id(note_id: int, page: int, per_page: int)
-        Get a single page of links associated with a note from the database
     """
 
     def __init__(self, session: Session, owner: Type[User]):
@@ -5493,102 +5386,6 @@ class NoteController(BaseController):
                 or_(Note.title.like(f'%{search}%'), Note.content.like(f'%{search}%')),
                 Note.user_id == self._owner.id
             ).all()
-
-    def append_links_to_note(self, note_id: int, links: list) -> Type[Note]:
-        """Append links to a note
-
-        Parameters
-        ----------
-        note_id : int
-            The id of the note
-        links : list
-            A list of link ids
-
-        Returns
-        -------
-        Note
-            The updated note object
-        """
-
-        with self._session as session:
-            try:
-                note = session.query(Note).filter(
-                    Note.id == note_id, Note.user_id == self._owner.id
-                ).first()
-
-                if not note:
-                    raise ValueError('Note not found.')
-
-                for link_id in links:
-                    link = session.query(Link).filter(
-                        Link.id == link_id, Link.user_id == self._owner.id
-                    ).first()
-
-                    if not link:
-                        raise ValueError('Link not found.')
-
-                    link_note = LinkNote(user_id=self._owner.id, note_id=note_id, link_id=link_id,
-                                         created=datetime.now())
-
-                    activity = Activity(user_id=self._owner.id, summary=f'Link {link.title[:50]} associated with \
-                                        note {note.title[:50]} by {self._owner.username}', created=datetime.now())
-
-                    session.add(link_note)
-                    session.add(activity)
-
-            except Exception as e:
-                session.rollback()
-                raise e
-
-            else:
-                session.commit()
-                return note
-
-    def get_links_by_note_id(self, note_id: int) -> list:
-        """Get all links associated with a note
-
-        Parameters
-        ----------
-        note_id : int
-            The id of the note
-
-        Returns
-        -------
-        list
-            A list of link objects
-        """
-
-        with self._session as session:
-            for link_note in session.query(LinkNote).filter(
-                LinkNote.note_id == note_id, LinkNote.user_id == self._owner.id
-            ).all():
-                yield session.query(Link).filter(
-                    Link.id == link_note.link_id, Link.user_id == self._owner.id
-                ).first()
-
-    def get_links_page_by_note_id(self, note_id: int, page: int, per_page: int) -> list:
-        """Get a single page of links associated with a note from the database
-
-        Parameters
-        ----------
-        note_id : int
-            The id of the note
-        page : int
-            The page number
-        per_page : int
-            The number of rows per page
-
-        Returns
-        -------
-        list
-            A list of link objects
-        """
-
-        with self._session as session:
-            offset = (page - 1) * per_page
-            return session.query(LinkNote).filter(
-                LinkNote.note_id == note_id, LinkNote.user_id == self._owner.id
-            ).offset(offset).limit(per_page).all()
 
 
 class SceneController(BaseController):
@@ -5834,6 +5631,32 @@ class SceneController(BaseController):
 
                 if not scene:
                     raise ValueError('Scene not found.')
+
+                for link in scene.links:
+                    session.query(LinkScene).filter(
+                        LinkScene.link_id == link.link_id, LinkScene.user_id == self._owner.id
+                    ).delete()
+                    session.query(Link).filter(Link.id == link.link_id).delete()
+                    session.delete(link)
+
+                for note in scene.notes:
+                    session.query(NoteScene).filter(
+                        NoteScene.note_id == note.note_id, NoteScene.user_id == self._owner.id
+                    ).delete()
+                    session.query(Note).filter(
+                        Note.id == note.note_id, Note.user_id == self._owner.id
+                    ).delete()
+                    session.delete(note)
+
+                siblings = session.query(Scene).filter(
+                    Scene.chapter_id == scene.chapter_id, Scene.user_id == self._owner.id,
+                    Scene.position > scene.position
+                ).all()
+
+                for sibling in siblings:
+                    sibling.position -= 1
+                    sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                    sibling.modified = datetime.now()
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Scene {scene.id} deleted by {self._owner.username}',

@@ -3307,7 +3307,6 @@ class Link(Base):
     characters: Mapped[Optional[List["CharacterLink"]]] = relationship("CharacterLink", back_populates="link")
     events: Mapped[Optional[List["EventLink"]]] = relationship("EventLink", back_populates="link")
     locations: Mapped[Optional[List["LinkLocation"]]] = relationship("LinkLocation", back_populates="link")
-    notes: Mapped[Optional[List["LinkNote"]]] = relationship("LinkNote", back_populates="link")
 
     def __repr__(self):
         """Returns a string representation of the link.
@@ -3522,107 +3521,107 @@ class LinkLocation(Base):
         return self
 
 
-class LinkNote(Base):
-    """The LinkNote class represents the relationship between a link and a note.
-
-    Attributes
-    ----------
-        user_id: int
-            The id of the owner of this entry
-        link_id: int
-            The link's id
-        note_id: int
-            The note's id
-        created: str
-            The creation datetime of the link between the Link and the Note
-        user: User
-            The user who owns this entry
-        link: Link
-            The link that the note belongs to
-        note: Note
-            The note that the link has
-
-    Methods
-    -------
-        __repr__()
-            Returns a string representation of the relationship
-        __str__()
-            Returns a string representation of the relationship
-        serialize()
-            Returns a dictionary representation of the relationship
-        unserialize(data: dict)
-            Updates the relationship's attributes with the values from the dictionary
-    """
-
-    __tablename__ = 'links_notes'
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    link_id: Mapped[int] = mapped_column(Integer, ForeignKey('links.id'), primary_key=True)
-    note_id: Mapped[int] = mapped_column(Integer, ForeignKey('notes.id'), primary_key=True)
-    created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    user: Mapped["User"] = relationship("User")
-    link: Mapped["Link"] = relationship("Link", back_populates="notes")
-    note: Mapped["Note"] = relationship("Note", back_populates="links")
-
-    def __repr__(self):
-        """Returns a string representation of the relationship.
-
-        Returns
-        -------
-        str
-            A string representation of the relationship
-        """
-
-        return f'<LinkNote {self.link.title!r} - {self.note.title!r}>'
-
-    def __str__(self):
-        """Returns a string representation of the relationship.
-
-        Returns
-        -------
-        str
-            A string representation of the relationship
-        """
-
-        return f'{self.link.title} - {self.note.title}'
-
-    def serialize(self) -> dict:
-        """Returns a dictionary representation of the relationship.
-
-        Returns
-        -------
-        dict
-            A dictionary representation of the relationship
-        """
-
-        return {
-            'user_id': self.user_id,
-            'link_id': self.link_id,
-            'note_id': self.note_id,
-            'created': str(self.created),
-        }
-
-    def unserialize(self, data: dict) -> "LinkNote":
-        """Updates the relationship's attributes with the values from the dictionary.
-
-        Parameters
-        ----------
-        data: dict
-            The dictionary with the new values for the relationship
-
-        Returns
-        -------
-        LinkNote
-            The unserialized relationship
-        """
-
-        self.user_id = data.get('user_id', self.user_id)
-        self.link_id = data.get('link_id', self.link_id)
-        self.note_id = data.get('note_id', self.note_id)
-        self.created = data.get('created', self.created)
-
-        return self
-
-
+# class LinkNote(Base):
+#     """The LinkNote class represents the relationship between a link and a note.
+#
+#     Attributes
+#     ----------
+#         user_id: int
+#             The id of the owner of this entry
+#         link_id: int
+#             The link's id
+#         note_id: int
+#             The note's id
+#         created: str
+#             The creation datetime of the link between the Link and the Note
+#         user: User
+#             The user who owns this entry
+#         link: Link
+#             The link that the note belongs to
+#         note: Note
+#             The note that the link has
+#
+#     Methods
+#     -------
+#         __repr__()
+#             Returns a string representation of the relationship
+#         __str__()
+#             Returns a string representation of the relationship
+#         serialize()
+#             Returns a dictionary representation of the relationship
+#         unserialize(data: dict)
+#             Updates the relationship's attributes with the values from the dictionary
+#     """
+#
+#     __tablename__ = 'links_notes'
+#     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+#     link_id: Mapped[int] = mapped_column(Integer, ForeignKey('links.id'), primary_key=True)
+#     note_id: Mapped[int] = mapped_column(Integer, ForeignKey('notes.id'), primary_key=True)
+#     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
+#     user: Mapped["User"] = relationship("User")
+#     link: Mapped["Link"] = relationship("Link", back_populates="notes")
+#     note: Mapped["Note"] = relationship("Note", back_populates="links")
+#
+#     def __repr__(self):
+#         """Returns a string representation of the relationship.
+#
+#         Returns
+#         -------
+#         str
+#             A string representation of the relationship
+#         """
+#
+#         return f'<LinkNote {self.link.title!r} - {self.note.title!r}>'
+#
+#     def __str__(self):
+#         """Returns a string representation of the relationship.
+#
+#         Returns
+#         -------
+#         str
+#             A string representation of the relationship
+#         """
+#
+#         return f'{self.link.title} - {self.note.title}'
+#
+#     def serialize(self) -> dict:
+#         """Returns a dictionary representation of the relationship.
+#
+#         Returns
+#         -------
+#         dict
+#             A dictionary representation of the relationship
+#         """
+#
+#         return {
+#             'user_id': self.user_id,
+#             'link_id': self.link_id,
+#             'note_id': self.note_id,
+#             'created': str(self.created),
+#         }
+#
+#     def unserialize(self, data: dict) -> "LinkNote":
+#         """Updates the relationship's attributes with the values from the dictionary.
+#
+#         Parameters
+#         ----------
+#         data: dict
+#             The dictionary with the new values for the relationship
+#
+#         Returns
+#         -------
+#         LinkNote
+#             The unserialized relationship
+#         """
+#
+#         self.user_id = data.get('user_id', self.user_id)
+#         self.link_id = data.get('link_id', self.link_id)
+#         self.note_id = data.get('note_id', self.note_id)
+#         self.created = data.get('created', self.created)
+#
+#         return self
+#
+#
 class LinkScene(Base):
     """The LinkScene class represents the relationship between a link and a scene.
 
@@ -3911,11 +3910,12 @@ class Location(Base):
     modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
     user: Mapped["User"] = relationship("User", back_populates="locations")
     images: Mapped[Optional[List["ImageLocation"]]] = relationship("ImageLocation", back_populates="location")
-    links: Mapped[Optional[List["LinkLocation"]]] = relationship("LinkLocation", back_populates="location", lazy="joined")
-    events: Mapped[Optional[List["EventLocation"]]] = relationship("EventLocation",
-                                                                   back_populates="location",
+    links: Mapped[Optional[List["LinkLocation"]]] = relationship("LinkLocation", back_populates="location",
+                                                                 lazy="joined")
+    events: Mapped[Optional[List["EventLocation"]]] = relationship("EventLocation", back_populates="location",
                                                                    lazy="joined")
-    notes: Mapped[Optional[List["LocationNote"]]] = relationship("LocationNote", back_populates="location", lazy="joined")
+    notes: Mapped[Optional[List["LocationNote"]]] = relationship("LocationNote", back_populates="location",
+                                                                 lazy="joined")
 
     def __repr__(self):
         """Returns a string representation of the location.
@@ -4335,7 +4335,6 @@ class Note(Base):
     scenes: Mapped[Optional[List["NoteScene"]]] = relationship("NoteScene", back_populates="note")
     characters: Mapped[Optional[List["CharacterNote"]]] = relationship("CharacterNote", back_populates="note")
     events: Mapped[Optional[List["EventNote"]]] = relationship("EventNote", back_populates="note")
-    links: Mapped[Optional[List["LinkNote"]]] = relationship("LinkNote", back_populates="note")
     locations: Mapped[Optional[List["LocationNote"]]] = relationship("LocationNote", back_populates="note")
 
     def __repr__(self):
@@ -4709,8 +4708,8 @@ class Scene(Base):
     modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
     chapter: Mapped["Chapter"] = relationship("Chapter", back_populates="scenes")
     user: Mapped["User"] = relationship("User")
-    links: Mapped[Optional[List["LinkScene"]]] = relationship("LinkScene", back_populates="scene")
-    notes: Mapped[Optional[List["NoteScene"]]] = relationship("NoteScene", back_populates="scene")
+    links: Mapped[Optional[List["LinkScene"]]] = relationship("LinkScene", back_populates="scene", lazy="joined")
+    notes: Mapped[Optional[List["NoteScene"]]] = relationship("NoteScene", back_populates="scene", lazy="joined")
 
     def __repr__(self):
         """Returns a string representation of the scene.
