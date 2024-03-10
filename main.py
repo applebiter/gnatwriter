@@ -26,3 +26,9 @@ if verify_password(password, user.password):
     print(f"Password '{password}' verified!")
 else:
     print(f"Password '{password}' incorrect!")
+
+stories = app("story").get_all_stories()
+
+for story in stories:
+    print(story.title)
+    
