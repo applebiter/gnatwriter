@@ -465,11 +465,6 @@ class AuthorController(BaseController):
     def get_all_authors(self) -> list | None:
         """Get all authors associated with a user
 
-        Parameters
-        ----------
-        user_id : int
-            The id of the user
-
         Returns
         -------
         list | None
