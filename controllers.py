@@ -4368,6 +4368,36 @@ class LinkController(BaseController):
                 if not link:
                     raise ValueError('Link not found.')
 
+                for chapter_link in session.query(ChapterLink).filter(
+                    ChapterLink.link_id == link_id, ChapterLink.user_id == self._owner.id
+                ).all():
+                    session.delete(chapter_link)
+
+                for character_link in session.query(CharacterLink).filter(
+                    CharacterLink.link_id == link_id, CharacterLink.user_id == self._owner.id
+                ).all():
+                    session.delete(character_link)
+
+                for event_link in session.query(EventLink).filter(
+                    EventLink.link_id == link_id, EventLink.user_id == self._owner.id
+                ).all():
+                    session.delete(event_link)
+
+                for link_location in session.query(LinkLocation).filter(
+                    LinkLocation.link_id == link_id, LinkLocation.user_id == self._owner.id
+                ).all():
+                    session.delete(link_location)
+
+                for link_scene in session.query(LinkScene).filter(
+                    LinkScene.link_id == link_id, LinkScene.user_id == self._owner.id
+                ).all():
+                    session.delete(link_scene)
+
+                for link_story in session.query(LinkStory).filter(
+                    LinkStory.link_id == link_id, LinkStory.user_id == self._owner.id
+                ).all():
+                    session.delete(link_story)
+
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Link {link.id} deleted by {self._owner.username}',
                                     created=datetime.now())
@@ -4685,6 +4715,26 @@ class LocationController(BaseController):
 
                 if not location:
                     raise ValueError('Location not found.')
+
+                for event_location in session.query(EventLocation).filter(
+                    EventLocation.location_id == location_id, EventLocation.user_id == self._owner.id
+                ).all():
+                    session.delete(event_location)
+
+                for image_location in session.query(ImageLocation).filter(
+                    ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
+                ).all():
+                    session.delete(image_location)
+
+                for link_location in session.query(LinkLocation).filter(
+                    LinkLocation.location_id == location_id, LinkLocation.user_id == self._owner.id
+                ).all():
+                    session.delete(link_location)
+
+                for location_note in session.query(LocationNote).filter(
+                    LocationNote.location_id == location_id, LocationNote.user_id == self._owner.id
+                ).all():
+                    session.delete(location_note)
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Location {location.id} deleted by {self._owner.username}',
@@ -5290,6 +5340,36 @@ class NoteController(BaseController):
 
                 if not note:
                     raise ValueError('Note not found.')
+
+                for chapter_note in session.query(ChapterNote).filter(
+                    ChapterNote.note_id == note_id, ChapterNote.user_id == self._owner.id
+                ).all():
+                    session.delete(chapter_note)
+
+                for character_note in session.query(CharacterNote).filter(
+                    CharacterNote.note_id == note_id, CharacterNote.user_id == self._owner.id
+                ).all():
+                    session.delete(character_note)
+
+                for event_note in session.query(EventNote).filter(
+                    EventNote.note_id == note_id, EventNote.user_id == self._owner.id
+                ).all():
+                    session.delete(event_note)
+
+                for location_note in session.query(LocationNote).filter(
+                    LocationNote.note_id == note_id, LocationNote.user_id == self._owner.id
+                ).all():
+                    session.delete(location_note)
+
+                for note_scene in session.query(NoteScene).filter(
+                    NoteScene.note_id == note_id, NoteScene.user_id == self._owner.id
+                ).all():
+                    session.delete(note_scene)
+
+                for note_story in session.query(NoteStory).filter(
+                    NoteStory.note_id == note_id, NoteStory.user_id == self._owner.id
+                ).all():
+                    session.delete(note_story)
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Note {note.id} deleted by {self._owner.username}',
@@ -6131,6 +6211,20 @@ class StoryController(BaseController):
 
                 if not story:
                     raise ValueError('Story not found.')
+
+                for link in story.links:
+                    session.query(Link).filter(Link.id == link.link_id).delete()
+                    session.delete(link)
+
+                for note in story.notes:
+                    session.query(Note).filter(
+                        Note.id == note.note_id, Note.user_id == self._owner.id
+                    ).delete()
+                    session.delete(note)
+
+                chapter_controller = ChapterController(session, self._owner)
+                for chapter in story.chapters:
+                    chapter_controller.delete_chapter(chapter.id)
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Story {story.id} deleted by {self._owner.username}',
