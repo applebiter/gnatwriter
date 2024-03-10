@@ -1099,37 +1099,16 @@ class ChapterController(BaseController):
                 if not chapter:
                     raise ValueError('Chapter not found.')
 
+                scene_controller = SceneController(session, self._owner)
                 for scene in chapter.scenes:
-                    for link_scene in scene.links:
-                        # delete the LinkScene objects
-                        session.query(LinkScene).filter(
-                            LinkScene.link_id == link_scene.link_id, LinkScene.user_id == self._owner.id
-                        ).delete()
-                        session.query(Link).filter(
-                            Link.id == link_scene.link_id, Link.user_id == self._owner.id
-                        ).delete()
-                        session.delete(link_scene)
-                    for note_scene in scene.notes:
-                        session.query(NoteScene).filter(
-                            NoteScene.note_id == note_scene.note_id, NoteScene.user_id == self._owner.id
-                        ).delete()
-                        session.query(Note).filter(
-                            Note.id == note_scene.note_id, Note.user_id == self._owner.id
-                        ).delete()
-                        session.delete(note_scene)
+                    scene_controller.delete_scene(scene.id)
                     session.delete(scene)
 
                 for link in chapter.links:
-                    session.query(ChapterLink).filter(
-                        ChapterLink.link_id == link.link_id, ChapterLink.user_id == self._owner.id
-                    ).delete()
                     session.query(Link).filter(Link.id == link.link_id).delete()
                     session.delete(link)
 
                 for note in chapter.notes:
-                    session.query(ChapterNote).filter(
-                        ChapterNote.note_id == note.note_id, ChapterNote.user_id == self._owner.id
-                    ).delete()
                     session.query(Note).filter(
                         Note.id == note.note_id, Note.user_id == self._owner.id
                     ).delete()
@@ -1839,18 +1818,12 @@ class CharacterController(BaseController):
                     raise ValueError('Character not found.')
 
                 for link in character.links:
-                    session.query(CharacterLink).filter(
-                        CharacterLink.link_id == link.link_id, CharacterLink.user_id == self._owner.id
-                    ).delete()
                     session.query(Link).filter(
                         Link.id == link.link_id, Link.user_id == self._owner.id
                     ).delete()
                     session.delete(link)
 
                 for note in character.notes:
-                    session.query(CharacterNote).filter(
-                        CharacterNote.note_id == note.note_id, CharacterNote.user_id == self._owner.id
-                    ).delete()
                     session.query(Note).filter(
                         Note.id == note.note_id, Note.user_id == self._owner.id
                     ).delete()
@@ -1869,9 +1842,7 @@ class CharacterController(BaseController):
                     session.delete(trait)
 
                 for event in character.events:
-                    session.query(CharacterEvent).filter(
-                        CharacterEvent.event_id == event.id, CharacterEvent.user_id == self._owner.id
-                    ).delete()
+                    session.delete(event)
 
                 activity = Activity(user_id=self._owner.id, summary=f'{character.__str__} deleted by \
                     {self._owner.username}', created=datetime.now())
@@ -3493,6 +3464,26 @@ class EventController(BaseController):
                 if not event:
                     raise ValueError('Event not found.')
 
+                for character_event in session.query(CharacterEvent).filter(
+                    CharacterEvent.event_id == event_id, CharacterEvent.user_id == self._owner.id
+                ).all():
+                    session.delete(character_event)
+
+                for event_location in session.query(EventLocation).filter(
+                    EventLocation.event_id == event_id, EventLocation.user_id == self._owner.id
+                ).all():
+                    session.delete(event_location)
+
+                for event_link in session.query(EventLink).filter(
+                    EventLink.event_id == event_id, EventLink.user_id == self._owner.id
+                ).all():
+                    session.delete(event_link)
+
+                for event_note in session.query(EventNote).filter(
+                    EventNote.event_id == event_id, EventNote.user_id == self._owner.id
+                ).all():
+                    session.delete(event_note)
+
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Event {event.id} deleted by {self._owner.username}',
                                     created=datetime.now())
@@ -4056,6 +4047,16 @@ class ImageController(BaseController):
 
                 if not image:
                     raise ValueError('Image not found.')
+
+                for character_image in session.query(CharacterImage).filter(
+                    CharacterImage.image_id == image_id, CharacterImage.user_id == self._owner.id
+                ).all():
+                    session.delete(character_image)
+
+                for image_location in session.query(ImageLocation).filter(
+                    ImageLocation.image_id == image_id, ImageLocation.user_id == self._owner.id
+                ).all():
+                    session.delete(image_location)
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Image {image.id} deleted by {self._owner.username}',
@@ -5629,16 +5630,10 @@ class SceneController(BaseController):
                     raise ValueError('Scene not found.')
 
                 for link in scene.links:
-                    session.query(LinkScene).filter(
-                        LinkScene.link_id == link.link_id, LinkScene.user_id == self._owner.id
-                    ).delete()
                     session.query(Link).filter(Link.id == link.link_id).delete()
                     session.delete(link)
 
                 for note in scene.notes:
-                    session.query(NoteScene).filter(
-                        NoteScene.note_id == note.note_id, NoteScene.user_id == self._owner.id
-                    ).delete()
                     session.query(Note).filter(
                         Note.id == note.note_id, Note.user_id == self._owner.id
                     ).delete()
