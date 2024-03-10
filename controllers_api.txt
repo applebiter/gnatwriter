@@ -212,37 +212,20 @@ class SubmissionController
     func get_submissions_by_story_id
     func get_submissions_page_by_story_id
 
-class
-UserController
-func
-__init__
-func
-create_user
-func
-register_user
-func
-activate_user
-func
-deactivate_user
-func
-login
-func
-change_password
-func
-delete_user
-func
-get_user_by_id
-func
-get_user_by_uuid
-func
-get_user_by_username
-func
-get_user_by_email
-func
-get_user_count
-func
-get_all_users
-func
-get_users_page
-func
-search_users
+class UserController
+    func create_user
+    func register_user
+    func activate_user
+    func deactivate_user
+    func login
+    func change_password
+    func delete_user
+    func get_user_by_id
+    func get_user_by_uuid
+    func get_user_by_username
+    func get_user_by_email
+    func get_user_count
+    func get_all_users
+    func get_users_page
+    func search_users
+
