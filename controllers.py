@@ -1,5 +1,3 @@
-import binascii
-import os
 from datetime import date
 from typing import Type
 import bcrypt
@@ -479,8 +477,6 @@ class AuthorController(BaseController):
 
         Parameters
         ----------
-        user_id : int
-            The id of the user who owns the author names
         page : int
             The page number
         per_page : int
