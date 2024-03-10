@@ -194,7 +194,7 @@ class StoryController
     func delete_story
     func get_story_by_id
     func get_all_stories
-    func get_all_stories_page_by_owner_id
+    func get_all_stories_page
     func search_stories
     func append_authors_to_story
     func get_authors_by_story_id
