@@ -5405,9 +5405,9 @@ class SceneController(BaseController):
         Change the position of a scene within a chapter
     delete_scene(scene_id: int)
         Delete a scene
-    get_scenes_by_owner_id(owner_id: int)
+    get_all_scenes()
         Get all scenes associated with an owner
-    get_scenes_page_by_owner_id(owner_id: int, page: int, per_page: int)
+    get_all_scenes_page(page: int, per_page: int)
         Get a single page of scenes associated with an owner from the database
     get_scenes_by_story_id(story_id: int)
         Get all scenes associated with a story
@@ -5668,15 +5668,10 @@ class SceneController(BaseController):
                 session.commit()
                 return True
 
-    def get_scenes_by_owner_id(self, owner_id: int) -> list:
+    def get_all_scenes(self) -> list:
         """Get all scenes associated with an owner
 
         Scenes are sorted by story id, chapter id, and position in ascending order.
-
-        Parameters
-        ----------
-        owner_id : int
-            The id of the owner
 
         Returns
         -------
@@ -5685,19 +5680,17 @@ class SceneController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Scene).filter(Scene.owner_id == owner_id).order_by(
+            return session.query(Scene).filter(Scene.user_id == self._owner.id).order_by(
                 Scene.story_id, Scene.chapter_id, Scene.position
             ).all()
 
-    def get_scenes_page_by_owner_id(self, owner_id: int, page: int, per_page: int) -> list:
+    def get_all_scenes_page(self, page: int, per_page: int) -> list:
         """Get a single page of scenes associated with an owner from the database
 
         Scenes are sorted by story id, chapter id, and position in ascending order
 
         Parameters
         ----------
-        owner_id : int
-            The id of the owner
         page : int
             The page number
         per_page : int
@@ -5712,7 +5705,7 @@ class SceneController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Scene).filter(
-                Scene.owner_id == owner_id
+                Scene.user_id == self._owner.id
             ).order_by(Scene.story_id, Scene.chapter_id, Scene.position).offset(offset).limit(per_page).all()
 
     def get_scenes_by_story_id(self, story_id: int) -> list:
@@ -5732,7 +5725,9 @@ class SceneController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Scene).filter(Scene.story_id == story_id).all()
+            return session.query(Scene).filter(Scene.story_id == story_id).order_by(
+                Scene.chapter_id, Scene.position
+            ).all()
 
     def get_scenes_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
         """Get a single page of scenes associated with a story from the database
@@ -5756,6 +5751,8 @@ class SceneController(BaseController):
             offset = (page - 1) * per_page
             return session.query(Scene).filter(
                 Scene.story_id == story_id
+            ).order_by(
+                Scene.chapter_id, Scene.position
             ).offset(offset).limit(per_page).all()
 
     def get_scenes_by_chapter_id(self, chapter_id: int) -> list:
@@ -5988,9 +5985,9 @@ class StoryController(BaseController):
         Delete a story
     get_story_by_id(story_id: int)
         Get a story by id
-    get_stories_by_owner_id(owner_id: int)
+    get_all_stories()
         Get all stories associated with an owner
-    get_stories_page_by_owner_id(owner_id: int, page: int, per_page: int)
+    get_all_stories_page(page: int, per_page: int)
         Get a single page of stories associated with an owner from the database
     search_stories_by_title_and_description(search: str)
         Search for stories by title and description
@@ -6149,13 +6146,8 @@ class StoryController(BaseController):
             story = session.query(Story).filter(Story.id == story_id).first()
             return story
 
-    def get_stories_by_owner_id(self, owner_id: int) -> list:
+    def get_all_stories(self) -> list:
         """Get all stories associated with an owner
-
-        Parameters
-        ----------
-        owner_id : int
-            The id of the owner
 
         Returns
         -------
@@ -6164,15 +6156,13 @@ class StoryController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Story).filter(Story.user_id == owner_id).all()
+            return session.query(Story).filter(Story.user_id == self._owner.id).all()
 
-    def get_stories_page_by_owner_id(self, owner_id: int, page: int, per_page: int) -> list:
+    def get_all_stories_page_by_owner_id(self, page: int, per_page: int) -> list:
         """Get a single page of stories associated with an owner from the database
 
         Parameters
         ----------
-        owner_id : int
-            The id of the owner
         page : int
             The page number
         per_page : int
@@ -6187,7 +6177,7 @@ class StoryController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Story).filter(
-                Story.owner_id == owner_id
+                Story.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def search_stories_by_title_and_description(self, search: str) -> list:
