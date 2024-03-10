@@ -1,0 +1,594 @@
+
+const datetime_format
+const date_format
+
+class Activity
+    const id
+    const user_id
+    const summary
+    const created
+    const user
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Author
+    const id
+    const user_id
+    const is_pseudonym
+    const name
+    const initials
+    const created
+    const modified
+    const user
+    const stories
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class AuthorStory
+    const author_id
+    const story_id
+    const user_id
+    const created
+    const user
+    const author
+    const story
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Bibliography
+    const id
+    const user_id
+    const story_id
+    const title
+    const pages
+    const publisher
+    const publication_date
+    const editor
+    const created
+    const modified
+    const user
+    const story
+    const authors
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class BibliographyAuthor
+    const id
+    const user_id
+    const bibliography_id
+    const name
+    const initials
+    const created
+    const user
+    const reference
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Chapter
+    const id
+    const user_id
+    const story_id
+    const position
+    const title
+    const description
+    const created
+    const modified
+    const scenes
+    const user
+    const story
+    const links
+    const notes
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class ChapterLink
+    const user_id
+    const story_id
+    const chapter_id
+    const link_id
+    const created
+    const user
+    const story
+    const chapter
+    const link
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class ChapterNote
+    const user_id
+    const story_id
+    const chapter_id
+    const note_id
+    const created
+    const user
+    const story
+    const chapter
+    const note
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Character
+    const id
+    const user_id
+    const title
+    const first_name
+    const middle_name
+    const last_name
+    const nickname
+    const gender
+    const sex
+    const date_of_birth
+    const date_of_death
+    const description
+    const created
+    const modified
+    const user
+    const character_relationships
+    const traits
+    const events
+    const images
+    const links
+    const notes
+    const stories
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class CharacterEvent
+    const user_id
+    const character_id
+    const event_id
+    const created
+    const user
+    const character
+    const event
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class CharacterImage
+    const user_id
+    const character_id
+    const image_id
+    const position
+    const is_default
+    const created
+    const modified
+    const user
+    const character
+    const image
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class CharacterLink
+    const user_id
+    const character_id
+    const link_id
+    const created
+    const user
+    const character
+    const link
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class CharacterNote
+    const user_id
+    const character_id
+    const note_id
+    const created
+    const user
+    const character
+    const note
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class CharacterRelationshipTypes
+    const FAMILY
+    const PERSONAL
+    const ROMANTIC
+    const PROFESSIONAL
+    const OTHER
+
+class CharacterRelationship
+    const id
+    const user_id
+    const parent_id
+    const position
+    const related_id
+    const relationship_type
+    const description
+    const start_date
+    const end_date
+    const created
+    const modified
+    const user
+    const parent_character
+    const related_character
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class CharacterStory
+    const user_id
+    const character_id
+    const story_id
+    const created
+    const user
+    const character
+    const story
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class CharacterTrait
+    const id
+    const user_id
+    const character_id
+    const position
+    const name
+    const magnitude
+    const created
+    const modified
+    const user
+    const character
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Event
+    const id
+    const user_id
+    const title
+    const description
+    const start_datetime
+    const end_datetime
+    const created
+    const modified
+    const user
+    const links
+    const characters
+    const notes
+    const locations
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class EventLink
+    const user_id
+    const event_id
+    const link_id
+    const created
+    const user
+    const event
+    const link
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class EventLocation
+    const user_id
+    const event_id
+    const location_id
+    const created
+    const user
+    const event
+    const location
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class EventNote
+    const user_id
+    const event_id
+    const note_id
+    const created
+    const user
+    const event
+    const note
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class ImageMimeTypes
+    const JPEG
+    const PNG
+    const GIF
+
+class Image
+    const id
+    const user_id
+    const filename
+    const dirname
+    const size_in_bytes
+    const mime_type
+    const caption
+    const created
+    const modified
+    const user
+    const character
+    const location
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class ImageLocation
+    const user_id
+    const image_id
+    const location_id
+    const position
+    const is_default
+    const created
+    const modified
+    const user
+    const image
+    const location
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Link
+    const id
+    const user_id
+    const title
+    const url
+    const created
+    const modified
+    const user
+    const stories
+    const chapters
+    const scenes
+    const characters
+    const events
+    const locations
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class LinkLocation
+    const user_id
+    const link_id
+    const location_id
+    const created
+    const user
+    const link
+    const location
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class LinkScene
+    const user_id
+    const link_id
+    const scene_id
+    const created
+    const user
+    const link
+    const scene
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class LinkStory
+    const user_id
+    const link_id
+    const story_id
+    const created
+    const user
+    const link
+    const story
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Location
+    const id
+    const user_id
+    const title
+    const description
+    const address
+    const city
+    const state
+    const country
+    const zip_code
+    const latitude
+    const longitude
+    const created
+    const modified
+    const user
+    const images
+    const links
+    const events
+    const notes
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class LocationNote
+    const user_id
+    const location_id
+    const note_id
+    const created
+    const user
+    const location
+    const note
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Note
+    const id
+    const user_id
+    const title
+    const content
+    const created
+    const modified
+    const user
+    const stories
+    const chapters
+    const scenes
+    const characters
+    const events
+    const locations
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class NoteScene
+    const user_id
+    const note_id
+    const scene_id
+    const created
+    const user
+    const note
+    const scene
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class NoteStory
+    const user_id
+    const note_id
+    const story_id
+    const created
+    const user
+    const note
+    const story
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Scene
+    const id
+    const user_id
+    const story_id
+    const chapter_id
+    const position
+    const title
+    const description
+    const content
+    const created
+    const modified
+    const chapter
+    const user
+    const links
+    const notes
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class Story
+    const id
+    const user_id
+    const title
+    const description
+    const created
+    const modified
+    const user
+    const chapters
+    const authors
+    const references
+    const submissions
+    const links
+    const notes
+    const characters
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class SubmissionResultType
+    const ACCEPTED
+    const REJECTED
+    const REWRITE_REQUESTED
+    const PENDING
+    const WITHDRAWN
+    const IGNORED
+
+class Submission
+    const id
+    const user_id
+    const story_id
+    const submitted_to
+    const date_sent
+    const date_reply_received
+    const date_published
+    const date_paid
+    const result
+    const amount
+    const created
+    const modified
+    const user
+    const story
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+
+class User
+    const id
+    const uuid
+    const username
+    const email
+    const password
+    const is_active
+    const is_banned
+    const created
+    const modified
+    const activities
+    const authors
+    const characters
+    const events
+    const images
+    const links
+    const locations
+    const notes
+    const stories
+    const submissions
+    func __repr__
+    func __str__
+    func serialize
+    func unserialize
+

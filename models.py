@@ -3274,8 +3274,6 @@ class Link(Base):
             The events that the link has
         locations: List[LinkLocation]
             The locations that the link has
-        notes: List[LinkNote]
-            The notes that the link has
 
     Methods
     -------
@@ -4200,8 +4198,6 @@ class Note(Base):
             The characters that the note has
         events: List[EventNote]
             The events that the note has
-        links: List[LinkNote]
-            The links that the note has
         locations: List[LocationNote]
             The locations that the note has
 
