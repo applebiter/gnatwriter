@@ -23,5 +23,5 @@ application separately before I can integrate it into Noveler. The idea here is 
 client on the Jack bus listen to the user and transcribe that for the LMs helping to write the story. Simultaneously,
 I want to use a text-to-speech model to allow the agents to respond to the user in real time. This is a long-term goal, and I am not
 expecting to have this feature in the app for a long time. Obviously, I'm thinking about an ecosystem of tools for a
-home network that will work online or offline, where the user can carry on running conversations with multiple agents 
+local network that will work online or offline, where the user can carry on running conversations with multiple agents 
 from anywhere in the home, office, or lab.
