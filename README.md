@@ -7,7 +7,7 @@ for one, welcome our new language model _partners_, but I also want to do it on 
 in offline mode. 100% free, 100% open source, 100% private. The user can use which ever models they want, and the app 
 will be able to use them, if the embeddings are compatible. 
 
-Noveler uses the sqlalchemy ORM in the backend, and by default it is set to use sqlite. The user can change this to 
+Noveler uses the SQLAlchemy 2.0 ORM in the backend, and by default it is set to use sqlite. The user can change this to 
 either postgres or mysql, but the user will have to set up the database themselves. My thinking was to go ahead and 
 build out the models and controllers into a working framework, and then to build the GUI on top of that. This way, I am 
 free to try out different GUI libraries, and I can also use the app in the terminal. 
