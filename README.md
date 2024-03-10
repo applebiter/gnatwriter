@@ -5,4 +5,4 @@ Noveler uses the SQLAlchemy 2.0 ORM in the backend, and by default it is set to 
 either postgres or mysql, but the user will have to set up the database themselves, though this is pretty easy, since the app will create the database tables automatically once you've given it a valid connection string. My thinking was to go ahead and build out the models and controllers into a working framework, and then to build the GUI on top of that. This way, I am free to try out different GUI libraries, and I can also use the app in the terminal. 
 
 I have zero experience building apps with LMs in the RAG framework, but I am excited to learn. My thinking is that I can keep the token window larger for each task by feeding the story as it is being written into the model, and then to
-use the model to generate what ever comes next with more detail.
+use the model to generate what ever comes next with more detail. And by that, I mean assistance. The idea of letting the model write the whole thing is not my goal, altho9ugh in the end it may be a byproduct.
