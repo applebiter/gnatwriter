@@ -1593,7 +1593,7 @@ class CharacterController(BaseController):
         Get character count associated with a user
     get_all_characters()
         Get all characters associated with a user
-    get_characters_page(page: int, per_page: int)
+    get_all_characters_page(page: int, per_page: int)
         Get a single page of characters from the database associated with a user
     get_character_count_by_story_id(story_id: int)
         Get character count associated with a story
@@ -1939,7 +1939,7 @@ class CharacterController(BaseController):
                 Character.user_id == self._owner.id
             ).all()
 
-    def get_characters_page(self, page: int, per_page: int) -> list:
+    def get_all_characters_page(self, page: int, per_page: int) -> list:
         """Get a single page of characters from the database associated with a user
 
         Parameters
