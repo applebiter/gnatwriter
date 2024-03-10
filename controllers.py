@@ -3348,9 +3348,9 @@ class EventController(BaseController):
         Update an event
     delete_event(event_id: int)
         Delete an event
-    get_events()
+    get_all_events()
         Get all events associated with a user
-    get_events_page(page: int, per_page: int)
+    get_all_events_page(page: int, per_page: int)
         Get a single page of events associated with a user from the database
     append_characters_to_event(event_id: int, characters: list)
         Append characters to an event
@@ -3512,7 +3512,7 @@ class EventController(BaseController):
                 session.commit()
                 return True
 
-    def get_events(self) -> list:
+    def get_all_events(self) -> list:
         """Get all events associated with a user
 
         Returns
@@ -3526,7 +3526,7 @@ class EventController(BaseController):
                 Event.user_id == self._owner.id
             ).all()
 
-    def get_events_page(self, page: int, per_page: int) -> list:
+    def get_all_events_page(self, page: int, per_page: int) -> list:
         """Get a single page of events associated with a user from the database
 
         Parameters
