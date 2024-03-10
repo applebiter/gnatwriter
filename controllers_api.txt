@@ -1,26 +1,26 @@
 
-func hash_password
-func verify_password
+func hash_password ( password: str ) : str
+func verify_password ( password: str, hashed_password: str ) : bool
 
 class ActivityController
-    func get_activity_by_id
-    func get_activities
-    func get_activities_page
-    func get_activity_count
-    func search_activities
+    func get_activity_by_id ( activity_id: int ) : Type[Activity] | None
+    func get_activities ( ) : list
+    func get_activities_page ( page: int, per_page: int ) : list
+    func get_activity_count ( ) : int
+    func search_activities ( search: str ) : list
 
 class AuthorController
-    func create_author
-    func update_author
-    func change_pseudonym_status
-    func delete_author
-    func get_author_by_id
-    func get_author_by_name
-    func get_author_count
-    func get_all_authors
-    func get_authors_page
-    func get_authors_by_story_id
-    func search_authors
+    func create_author ( name: str, initials: str = None, is_pseudonym: bool = False ) : Author
+    func update_author ( author_id: int, name: str, initials: str = None ) : Type[Author]
+    func change_pseudonym_status ( author_id: int, is_pseudonym: bool ) : Type[Author]
+    func delete_author ( author_id: int ) : bool
+    func get_author_by_id ( author_id: int ) : Type[Author] | None
+    func get_author_by_name ( name: str ) : Type[Author] | None
+    func get_author_count ( ) : int
+    func get_all_authors ( ) list
+    func get_authors_page ( page: int, per_page: int ) : list
+    func get_authors_by_story_id ( story_id: int ) : list
+    func search_authors ( search: str ) : list
 
 class BibliographyController
     func create_bibliography
