@@ -3930,9 +3930,9 @@ class ImageController(BaseController):
         Update an image
     delete_image(image_id: int)
         Delete an image
-    get_images()
+    get_all_images()
         Get all images associated with a user
-    get_images_page(page: int, per_page: int)
+    get_all_images_page(page: int, per_page: int)
         Get a single page of images associated with a user from the database
     search_images_by_caption(search: str)
         Search for images by caption
@@ -4076,7 +4076,7 @@ class ImageController(BaseController):
                 session.commit()
                 return True
 
-    def get_images(self) -> list:
+    def get_all_images(self) -> list:
         """Get all images associated with a user
 
         Returns
@@ -4090,7 +4090,7 @@ class ImageController(BaseController):
                 Image.user_id == self._owner.id
             ).all()
 
-    def get_images_page(self, page: int, per_page: int) -> list:
+    def get_all_images_page(self, page: int, per_page: int) -> list:
         """Get a single page of images associated with a user from the database
 
         Parameters
@@ -4252,9 +4252,9 @@ class LinkController(BaseController):
         Delete a link
     get_link_by_id(link_id: int)
         Get a link by id
-    get_links()
+    get_all_links()
         Get all links associated with a user
-    get_links_page(page: int, per_page: int)
+    get_all_links_page(page: int, per_page: int)
         Get a single page of links associated with a user from the database
     search_links_by_title(search: str)
         Search for links by title
@@ -4427,7 +4427,7 @@ class LinkController(BaseController):
                 LinkStory.story_id == story_id, LinkStory.user_id == self._owner.id
             ).all()
 
-    def get_links(self) -> list:
+    def get_all_links(self) -> list:
         """Get all links associated with an owner
 
         Returns
@@ -4439,7 +4439,7 @@ class LinkController(BaseController):
         with self._session as session:
             return session.query(Link).filter(Link.user_id == self._owner.id).all()
 
-    def get_links_page(self, page: int, per_page: int) -> list:
+    def get_all_links_page(self, page: int, per_page: int) -> list:
         """Get a single page of links associated with an owner from the database
 
         Parameters
@@ -4501,9 +4501,9 @@ class LocationController(BaseController):
         Update a location
     delete_location(location_id: int)
         Delete a location
-    get_locations()
+    get_all_locations()
         Get all locations associated with a user
-    get_locations_page(page: int, per_page: int)
+    get_all_locations_page(page: int, per_page: int)
         Get a single page of locations associated with a user from the database
     search_locations_by_title_and_description(search: str)
         Search for locations by title and description
@@ -4704,7 +4704,7 @@ class LocationController(BaseController):
                 session.commit()
                 return True
 
-    def get_locations(self) -> list:
+    def get_all_locations(self) -> list:
         """Get all locations associated with an owner
 
         Returns
@@ -4716,7 +4716,7 @@ class LocationController(BaseController):
         with self._session as session:
             return session.query(Location).filter(Location.user_id == self._owner.id).all()
 
-    def get_locations_page(self, page: int, per_page: int) -> list:
+    def get_all_locations_page(self, page: int, per_page: int) -> list:
         """Get a single page of locations associated with an owner from the database
 
         Parameters
@@ -5175,11 +5175,11 @@ class NoteController(BaseController):
         Update a note
     delete_note(note_id: int)
         Delete a note
-    get_notes()
+    get_all_notes()
         Get all notes associated with an owner
-    get_notes_page(page: int, per_page: int)
+    get_all_notes_page(page: int, per_page: int)
         Get a single page of notes associated with an owner from the database
-    search_notes_by_title_and_content(search: str)
+    search_notes(search: str)
         Search for notes by title and content
     """
 
@@ -5328,7 +5328,7 @@ class NoteController(BaseController):
                 Note.id == note_id, Note.user_id == self._owner.id
             ).first()
 
-    def get_notes(self) -> list:
+    def get_all_notes(self) -> list:
         """Get all notes associated with an owner
 
         Returns
@@ -5340,7 +5340,7 @@ class NoteController(BaseController):
         with self._session as session:
             return session.query(Note).filter(Note.user_id == self._owner.id).all()
 
-    def get_notes_page(self, page: int, per_page: int) -> list:
+    def get_all_notes_page(self, page: int, per_page: int) -> list:
         """Get a single page of notes associated with an owner from the database
 
         Parameters
@@ -5362,7 +5362,7 @@ class NoteController(BaseController):
                 Note.owner_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def search_notes_by_title_and_content(self, search: str) -> list:
+    def search_notest(self, search: str) -> list:
         """Search for notes by title and content
 
         Parameters
@@ -5461,7 +5461,7 @@ class SceneController(BaseController):
         with self._session as session:
             try:
                 title_exists = session.query(Scene).filter(
-                    Scene.title == title, Scene.chapter_id == chapter_id
+                    Scene.title == title, Scene.chapter_id == chapter_id, Scene.user_id == self._owner.id
                 ).first()
 
                 if title_exists:
@@ -5512,7 +5512,9 @@ class SceneController(BaseController):
 
         with self._session as session:
             try:
-                scene = session.query(Scene).filter(Scene.id == scene_id).first()
+                scene = session.query(Scene).filter(
+                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                ).first()
 
                 if not scene:
                     raise ValueError('Scene not found.')
@@ -5561,8 +5563,9 @@ class SceneController(BaseController):
 
         with self._session as session:
             try:
-                datetime_format = "%Y-%m-%d %H:%M:%S.%f"
-                scene = session.query(Scene).filter(Scene.id == scene_id).first()
+                scene = session.query(Scene).filter(
+                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                ).first()
 
                 if not scene:
                     raise ValueError('Scene not found.')
@@ -5573,7 +5576,7 @@ class SceneController(BaseController):
                 if scene.position > position:
                     scenes = session.query(Scene).filter(
                         Scene.chapter_id == scene.chapter_id, Scene.position >= position,
-                        Scene.position < scene.position
+                        Scene.position < scene.position, Scene.user_id == self._owner.id
                     ).all()
                     for sibling in scenes:
                         sibling.position += 1
@@ -5582,7 +5585,7 @@ class SceneController(BaseController):
                 else:
                     scenes = session.query(Scene).filter(
                         Scene.chapter_id == scene.chapter_id, Scene.position > scene.position,
-                        Scene.position <= position
+                        Scene.position <= position, Scene.user_id == self._owner.id
                     ).all()
                     for sibling in scenes:
                         sibling.position -= 1
@@ -5622,7 +5625,9 @@ class SceneController(BaseController):
 
         with self._session as session:
             try:
-                scene = session.query(Scene).filter(Scene.id == scene_id).first()
+                scene = session.query(Scene).filter(
+                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                ).first()
 
                 if not scene:
                     raise ValueError('Scene not found.')
@@ -5725,7 +5730,9 @@ class SceneController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Scene).filter(Scene.story_id == story_id).order_by(
+            return session.query(Scene).filter(
+                Scene.story_id == story_id, Scene.user_id == self._owner.id
+            ).order_by(
                 Scene.chapter_id, Scene.position
             ).all()
 
@@ -5750,7 +5757,7 @@ class SceneController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Scene).filter(
-                Scene.story_id == story_id
+                Scene.story_id == story_id, Scene.user_id == self._owner.id
             ).order_by(
                 Scene.chapter_id, Scene.position
             ).offset(offset).limit(per_page).all()
@@ -5772,7 +5779,9 @@ class SceneController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Scene).filter(Scene.chapter_id == chapter_id).order_by(Scene.position).all()
+            return session.query(Scene).filter(
+                Scene.chapter_id == chapter_id, Scene.user_id == self._owner.id
+            ).order_by(Scene.position).all()
 
     def get_scenes_page_by_chapter_id(self, chapter_id: int, page: int, per_page: int) -> list:
         """Get a single page of scenes associated with a chapter from the database
@@ -5797,7 +5806,7 @@ class SceneController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Scene).filter(
-                Scene.chapter_id == chapter_id
+                Scene.chapter_id == chapter_id, Scene.user_id == self._owner.id
             ).order_by(Scene.position).offset(offset).limit(per_page).all()
 
     def search_scenes_by_title_and_description(self, search: str) -> list:
@@ -5816,7 +5825,8 @@ class SceneController(BaseController):
 
         with self._session as session:
             return session.query(Scene).filter(
-                or_(Scene.title.like(f'%{search}%'), Scene.description.like(f'%{search}%'))
+                or_(Scene.title.like(f'%{search}%'), Scene.description.like(f'%{search}%')),
+                Scene.user_id == self._owner.id
             ).all()
 
     def search_scenes_by_content(self, search: str) -> list:
@@ -5834,7 +5844,9 @@ class SceneController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Scene).filter(Scene.content.like(f'%{search}%')).all()
+            return session.query(Scene).filter(
+                Scene.content.like(f'%{search}%'), Scene.user_id == self._owner.id
+            ).all()
 
     def append_links_to_scene(self, scene_id: int, link_ids: list) -> Type[Scene]:
         """Append links to a scene
@@ -5854,13 +5866,17 @@ class SceneController(BaseController):
 
         with self._session as session:
             try:
-                scene = session.query(Scene).filter(Scene.id == scene_id).first()
+                scene = session.query(Scene).filter(
+                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                ).first()
 
                 if not scene:
                     raise ValueError('Scene not found.')
 
                 for link_id in link_ids:
-                    link = session.query(Link).filter(Link.id == link_id).first()
+                    link = session.query(Link).filter(
+                        Link.id == link_id, Link.user_id == self._owner.id
+                    ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
@@ -5897,7 +5913,9 @@ class SceneController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Link).join(LinkScene).filter(LinkScene.scene_id == scene_id).all()
+            return session.query(Link).join(LinkScene).filter(
+                LinkScene.scene_id == scene_id, LinkScene.user_id == self._owner.id
+            ).all()
 
     def append_notes_to_scene(self, scene_id: int, note_ids: list) -> Type[Scene]:
         """Append notes to a scene
@@ -5917,13 +5935,17 @@ class SceneController(BaseController):
 
         with self._session as session:
             try:
-                scene = session.query(Scene).filter(Scene.id == scene_id).first()
+                scene = session.query(Scene).filter(
+                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                ).first()
 
                 if not scene:
                     raise ValueError('Scene not found.')
 
                 for note_id in note_ids:
-                    note = session.query(Note).filter(Note.id == note_id).first()
+                    note = session.query(Note).filter(
+                        Note.id == note_id, Note.user_id == self._owner.id
+                    ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
@@ -5960,7 +5982,9 @@ class SceneController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Note).join(NoteScene).filter(NoteScene.scene_id == scene_id).all()
+            return session.query(Note).join(NoteScene).filter(
+                NoteScene.scene_id == scene_id, NoteScene.user_id == self._owner.id
+            ).all()
 
 
 class StoryController(BaseController):
@@ -5989,7 +6013,7 @@ class StoryController(BaseController):
         Get all stories associated with an owner
     get_all_stories_page(page: int, per_page: int)
         Get a single page of stories associated with an owner from the database
-    search_stories_by_title_and_description(search: str)
+    search_stories(search: str)
         Search for stories by title and description
     append_authors_to_story(story_id: int, author_ids: list)
         Append authors to a story
@@ -6069,7 +6093,9 @@ class StoryController(BaseController):
 
         with self._session as session:
             try:
-                story = session.query(Story).filter(Story.id == story_id).first()
+                story = session.query(Story).filter(
+                    Story.id == story_id, Story.user_id == self._owner.id
+                ).first()
 
                 if not story:
                     raise ValueError('Story not found.')
@@ -6108,7 +6134,9 @@ class StoryController(BaseController):
 
         with self._session as session:
             try:
-                story = session.query(Story).filter(Story.id == story_id).first()
+                story = session.query(Story).filter(
+                    Story.id == story_id, Story.user_id == self._owner.id
+                ).first()
 
                 if not story:
                     raise ValueError('Story not found.')
@@ -6143,7 +6171,9 @@ class StoryController(BaseController):
         """
 
         with self._session as session:
-            story = session.query(Story).filter(Story.id == story_id).first()
+            story = session.query(Story).filter(
+                Story.id == story_id, Story.user_id == self._owner.id
+            ).first()
             return story
 
     def get_all_stories(self) -> list:
@@ -6180,7 +6210,7 @@ class StoryController(BaseController):
                 Story.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def search_stories_by_title_and_description(self, search: str) -> list:
+    def search_stories(self, search: str) -> list:
         """Search for stories by title and description
 
         Parameters
@@ -6196,7 +6226,8 @@ class StoryController(BaseController):
 
         with self._session as session:
             return session.query(Story).filter(
-                or_(Story.title.like(f'%{search}%'), Story.description.like(f'%{search}%'))
+                or_(Story.title.like(f'%{search}%'), Story.description.like(f'%{search}%')),
+                Story.user_id == self._owner.id
             ).all()
 
     def append_authors_to_story(self, story_id: int, author_ids: list) -> Type[Story]:
@@ -6217,13 +6248,17 @@ class StoryController(BaseController):
 
         with self._session as session:
             try:
-                story = session.query(Story).filter(Story.id == story_id).first()
+                story = session.query(Story).filter(
+                    Story.id == story_id, Story.user_id == self._owner.id
+                ).first()
 
                 if not story:
                     raise ValueError('Story not found.')
 
                 for author_id in author_ids:
-                    author = session.query(Author).filter(Author.id == author_id).first()
+                    author = session.query(Author).filter(
+                        Author.id == author_id, Author.user_id == self._owner.id
+                    ).first()
 
                     if not author:
                         raise ValueError('Author not found.')
@@ -6260,7 +6295,9 @@ class StoryController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Author).join(AuthorStory).filter(AuthorStory.story_id == story_id).all()
+            return session.query(Author).join(AuthorStory).filter(
+                AuthorStory.story_id == story_id, AuthorStory.user_id == self._owner.id
+            ).all()
 
     def append_links_to_story(self, story_id: int, link_ids: list) -> Type[Story]:
         """Append links to a story
@@ -6280,13 +6317,17 @@ class StoryController(BaseController):
 
         with self._session as session:
             try:
-                story = session.query(Story).filter(Story.id == story_id).first()
+                story = session.query(Story).filter(
+                    Story.id == story_id, Story.user_id == self._owner.id
+                ).first()
 
                 if not story:
                     raise ValueError('Story not found.')
 
                 for link_id in link_ids:
-                    link = session.query(Link).filter(Link.id == link_id).first()
+                    link = session.query(Link).filter(
+                        Link.id == link_id, Link.user_id == self._owner.id
+                    ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
@@ -6323,7 +6364,9 @@ class StoryController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Link).join(LinkStory).filter(LinkStory.story_id == story_id).all()
+            return session.query(Link).join(LinkStory).filter(
+                LinkStory.story_id == story_id, LinkStory.user_id == self._owner.id
+            ).all()
 
     def append_notes_to_story(self, story_id: int, note_ids: list) -> Type[Story]:
         """Append notes to a story
@@ -6343,13 +6386,17 @@ class StoryController(BaseController):
 
         with self._session as session:
             try:
-                story = session.query(Story).filter(Story.id == story_id).first()
+                story = session.query(Story).filter(
+                    Story.id == story_id, Story.user_id == self._owner.id
+                ).first()
 
                 if not story:
                     raise ValueError('Story not found.')
 
                 for note_id in note_ids:
-                    note = session.query(Note).filter(Note.id == note_id).first()
+                    note = session.query(Note).filter(
+                        Note.id == note_id, Note.user_id == self._owner.id
+                    ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
@@ -6386,7 +6433,9 @@ class StoryController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Note).join(NoteStory).filter(NoteStory.story_id == story_id).all()
+            return session.query(Note).join(NoteStory).filter(
+                NoteStory.story_id == story_id, NoteStory.user_id == self._owner.id
+            ).all()
 
 
 class SubmissionController(BaseController):
@@ -6410,9 +6459,9 @@ class SubmissionController(BaseController):
         Update a submission
     delete_submission(submission_id: int)
         Delete a submission
-    get_submissions_by_owner_id(owner_id: int)
+    get_all_submissions()
         Get all submissions associated with an owner
-    get_submissions_page_by_owner_id(owner_id: int, page: int, per_page: int)
+    get_all_submissions_page(page: int, per_page: int)
         Get a single page of submissions associated with an owner from the database
     get_submissions_by_story_id(story_id: int)
         Get all submissions associated with a story
@@ -6446,9 +6495,9 @@ class SubmissionController(BaseController):
         with (self._session as session):
             try:
                 if date_sent is not None:
-                    date_sent = datetime.strptime(date_sent, '%Y-%m-%d')
+                    date_sent = datetime.strptime(date_sent, date_format)
                 else:
-                    datetime.strptime(str(date.today()), '%Y-%m-%d')
+                    datetime.strptime(str(date.today()), date_format)
 
                 created = datetime.now()
                 modified = created
@@ -6502,7 +6551,9 @@ class SubmissionController(BaseController):
 
         with self._session as session:
             try:
-                submission = session.query(Submission).filter(Submission.id == submission_id).first()
+                submission = session.query(Submission).filter(
+                    Submission.id == submission_id, Submission.user_id == self._owner.id
+                ).first()
 
                 if not submission:
                     raise ValueError('Submission not found.')
@@ -6544,7 +6595,9 @@ class SubmissionController(BaseController):
 
         with self._session as session:
             try:
-                submission = session.query(Submission).filter(Submission.id == submission_id).first()
+                submission = session.query(Submission).filter(
+                    Submission.id == submission_id, Submission.user_id == self._owner.id
+                ).first()
 
                 if not submission:
                     raise ValueError('Submission not found.')
@@ -6563,13 +6616,8 @@ class SubmissionController(BaseController):
                 session.commit()
                 return True
 
-    def get_submissions_by_owner_id(self, owner_id: int) -> list:
+    def get_all_submissions_by_owner_id(self) -> list:
         """Get all submissions associated with an owner
-
-        Parameters
-        ----------
-        owner_id : int
-            The id of the owner
 
         Returns
         -------
@@ -6578,15 +6626,13 @@ class SubmissionController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Submission).filter(Submission.owner_id == owner_id).all()
+            return session.query(Submission).filter(Submission.user_id == self._owner.id).all()
 
-    def get_submissions_page_by_owner_id(self, owner_id: int, page: int, per_page: int) -> list:
+    def get_all_submissions_page(self, page: int, per_page: int) -> list:
         """Get a single page of submissions associated with an owner from the database
 
         Parameters
         ----------
-        owner_id : int
-            The id of the owner
         page : int
             The page number
         per_page : int
@@ -6601,7 +6647,7 @@ class SubmissionController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Submission).filter(
-                Submission.owner_id == owner_id
+                Submission.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def get_submissions_by_story_id(self, story_id: int) -> list:
@@ -6619,7 +6665,9 @@ class SubmissionController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Submission).filter(Submission.story_id == story_id).all()
+            return session.query(Submission).filter(
+                Submission.story_id == story_id, Submission.user_id == self._owner.id
+            ).all()
 
     def get_submissions_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
         """Get a single page of submissions associated with a story from the database
@@ -6642,7 +6690,7 @@ class SubmissionController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Submission).filter(
-                Submission.story_id == story_id
+                Submission.story_id == story_id, Submission.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
 
