@@ -192,9 +192,9 @@ class AuthorController(BaseController):
 
     Methods
     -------
-    create_author(is_pseudonym: bool, name: str, initials: str)
+    create_author(name: str, initials: str, is_pseudonym: bool)
         Create a new author
-    update_author(is_pseudonym: bool, name: str, initials: str)
+    update_author(author_id: int, name: str, initials: str)
         Update an author
     change_pseudonym_status(author_id: int, is_pseudonym: bool)
         Change the pseudonym status of an author
@@ -221,17 +221,17 @@ class AuthorController(BaseController):
 
         super().__init__(session, owner)
 
-    def create_author(self, is_pseudonym: bool, name: str, initials: str = None) -> Author:
+    def create_author(self, name: str, initials: str = None, is_pseudonym: bool = False) -> Author:
         """Create a new author
 
         Parameters
         ----------
-        is_pseudonym : bool
-            Whether the author is a pseudonym
         name : str
             The name of the new author
         initials : str
             The initials of the new author, optional
+        is_pseudonym : bool
+            Whether the author is a pseudonym, optional, default is False, suggesting it is the user's actual name
 
         Returns
         -------
@@ -270,7 +270,7 @@ class AuthorController(BaseController):
                 session.commit()
                 return author
 
-    def update_author(self, author_id: int, is_pseudonym: bool, name: str, initials: str = None) -> Type[Author]:
+    def update_author(self, author_id: int, name: str, initials: str = None) -> Type[Author]:
         """Update an author
 
         Parameters
@@ -307,7 +307,6 @@ class AuthorController(BaseController):
                 if name_exists:
                     raise Exception('That author already exists.')
 
-                author.is_pseudonym = is_pseudonym
                 author.name = name
                 author.initials = initials
                 author.modified = datetime.now()
@@ -460,19 +459,19 @@ class AuthorController(BaseController):
         with self._session as session:
             return session.query(func.count(Author.id)).filter(Author.user_id == self._owner.id).scalar()
 
-    def get_all_authors(self) -> list | None:
+    def get_all_authors(self) -> list:
         """Get all authors associated with a user
 
         Returns
         -------
-        list | None
-            A list of author objects or None if none are found
+        list
+            A list of author objects
         """
 
         with self._session as session:
             return session.query(Author).filter(Author.user_id == self._owner.id).all()
 
-    def get_authors_page(self, page: int, per_page: int) -> list | None:
+    def get_authors_page(self, page: int, per_page: int) -> list:
         """Get a single page of authors from the database associated with a user
 
         Parameters
@@ -484,15 +483,15 @@ class AuthorController(BaseController):
 
         Returns
         -------
-        list | None
-            A list of author objects or None if none are found
+        list
+            A list of author objects
         """
 
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Author).filter(Author.user_id == self._owner.id).offset(offset).limit(per_page).all()
 
-    def get_authors_by_story_id(self, story_id: int) -> list | None:
+    def get_authors_by_story_id(self, story_id: int) -> list:
         """Get all authors associated with a story
 
         Parameters
@@ -502,8 +501,8 @@ class AuthorController(BaseController):
 
         Returns
         -------
-        list | None
-            A list of author objects or None if the story is not found
+        list
+            A list of author objects
         """
         with self._session as session:
             story = session.query(Story).filter(
@@ -511,7 +510,7 @@ class AuthorController(BaseController):
             ).first()
             return story.authors if story else None
 
-    def search_authors(self, search: str) -> list | None:
+    def search_authors(self, search: str) -> list:
         """Search for authors by name
 
         Parameters
@@ -521,8 +520,8 @@ class AuthorController(BaseController):
 
         Returns
         -------
-        list | None
-            A list of author objects or None if none are found
+        list
+            A list of author objects
         """
 
         with self._session as session:
@@ -823,7 +822,7 @@ class BibliographyController(BaseController):
                 Bibliography.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def get_bibliographies_by_story_id(self, story_id: int) -> list | None:
+    def get_bibliographies_by_story_id(self, story_id: int) -> list:
         """Get all bibliographies associated with a story
 
         Parameters
@@ -833,8 +832,8 @@ class BibliographyController(BaseController):
 
         Returns
         -------
-        list | None
-            A list of bibliography objects or None if the story is not found
+        list
+            A list of bibliography objects
         """
 
         with self._session as session:
@@ -843,7 +842,7 @@ class BibliographyController(BaseController):
             ).all()
             return bibliographies if bibliographies else None
 
-    def get_bibliographies_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list | None:
+    def get_bibliographies_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
         """Get a single page of bibliographies associated with a story from the database
 
         Parameters
@@ -857,8 +856,8 @@ class BibliographyController(BaseController):
 
         Returns
         -------
-        list | None
-            A list of bibliography objects or None if the story is not found
+        list
+            A list of bibliography objects
         """
 
         with self._session as session:
@@ -887,7 +886,7 @@ class BibliographyController(BaseController):
                 Bibliography.title.like(f'%{search}%'), Bibliography.user_id == self._owner.id
             ).all()
 
-    def search_bibliographies_by_story_id(self, story_id: int, search: str) -> list | None:
+    def search_bibliographies_by_story_id(self, story_id: int, search: str) -> list:
         """Search for bibliographies by title associated with a story
 
         Parameters
@@ -899,8 +898,8 @@ class BibliographyController(BaseController):
 
         Returns
         -------
-        list | None
-            A list of bibliography objects or None if none found
+        list
+            A list of bibliography objects
         """
 
         with self._session as session:
@@ -2025,7 +2024,7 @@ class CharacterController(BaseController):
                 Character.user_id == self._owner.id
             ).all()
 
-    def search_characters_by_story_id(self, story_id: int, search: str) -> list | None:
+    def search_characters_by_story_id(self, story_id: int, search: str) -> list:
         """Search for characters by title, first name, middle name, last name, nickname, and description belonging to \
         a specific story
 
@@ -2038,8 +2037,8 @@ class CharacterController(BaseController):
 
         Returns
         -------
-        list | None
-            The list of characters associated with the story or None if none are found
+        list
+            The list of characters associated with the story
         """
 
         with self._session as session:
@@ -3921,7 +3920,7 @@ class ImageController(BaseController):
         Get all images associated with a user
     get_all_images_page(page: int, per_page: int)
         Get a single page of images associated with a user from the database
-    search_images_by_caption(search: str)
+    search_images(search: str)
         Search for images by caption
     get_images_by_character_id(character_id: int)
         Get all images associated with a character
@@ -3938,7 +3937,9 @@ class ImageController(BaseController):
 
         super().__init__(session, owner)
 
-    def create_image(self, filename: str, dirname: str, size_in_bytes: int, mime_type: str, caption: str = None) -> Image:
+    def create_image(
+            self, filename: str, dirname: str, size_in_bytes: int, mime_type: str, caption: str = None
+    ) -> Image:
         """Create a new image
 
         Parameters
@@ -4109,7 +4110,7 @@ class ImageController(BaseController):
                 Image.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def search_images_by_caption(self, search: str) -> list:
+    def search_images(self, search: str) -> list:
         """Search for images by caption
 
         Parameters
@@ -4253,7 +4254,7 @@ class LinkController(BaseController):
         Get all links associated with a user
     get_all_links_page(page: int, per_page: int)
         Get a single page of links associated with a user from the database
-    search_links_by_title(search: str)
+    search_links(search: str)
         Search for links by title
     """
 
@@ -4486,7 +4487,7 @@ class LinkController(BaseController):
             offset = (page - 1) * per_page
             return session.query(Link).filter(Link.user_id == self._owner.id).offset(offset).limit(per_page).all()
 
-    def search_links_by_title(self, search: str) -> list:
+    def search_links(self, search: str) -> list:
         """Search for links by title
 
         Parameters
@@ -6273,7 +6274,7 @@ class StoryController(BaseController):
         with self._session as session:
             return session.query(Story).filter(Story.user_id == self._owner.id).all()
 
-    def get_all_stories_page_by_owner_id(self, page: int, per_page: int) -> list:
+    def get_all_stories_page(self, page: int, per_page: int) -> list:
         """Get a single page of stories associated with an owner from the database
 
         Parameters
