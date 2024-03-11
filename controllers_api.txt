@@ -56,48 +56,48 @@ class ChapterController
     func get_notes_by_chapter_id ( chapter_id: int ) : list
 
 class CharacterController
-    func create_character
-    func update_character
-    func delete_character
-    func get_character_by_id
-    func get_character_count
-    func get_all_characters
-    func get_all_characters_page
-    func get_character_count_by_story_id
-    func get_characters_by_story_id
-    func get_characters_page_by_story_id
-    func search_characters
-    func search_characters_by_story_id
-    func create_relationship
-    func update_relationship
-    func change_relationship_position
-    func delete_relationship
-    func get_relationship_by_id
-    func get_relationships_by_character_id
-    func get_relationships_page_by_character_id
-    func create_trait
-    func update_trait
-    func change_trait_position
-    func delete_trait
-    func get_trait_by_id
-    func get_traits_by_character_id
-    func get_traits_page_by_character_id
-    func append_events_to_character
-    func get_events_by_character_id
-    func get_events_page_by_character_id
-    func append_links_to_character
-    func get_links_by_character_id
-    func get_links_page_by_character_id
-    func append_notes_to_character
-    func get_notes_by_character_id
-    func get_notes_page_by_character_id
-    func append_images_to_character
-    func change_image_position
-    func change_image_default_status
-    func delete_image
-    func get_image_count_by_character_id
-    func get_images_by_character_id
-    func get_images_page_by_character_id
+    func create_character ( title: str = None, first_name: str = None, middle_name: str = None, last_name: str = None, nickname: str = None, gender: str = None, sex: str = None, date_of_birth: str = None, date_of_death: str = None, description: None ) : Character    
+    func update_character ( character_id: int, title: str = None, first_name: str = None, middle_name: str = None, last_name: str = None, nickname: str = None, gender: str = None, sex: str = None, date_of_birth: str = None, date_of_death: str = None, description: None ) : Character  
+    func delete_character ( character_id: int ) : bool
+    func get_character_by_id ( character_id: int ) : Type[Character] | None
+    func get_character_count ( ) : int
+    func get_all_characters ( ) : list
+    func get_all_characters_page ( page: int, per_page: int ) : list
+    func get_character_count_by_story_id ( story_id: int ) : int
+    func get_characters_by_story_id ( story_id: int ) : list
+    func get_characters_page_by_story_id ( story_id: int, page: int, per_page: int ) : list
+    func search_characters ( search: str ) : list
+    func search_characters_by_story_id ( story_id: int, search: str ) : list
+    func create_relationship ( parent_id: int, related_id: int, relationship_type: str, description: str = None, start_date: str = None, end_date: str = None ) : CharacterRelationship    
+    func update_relationship ( relationship_id: int, parent_id: int, related_id: int, relationship_type: str, description: str = None, start_date: str = None, end_date: str = None ) : Type[CharacterRelationship]    
+    func change_relationship_position ( relationship_id: int, position: int ) : CharacterRelationship    
+    func delete_relationship ( relationship_id: int ) : bool
+    func get_relationship_by_id ( relationship_id: int ) : Type[CharacterRelationship] | None
+    func get_relationships_by_character_id ( character_id: int ) : list
+    func get_relationships_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
+    func create_trait ( character_id: int, name: str, magnitude: int ) : CharacterTrait
+    func update_trait ( trait_id: int, name: str, magnitude: int ) : Type[CharacterTrait]
+    func change_trait_position ( trait_id: int, position: int ) : Type[CharacterTrait]
+    func delete_trait ( trait_id: int ) : bool
+    func get_trait_by_id ( trait_id: int ) : Type[CharacterTrait] | None
+    func get_traits_by_character_id ( character_id: int ) : list
+    func get_traits_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
+    func append_events_to_character ( character_id: int, events: list ) : Type[Character]
+    func get_events_by_character_id ( character_id: int ) : list
+    func get_events_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
+    func append_links_to_character ( character_id: int, links: list ) : Type[Character]
+    func get_links_by_character_id ( character_id: int) : list
+    func get_links_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
+    func append_notes_to_character ( character_id: int, notes: list ) : Type[Character]
+    func get_notes_by_character_id ( character_id: int ) : list
+    func get_notes_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
+    func append_images_to_character ( character_id: int, images: list ) : Type[Character]
+    func change_image_position ( image_id: int, position: int ) : Type[CharacterImage]
+    func change_image_default_status ( image_id: int, is_default: bool ) : Type[CharacterImage]
+    func delete_image ( image_id: int ) : bool
+    func get_image_count_by_character_id ( character_id: int ) : int
+    func get_images_by_character_id ( character_id: int ) : list
+    func get_images_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
 
 class EventController
     func create_event
