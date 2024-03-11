@@ -50,9 +50,9 @@ class ChapterController
    get_chapter_count_by_story_id ( story_id: int ) : int
    search_chapters ( search: str ) : list
    search_chapters_by_story_id ( story_id: int, search: str ) : list
-   append_links_to_chapter ( chapter_id: int, links: list ) : Type[Chapter]
+   append_links_to_chapter ( chapter_id: int, link_ids: list ) : Type[Chapter]
    get_links_by_chapter_id ( chapter_id: int ) : list
-   append_notes_to_chapter ( chapter_id: int, notes: list ) : Type[Chapter]
+   append_notes_to_chapter ( chapter_id: int, note_ids: list ) : Type[Chapter]
    get_notes_by_chapter_id ( chapter_id: int ) : list
 
 class CharacterController
@@ -82,16 +82,16 @@ class CharacterController
    get_trait_by_id ( trait_id: int ) : Type[CharacterTrait] | None
    get_traits_by_character_id ( character_id: int ) : list
    get_traits_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
-   append_events_to_character ( character_id: int, events: list ) : Type[Character]
+   append_events_to_character ( character_id: int, event_ids: list ) : Type[Character]
    get_events_by_character_id ( character_id: int ) : list
    get_events_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
-   append_links_to_character ( character_id: int, links: list ) : Type[Character]
+   append_links_to_character ( character_id: int, linkvs: list ) : Type[Character]
    get_links_by_character_id ( character_id: int) : list
    get_links_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
-   append_notes_to_character ( character_id: int, notes: list ) : Type[Character]
+   append_notes_to_character ( character_id: int, note_ids: list ) : Type[Character]
    get_notes_by_character_id ( character_id: int ) : list
    get_notes_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
-   append_images_to_character ( character_id: int, images: list ) : Type[Character]
+   append_images_to_character ( character_id: int, image_ids: list ) : Type[Character]
    change_image_position ( image_id: int, position: int ) : Type[CharacterImage]
    change_image_default_status ( image_id: int, is_default: bool ) : Type[CharacterImage]
    delete_image ( image_id: int ) : bool
@@ -108,12 +108,12 @@ class EventController
    append_characters_to_event ( event_id: int, characters: list ) : Type[Event]
    get_characters_by_event_id ( event_id: int ) : list
    get_characters_page_by_event_id ( event_id: int, page: int, per_page: int ) : list
-   append_locations_to_event ( event_id: int, locations: list ) : Type[Event]
-   get_locations_by_event_id ( ebent_id: int ) : list
-   append_links_to_event ( event_id: int, links: list ) : Type[Event]
+   append_locations_to_event ( event_id: int, location_ids: list ) : Type[Event]
+   get_locations_by_event_id ( event_id: int ) : list
+   append_links_to_event ( event_id: int, link_ids: list ) : Type[Event]
    get_links_by_event_id ( event_id: int ) : list
    get_links_page_by_event_id ( event_id: int, page: int, per_page: int ) : list
-   append_notes_to_event ( event_id: int, notes: list ) : Type[Event]
+   append_notes_to_event ( event_id: int, note_ids: list ) : Type[Event]
    get_notes_by_event_id ( event_id: int ) : list
    get_notes_page_by_event_id ( event_id: int, page: int, per_page: int ) : list
 
@@ -140,10 +140,10 @@ class LinkController
    search_links ( search: str ) : list
 
 class LocationController
-   create_location
-   update_location
-   delete_location
-   get_all_locations
+   create_location ( title: str, description: str = None, address: str = None, city: str = None, state: str = None, country: str = None, zip_code: str = None, latitude: float = None, longitude: float = None ) : Type[Location]
+   update_location ( location_id: int, title: str, description: str = None, address: str = None, city: str = None, state: str = None, country: str = None, zip_code: str = None, latitude: float = None, longitude: float = None ) : Type[Location]
+   delete_location ( location_id: int ) : bool
+   get_all_locations ( ) : list
    get_all_locations_page
    search_locations_by_title_and_description
    search_locations_by_address
