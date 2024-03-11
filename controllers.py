@@ -1402,14 +1402,14 @@ class ChapterController(BaseController):
                 Chapter.story_id == story_id, Chapter.user_id == self._owner.id
             ).all()
 
-    def append_links_to_chapter(self, chapter_id: int, links: list) -> Type[Chapter]:
+    def append_links_to_chapter(self, chapter_id: int, link_ids: list) -> Type[Chapter]:
         """Append links to a chapter
 
         Parameters
         ----------
         chapter_id : int
             The id of the chapter
-        links : list
+        link_ids : list
             A list of link ids
 
         Returns
@@ -1427,7 +1427,7 @@ class ChapterController(BaseController):
                 if not chapter:
                     raise ValueError('Chapter not found.')
 
-                for link_id in links:
+                for link_id in link_ids:
                     link = session.query(Link).filter(Link.id == link_id).first()
 
                     if not link:
@@ -1469,14 +1469,14 @@ class ChapterController(BaseController):
                 ChapterLink.chapter_id == chapter_id, ChapterLink.user_id == self._owner.id
             ).all()
 
-    def append_notes_to_chapter(self, chapter_id: int, notes: list) -> Type[Chapter]:
+    def append_notes_to_chapter(self, chapter_id: int, note_ids: list) -> Type[Chapter]:
         """Append notes to a chapter
 
         Parameters
         ----------
         chapter_id : int
             The id of the chapter
-        notes : list
+        note_ids : list
             A list of note ids
 
         Returns
@@ -1494,7 +1494,7 @@ class ChapterController(BaseController):
                 if not chapter:
                     raise ValueError('Chapter not found.')
 
-                for note_id in notes:
+                for note_id in note_ids:
                     note = session.query(Note).filter(
                         Note.id == note_id, Note.user_id == self._owner.id
                     ).first()
@@ -2670,14 +2670,14 @@ class CharacterController(BaseController):
             ).offset(
                 offset).limit(per_page).all()
 
-    def append_events_to_character(self, character_id: int, events: list) -> Type[Character]:
+    def append_events_to_character(self, character_id: int, event_ids: list) -> Type[Character]:
         """Append events to a character
 
         Parameters
         ----------
         character_id : int
             The id of the character
-        events : list
+        event_ids : list
             A list of event ids
 
         Returns
@@ -2695,7 +2695,7 @@ class CharacterController(BaseController):
                 if not character:
                     raise ValueError('Character not found.')
 
-                for event_id in events:
+                for event_id in event_ids:
                     event = session.query(Event).filter(
                         Event.id == event_id, Event.user_id == self._owner.id
                     ).first()
@@ -2769,14 +2769,14 @@ class CharacterController(BaseController):
                 CharacterEvent.character_id == character_id, CharacterEvent.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_links_to_character(self, character_id: int, links: list) -> Type[Character]:
+    def append_links_to_character(self, character_id: int, link_ids: list) -> Type[Character]:
         """Append links to a character
 
         Parameters
         ----------
         character_id : int
             The id of the character
-        links : list
+        link_ids : list
             A list of link ids
 
         Returns
@@ -2794,7 +2794,7 @@ class CharacterController(BaseController):
                 if not character:
                     raise ValueError('Character not found.')
 
-                for link_id in links:
+                for link_id in link_ids:
                     link = session.query(Link).filter(
                         Link.id == link_id, Link.user_id == self._owner.id
                     ).first()
@@ -2865,14 +2865,14 @@ class CharacterController(BaseController):
                 CharacterLink.character_id == character_id, CharacterLink.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_notes_to_character(self, character_id: int, notes: list) -> Type[Character]:
+    def append_notes_to_character(self, character_id: int, note_ids: list) -> Type[Character]:
         """Append notes to a character
 
         Parameters
         ----------
         character_id : int
             The id of the character
-        notes : list
+        note_ids : list
             A list of note ids
 
         Returns
@@ -2890,7 +2890,7 @@ class CharacterController(BaseController):
                 if not character:
                     raise ValueError('Character not found.')
 
-                for note_id in notes:
+                for note_id in note_ids:
                     note = session.query(Note).filter(
                         Note.id == note_id, Note.user_id == self._owner.id
                     ).first()
@@ -2961,7 +2961,7 @@ class CharacterController(BaseController):
                 CharacterNote.character_id == character_id, CharacterNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_images_to_character(self, character_id: int, images: list) -> Type[Character]:
+    def append_images_to_character(self, character_id: int, image_ids: list) -> Type[Character]:
         """Append images to a character
 
         As images are appended to the character, before each image is appended, the highest position among other images
@@ -2972,7 +2972,7 @@ class CharacterController(BaseController):
         ----------
         character_id : int
             The id of the character
-        images : list
+        image_ids : list
             A list of image ids
 
         Returns
@@ -2990,7 +2990,7 @@ class CharacterController(BaseController):
                 if not character:
                     raise ValueError('Character not found.')
 
-                for image_id in images:
+                for image_id in image_ids:
                     image = session.query(Image).filter(
                         Image.id == image_id, Image.user_id == self._owner.id
                     ).first()
@@ -3534,14 +3534,14 @@ class EventController(BaseController):
                 Event.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_characters_to_event(self, event_id: int, characters: list) -> Type[Event]:
+    def append_characters_to_event(self, event_id: int, character_ids: list) -> Type[Event]:
         """Append characters to an event
 
         Parameters
         ----------
         event_id : int
             The id of the event
-        characters : list
+        character_ids : list
             A list of character ids
 
         Returns
@@ -3559,7 +3559,7 @@ class EventController(BaseController):
                 if not event:
                     raise ValueError('Event not found.')
 
-                for character_id in characters:
+                for character_id in character_ids:
                     character = session.query(Character).filter(
                         Character.id == character_id, Character.user_id == self._owner.id
                     ).first()
@@ -3631,14 +3631,14 @@ class EventController(BaseController):
                     Character.id == character_event.character_id, Character.user_id == self._owner.id
                 ).first()
 
-    def append_locations_to_event(self, event_id: int, locations: list) -> Type[Event]:
+    def append_locations_to_event(self, event_id: int, location_ids: list) -> Type[Event]:
         """Append locations to an event
 
         Parameters
         ----------
         event_id : int
             The id of the event
-        locations : list
+        location_ids : list
             A list of location ids
 
         Returns
@@ -3656,7 +3656,7 @@ class EventController(BaseController):
                 if not event:
                     raise ValueError('Event not found.')
 
-                for location_id in locations:
+                for location_id in location_ids:
                     location = session.query(Location).filter(
                         Location.id == location_id, Location.user_id == self._owner.id
                     ).first()
@@ -3703,14 +3703,14 @@ class EventController(BaseController):
                     Location.id == event_location.location_id, Location.user_id == self._owner.id
                 ).first()
 
-    def append_links_to_event(self, event_id: int, links: list) -> Type[Event]:
+    def append_links_to_event(self, event_id: int, link_ids: list) -> Type[Event]:
         """Append links to an event
 
         Parameters
         ----------
         event_id : int
             The id of the event
-        links : list
+        link_ids : list
             A list of link ids
 
         Returns
@@ -3728,7 +3728,7 @@ class EventController(BaseController):
                 if not event:
                     raise ValueError('Event not found.')
 
-                for link_id in links:
+                for link_id in link_ids:
                     link = session.query(Link).filter(
                         Link.id == link_id, Link.user_id == self._owner.id
                     ).first()
@@ -3799,14 +3799,14 @@ class EventController(BaseController):
                 EventLink.event_id == event_id, EventLink.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_notes_to_event(self, event_id: int, notes: list) -> Type[Event]:
+    def append_notes_to_event(self, event_id: int, note_ids: list) -> Type[Event]:
         """Append notes to an event
 
         Parameters
         ----------
         event_id : int
             The id of the event
-        notes : list
+        note_ids : list
             A list of note ids
 
         Returns
@@ -3824,7 +3824,7 @@ class EventController(BaseController):
                 if not event:
                     raise ValueError('Event not found.')
 
-                for note_id in notes:
+                for note_id in note_ids:
                     note = session.query(Note).filter(
                         Note.id == note_id, Note.user_id == self._owner.id
                     ).first()
@@ -4901,14 +4901,14 @@ class LocationController(BaseController):
                 Location.zip_code.like(f'%{search}%'), Location.user_id == self._owner.id
             ).all()
 
-    def append_images_to_location(self, location_id: int, images: list) -> Type[Location]:
+    def append_images_to_location(self, location_id: int, image_ids: list) -> Type[Location]:
         """Append images to a location
 
         Parameters
         ----------
         location_id : int
             The id of the location
-        images : list
+        image_ids : list
             A list of image ids
 
         Returns
@@ -4926,7 +4926,7 @@ class LocationController(BaseController):
                 if not location:
                     raise ValueError('Location not found.')
 
-                for image_id in images:
+                for image_id in image_ids:
                     image = session.query(Image).filter(
                         Image.id == image_id, Image.user_id == self._owner.id
                     ).first()
@@ -5008,14 +5008,14 @@ class LocationController(BaseController):
                 ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_links_to_location(self, location_id: int, links: list) -> Type[Location]:
+    def append_links_to_location(self, location_id: int, link_ids: list) -> Type[Location]:
         """Append links to a location
 
         Parameters
         ----------
         location_id : int
             The id of the location
-        links : list
+        link_ids : list
             A list of link ids
 
         Returns
@@ -5033,7 +5033,7 @@ class LocationController(BaseController):
                 if not location:
                     raise ValueError('Location not found.')
 
-                for link_id in links:
+                for link_id in link_ids:
                     link = session.query(Link).filter(
                         Link.id == link_id, Link.user_id == self._owner.id
                     ).first()
@@ -5105,14 +5105,14 @@ class LocationController(BaseController):
                 LinkLocation.location_id == location_id, LinkLocation.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_notes_to_location(self, location_id: int, notes: list) -> Type[Location]:
+    def append_notes_to_location(self, location_id: int, note_ids: list) -> Type[Location]:
         """Append notes to a location
 
         Parameters
         ----------
         location_id : int
             The id of the location
-        notes : list
+        note_ids : list
             A list of note ids
 
         Returns
@@ -5130,7 +5130,7 @@ class LocationController(BaseController):
                 if not location:
                     raise ValueError('Location not found.')
 
-                for note_id in notes:
+                for note_id in note_ids:
                     note = session.query(Note).filter(
                         Note.id == note_id, Note.user_id == self._owner.id
                     ).first()
