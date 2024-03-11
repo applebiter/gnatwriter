@@ -23,37 +23,37 @@ class AuthorController
     func search_authors ( search: str ) : list
 
 class BibliographyController
-    func create_bibliography
-    func update_bibliography
-    func delete_bibliography
-    func get_bibliography_by_id
-    func get_bibliography_by_title
-    func get_bibliography_count
-    func get_all_bibliographies
-    func get_bibliographies_page
-    func get_bibliographies_by_story_id
-    func get_bibliographies_page_by_story_id
-    func search_bibliographies
-    func search_bibliographies_by_story_id
+    func create_bibliography ( story_id: int, title: str, pages: str = None, publication_date: str = None, other_text: str = None ) : Bibliography
+    func update_bibliography ( bibliography_id: int, story_id: int, title: str, pages: str = None, publication_date: str = None, other_text: str = None ) : Type[Bibliography]    
+    func delete_bibliography ( bibliography_id: int ) : bool
+    func get_bibliography_by_id ( bibliography_id: int ) : Type[Bibliography] | None
+    func get_bibliography_by_title ( title: str ) : Type[Bibliography] | None
+    func get_bibliography_count ( ) : int
+    func get_all_bibliographies ( ) : list
+    func get_bibliographies_page ( page: int, per_page: int ) : list
+    func get_bibliographies_by_story_id ( story_id: int ) list
+    func get_bibliographies_page_by_story_id ( story_id: int, page: int, per_page: int ) : list
+    func search_bibliographies ( search: str ) : list
+    func search_bibliographies_by_story_id ( story_id: int, search: str ) : list
 
 class ChapterController
-    func create_chapter
-    func update_chapter
-    func delete_chapter
-    func change_chapter_position
-    func get_chapter_by_id
-    func get_all_chapters
-    func get_all_chapters_page
-    func get_chapter_count
-    func get_chapters_by_story_id
-    func get_chapters_page_by_story_id
-    func get_chapter_count_by_story_id
-    func search_chapters
-    func search_chapters_by_story_id
-    func append_links_to_chapter
-    func get_links_by_chapter_id
-    func append_notes_to_chapter
-    func get_notes_by_chapter_id
+    func create_chapter ( story_id: int, title: str, description: str = None ) : Chapter
+    func update_chapter ( chapter_id: int, title: str, description: str = None ) : Type[Chapter]
+    func delete_chapter ( chapter_id: int ) : bool
+    func change_chapter_position ( chapter_id: int, position: int ) : Type[Character]
+    func get_chapter_by_id ( chapter_id: int ) : Type[Chapter] | None
+    func get_all_chapters ( ) : list
+    func get_all_chapters_page ( page: int, per_page: int ) : list
+    func get_chapter_count ( ) : int
+    func get_chapters_by_story_id ( story_id: int ) : list
+    func get_chapters_page_by_story_id ( story_id: int, page: int, per_page: int ) : list
+    func get_chapter_count_by_story_id ( story_id: int ) : int
+    func search_chapters ( search: str ) : list
+    func search_chapters_by_story_id ( story_id: int, search: str ) : list
+    func append_links_to_chapter ( chapter_id: int, links: list ) : Type[Chapter]
+    func get_links_by_chapter_id ( chapter_id: int ) : list
+    func append_notes_to_chapter ( chapter_id: int, notes: list ) : Type[Chapter]
+    func get_notes_by_chapter_id ( chapter_id: int ) : list
 
 class CharacterController
     func create_character
