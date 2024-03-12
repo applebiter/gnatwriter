@@ -61,18 +61,18 @@ class Bibliography
     func unserialize( data: dict ) : Bibliography
 
 class BibliographyAuthor
-    const id
-    const user_id
-    const bibliography_id
-    const name
-    const initials
-    const created
-    const user
-    const reference
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const bibliography_id: int
+    const name: str
+    const initials: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const reference: Bibliography
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : BibliographyAuthor
 
 class Chapter
     const id
