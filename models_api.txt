@@ -1,64 +1,64 @@
 
-const datetime_format
-const date_format
+const datetime_format: str
+const date_format: str
 
 class Activity
-    const id
-    const user_id
-    const summary
-    const created
-    const user
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const summary: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize ( data: dict ) : Activity
 
 class Author
-    const id
-    const user_id
-    const is_pseudonym
-    const name
-    const initials
-    const created
-    const modified
-    const user
-    const stories
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const is_pseudonym: bool
+    const name: str
+    const initials: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const stories: List[AuthorStory]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Author
 
 class AuthorStory
-    const author_id
-    const story_id
-    const user_id
-    const created
-    const user
-    const author
-    const story
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const author_id: int
+    const story_id: int
+    const user_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const author: Author
+    const story: Story
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : AuthorStory
 
 class Bibliography
-    const id
-    const user_id
-    const story_id
-    const title
-    const pages
-    const publisher
-    const publication_date
-    const editor
-    const created
-    const modified
-    const user
-    const story
-    const authors
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const story_id: int
+    const title: str
+    const pages: str
+    const publisher: str
+    const publication_date: str for input/output, datetime.date object otherwise
+    const editor: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const story: Story
+    const authors: List[BibliographyStory]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Bibliography
 
 class BibliographyAuthor
     const id
