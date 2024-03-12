@@ -188,19 +188,19 @@ class SceneController
    get_notes_by_scene_id ( scene_id: int ) : list
 
 class StoryController
-   create_story
-   update_story
-   delete_story
-   get_story_by_id
-   get_all_stories
-   get_all_stories_page
-   search_stories
-   append_authors_to_story
-   get_authors_by_story_id
-   append_links_to_story
-   get_links_by_story_id
-   append_notes_to_story
-   get_notes_by_story_id
+   create_story ( title: str, description: str = None ) : Story
+   update_story ( story_id: int, title: str, description: str = None ) : Type[Story]
+   delete_story ( story_id: int ) : bool
+   get_story_by_id ( story_id: int ) : Type[Story] | None
+   get_all_stories ( ) : list
+   get_all_stories_page ( page: int, per_page: int ) : list
+   search_stories ( search: str ) : list
+   append_authors_to_story ( story_id: int, author_ids: list ) : Type[Story]
+   get_authors_by_story_id ( story_id: int ) : list
+   append_links_to_story ( story_id: int, link_ids: list ) : Type[Story]
+   get_links_by_story_id ( story_id: int ) : list
+   append_notes_to_story ( story_id: int, mote_ids: list ) : Type[Story]
+   get_notes_by_story_id ( story_id: int ) : list
 
 class SubmissionController
    create_submission

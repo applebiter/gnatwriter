@@ -6088,7 +6088,7 @@ class StoryController(BaseController):
 
         super().__init__(session, owner)
 
-    def create_story(self, title: str, description: str) -> Story:
+    def create_story(self, title: str, description: str = None) -> Story:
         """Create a new story
 
         Parameters
@@ -6127,7 +6127,7 @@ class StoryController(BaseController):
                 session.commit()
                 return story
 
-    def update_story(self, story_id: int, title: str, description: str) -> Type[Story]:
+    def update_story(self, story_id: int, title: str, description: str = None) -> Type[Story]:
         """Update a story
 
         Parameters
