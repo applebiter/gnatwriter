@@ -212,19 +212,19 @@ class SubmissionController
    get_submissions_page_by_story_id ( story_id: int, page: int, per_page: int ) : list
 
 class UserController
-   create_user
-   register_user
-   activate_user
-   deactivate_user
-   login
-   change_password
-   delete_user
-   get_user_by_id
-   get_user_by_uuid
-   get_user_by_username
-   get_user_by_email
-   get_user_count
-   get_all_users
-   get_users_page
-   search_users
+   create_user ( username: str, password: str, email: str ) : User
+   register_user ( username: str, password: str, repassword: str, email: str, reemail: str ) : User
+   activate_user ( user_id: int ) : Type[User]
+   deactivate_user ( user_id: int ) : Type[User]
+   login ( username: str, password: str ) : Type[User]
+   change_password ( user_id: int, old_password: str, new_password: str, repassword: str ) : Type[User]
+   delete_user ( user_id: int ) : bool
+   get_user_by_id ( user_id: int ) : Type[User] | None
+   get_user_by_uuid ( uuid: str ) : Type[User] | None
+   get_user_by_username ( username: str ) : Type[User] | None
+   get_user_by_email ( email: str ) : Type[User] | None
+   get_user_count ( ) : int
+   get_all_users ( ) : list
+   get_all_users_page ( page: int, per_page: int ) : list
+   search_users ( search: str ) : list
 

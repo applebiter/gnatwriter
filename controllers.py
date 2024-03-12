@@ -6802,7 +6802,7 @@ class UserController(BaseController):
         Get user count
     get_all_users()
         Get all users
-    get_users_page(page: int, per_page: int)
+    get_all_users_page(page: int, per_page: int)
         Get a single page of users from the database
     search_users(search: str)
         Search for users by username or email
@@ -6962,7 +6962,7 @@ class UserController(BaseController):
                     session.commit()
                     return user
 
-    def activate_user(self, user_id: int) -> User:
+    def activate_user(self, user_id: int) -> Type[User]:
         """Activate a user
 
         Parameters
@@ -6999,7 +6999,7 @@ class UserController(BaseController):
 
             else:
                 session.commit()
-                return user.id
+                return user
 
     def deactivate_user(self, user_id: int) -> Type[User]:
         """Deactivate a user
@@ -7283,7 +7283,7 @@ class UserController(BaseController):
         with self._session as session:
             return session.query(User).all()
 
-    def get_users_page(self, page: int, per_page: int) -> list:
+    def get_all_users_page(self, page: int, per_page: int) -> list:
         """Get a single page of users from the database
 
         Parameters
