@@ -171,22 +171,21 @@ class NoteController
    search_notes ( search: str ) : list
 
 class SceneController
-   create_scene
-   update_scene
-   change_scene_position
-   delete_scene
-   get_all_scenes
-   get_all_scenes_page
-   get_scenes_by_story_id
-   get_scenes_page_by_story_id
-   get_scenes_by_chapter_id
-   get_scenes_page_by_chapter_id
-   search_scenes_by_title_and_description
-   search_scenes_by_content
-   append_links_to_scene
-   get_links_by_scene_id
-   append_notes_to_scene
-   get_notes_by_scene_id
+   create_scene ( story_id: int, chapter_id: int, title: str, description: str = None, content: str = None ) : Type[Scene]
+   update_scene ( scene_id: int, title: str, description: str = None, content: str = None ) : Type[Scene]
+   change_scene_position ( scene_id: int, position: int ) : Type[Scene]
+   delete_scene ( scene_id: int ) : bool
+   get_all_scenes ( ) : list
+   get_all_scenes_page ( page: int, per_page: int ) : list
+   get_scenes_by_story_id ( story_id: int ) : list
+   get_scenes_page_by_story_id ( story_id: int, page: int, per_page: int ) : list
+   get_scenes_by_chapter_id ( chapter_id: int ) : list
+   get_scenes_page_by_chapter_id ( chapter_id: int, page: int, per_page: int ) : list
+   search_scenes ( search: str ) : list
+   append_links_to_scene ( scene_id: int, link_ids: list ) : Type[Scene]
+   get_links_by_scene_id ( scene_id: int ) : list
+   append_notes_to_scene ( scene_id: int, note_ids: list ) : Type[Scene]
+   get_notes_by_scene_id ( scene_id: int ) : list
 
 class StoryController
    create_story

@@ -5440,7 +5440,7 @@ class NoteController(BaseController):
                 Note.owner_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def search_notest(self, search: str) -> list:
+    def search_notes(self, search: str) -> list:
         """Search for notes by title and content
 
         Parameters
@@ -5495,10 +5495,8 @@ class SceneController(BaseController):
         Get all scenes associated with a chapter
     get_scenes_page_by_chapter_id(chapter_id: int, page: int, per_page: int)
         Get a single page of scenes associated with a chapter from the database
-    search_scenes_by_title_and_description(search: str)
-        Search for scenes by title and description
-    search_scenes_by_content(search: str)
-        Search for scenes by content
+    search_scenes(search: str)
+        Search for scenes by title, description, and content
     append_links_to_scene(scene_id: int, link_ids: list)
         Append links to a scene
     get_links_by_scene_id(scene_id: int)
@@ -5514,7 +5512,9 @@ class SceneController(BaseController):
 
         super().__init__(session, owner)
 
-    def create_scene(self, story_id: int, chapter_id: int, title: str, description: str, content: str) -> Scene:
+    def create_scene(
+            self, story_id: int, chapter_id: int, title: str, description: str = None, content: str = None
+    ) -> Scene:
         """Create a new scene
 
         Parameters
@@ -5568,7 +5568,7 @@ class SceneController(BaseController):
                 session.commit()
                 return scene
 
-    def update_scene(self, scene_id: int, title: str, description: str, content: str) -> Type[Scene]:
+    def update_scene(self, scene_id: int, title: str, description: str = None, content: str = None) -> Type[Scene]:
         """Update a scene
 
         Parameters
@@ -5881,8 +5881,8 @@ class SceneController(BaseController):
                 Scene.chapter_id == chapter_id, Scene.user_id == self._owner.id
             ).order_by(Scene.position).offset(offset).limit(per_page).all()
 
-    def search_scenes_by_title_and_description(self, search: str) -> list:
-        """Search for scenes by title and description
+    def search_scenes(self, search: str) -> list:
+        """Search for scenes by title, description, and content
 
         Parameters
         ----------
@@ -5897,27 +5897,9 @@ class SceneController(BaseController):
 
         with self._session as session:
             return session.query(Scene).filter(
-                or_(Scene.title.like(f'%{search}%'), Scene.description.like(f'%{search}%')),
+                or_(Scene.title.like(f'%{search}%'), Scene.description.like(f'%{search}%'),
+                    Scene.content.like(f'%{search}%')),
                 Scene.user_id == self._owner.id
-            ).all()
-
-    def search_scenes_by_content(self, search: str) -> list:
-        """Search for scenes by content
-
-        Parameters
-        ----------
-        search : str
-            The search string
-
-        Returns
-        -------
-        list
-            A list of scene objects
-        """
-
-        with self._session as session:
-            return session.query(Scene).filter(
-                Scene.content.like(f'%{search}%'), Scene.user_id == self._owner.id
             ).all()
 
     def append_links_to_scene(self, scene_id: int, link_ids: list) -> Type[Scene]:
