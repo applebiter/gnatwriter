@@ -203,13 +203,13 @@ class StoryController
    get_notes_by_story_id ( story_id: int ) : list
 
 class SubmissionController
-   create_submission
-   update_submission
-   delete_submission
-   get_all_submissions
-   get_all_submissions_page
-   get_submissions_by_story_id
-   get_submissions_page_by_story_id
+   create_submission ( story_id: int, submitted_to: str, date_sent: str = None ) : Submission
+   update_submission ( submission_id: int, submitted_to: str, date_sent: str, date_reply_received: str, date_published: str, date_paid: str, result: str, amount: float) : Type[Submission]
+   delete_submission ( submission_id: int ) : bool
+   get_all_submissions ( ) : list
+   get_all_submissions_page ( page: int, per_page: int ) : list
+   get_submissions_by_story_id ( story_id: int ) : list
+   get_submissions_page_by_story_id ( story_id: int, page: int, per_page: int ) : list
 
 class UserController
    create_user
