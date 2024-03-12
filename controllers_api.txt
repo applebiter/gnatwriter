@@ -162,13 +162,13 @@ class LocationController
    get_notes_page_by_location_id ( location_id: int, page: int, per_page: int ) : list
 
 class NoteController
-   create_note
-   update_note
-   delete_note
-   get_note_by_id
-   get_all_notes
-   get_all_notes_page
-   search_notes
+   create_note ( title: str, content: str ) : Note
+   update_note ( note_id: int, title: str, content: str ) : Type[Note]
+   delete_note ( note_id: int ) bool
+   get_note_by_id ( note_id: int ) Type[Note] | None
+   get_all_notes ( ) : list
+   get_all_notes_page ( page: int, per_page: int ) : list
+   search_notes ( search: str ) : list
 
 class SceneController
    create_scene
