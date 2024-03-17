@@ -75,81 +75,81 @@ class BibliographyAuthor
     func unserialize( data: dict ) : BibliographyAuthor
 
 class Chapter
-    const id
-    const user_id
-    const story_id
-    const position
-    const title
-    const description
-    const created
-    const modified
-    const scenes
-    const user
-    const story
-    const links
-    const notes
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id; int
+    const story_id: int
+    const position: int
+    const title: str
+    const description: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const scenes: List[ChapterScene]
+    const user: User
+    const story: Story
+    const links: List[ChapterLink]
+    const notes: List[ChapterNote]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Chapter
 
 class ChapterLink
-    const user_id
-    const story_id
-    const chapter_id
-    const link_id
-    const created
-    const user
-    const story
-    const chapter
-    const link
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const story_id: int
+    const chapter_id: int
+    const link_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const story: Story
+    const chapter: Chapter
+    const link: Link
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : ChapterLink
 
 class ChapterNote
-    const user_id
-    const story_id
-    const chapter_id
-    const note_id
-    const created
-    const user
-    const story
-    const chapter
-    const note
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const story_id: int
+    const chapter_id: int
+    const note_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const story: Story
+    const chapter: Chapter
+    const note: Note
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : ChapterNote
 
 class Character
-    const id
-    const user_id
-    const title
-    const first_name
-    const middle_name
-    const last_name
-    const nickname
-    const gender
-    const sex
-    const date_of_birth
-    const date_of_death
-    const description
-    const created
-    const modified
-    const user
-    const character_relationships
-    const traits
-    const events
-    const images
-    const links
-    const notes
-    const stories
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const title: str
+    const first_name: str
+    const middle_name: str
+    const last_name: str
+    const nickname: str
+    const gender: str
+    const sex: str
+    const date_of_birth: str for input/output, datetime.date object otherwise
+    const date_of_death: str for input/output, datetime.date object otherwise
+    const description: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const character_relationships: List[CharacterRelationship]
+    const traits: List[CharacterTrait]
+    const events: List[CharacterEvent]
+    const images: List[CharacterImage]
+    const links: List[CharacterLink]
+    const notes: List[CharacterNote]
+    const stories: List[CharacterStory]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Character
 
 class CharacterEvent
     const user_id
