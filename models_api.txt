@@ -152,115 +152,115 @@ class Character
     func unserialize( data: dict ) : Character
 
 class CharacterEvent
-    const user_id
-    const character_id
-    const event_id
-    const created
-    const user
-    const character
-    const event
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const character_id: int
+    const event_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const character: Character
+    const event: Event
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : CharacterEvent
 
 class CharacterImage
-    const user_id
-    const character_id
-    const image_id
-    const position
-    const is_default
-    const created
-    const modified
-    const user
-    const character
-    const image
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const character_id: int
+    const image_id: int
+    const position: int
+    const is_default: bool
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: USer
+    const character: Character
+    const image: Image
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : CharacterImage
 
 class CharacterLink
-    const user_id
-    const character_id
-    const link_id
-    const created
-    const user
-    const character
-    const link
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const character_id: int
+    const link_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: USer
+    const character: Character
+    const link: Link
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : CharacterLink
 
 class CharacterNote
-    const user_id
-    const character_id
-    const note_id
-    const created
-    const user
-    const character
-    const note
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const character_id: int
+    const note_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const character: Character
+    const note: Note
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : CharacterNote
 
 class CharacterRelationshipTypes
-    const FAMILY
-    const PERSONAL
-    const ROMANTIC
-    const PROFESSIONAL
-    const OTHER
+    const FAMILY: str "Family"
+    const PERSONAL: str "Personal"
+    const ROMANTIC: str "Romantic"
+    const PROFESSIONAL: str "Professional"
+    const OTHER: str "Other"
 
 class CharacterRelationship
-    const id
-    const user_id
-    const parent_id
-    const position
-    const related_id
-    const relationship_type
-    const description
-    const start_date
-    const end_date
-    const created
-    const modified
-    const user
-    const parent_character
-    const related_character
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: id
+    const user_id: int
+    const parent_id: int
+    const position: int
+    const related_id: int
+    const relationship_type: str
+    const description: str
+    const start_date: str for input/output, datetime.date object otherwise
+    const end_date: str for input/output, datetime.date object otherwise
+    const created; str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const parent_character: Character
+    const related_character: Character
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : str
+    func unserialize( data: dict ) : CharacterRelationship
 
 class CharacterStory
-    const user_id
-    const character_id
-    const story_id
-    const created
-    const user
-    const character
-    const story
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const character_id: int
+    const story_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const character: Character
+    const story: Story
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : CharacterStory
 
 class CharacterTrait
-    const id
-    const user_id
-    const character_id
-    const position
-    const name
-    const magnitude
-    const created
-    const modified
-    const user
-    const character
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const character_id: int
+    const position: int
+    const name: str
+    const magnitude: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const character: Character
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Charactertrait
 
 class Event
     const id
