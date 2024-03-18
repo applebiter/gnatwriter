@@ -263,332 +263,332 @@ class CharacterTrait
     func unserialize( data: dict ) : Charactertrait
 
 class Event
-    const id
-    const user_id
-    const title
-    const description
-    const start_datetime
-    const end_datetime
-    const created
-    const modified
-    const user
-    const links
-    const characters
-    const notes
-    const locations
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const title: str
+    const description: str
+    const start_datetime: str for input/output, datetime.datetime object otherwise
+    const end_datetime: str for input/output, datetime.datetime object otherwise
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const links: List[EventLink]
+    const characters: List[CharacterEvent]
+    const notes" List[EventNote]
+    const locations: List[EventLocation]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Event
 
 class EventLink
-    const user_id
-    const event_id
-    const link_id
-    const created
-    const user
-    const event
-    const link
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const event_id: int
+    const link_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const event: Event
+    const link: Link
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : EventLink
 
 class EventLocation
-    const user_id
-    const event_id
-    const location_id
-    const created
-    const user
-    const event
-    const location
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const event_id: int
+    const location_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const event: Event
+    const location: Location
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict 0 : EventLocation
 
 class EventNote
-    const user_id
-    const event_id
-    const note_id
-    const created
-    const user
-    const event
-    const note
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const event_id: int
+    const note_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const event: Event
+    const note: Note
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : str
+    func unserialize( data: dict ) : EventNote
 
 class ImageMimeTypes
-    const JPEG
-    const PNG
-    const GIF
+    const JPEG: str "image/jpeg"
+    const PNG: str "image/png"
+    const GIF: str "image/gif"
 
 class Image
-    const id
-    const user_id
-    const filename
-    const dirname
-    const size_in_bytes
-    const mime_type
-    const caption
-    const created
-    const modified
-    const user
-    const character
-    const location
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const filename: str
+    const dirname: str
+    const size_in_bytes: int
+    const mime_type: str
+    const caption: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const character: Character
+    const location: Location
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Image
 
 class ImageLocation
-    const user_id
-    const image_id
-    const location_id
-    const position
-    const is_default
-    const created
-    const modified
-    const user
-    const image
-    const location
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const image_id: int
+    const location_id: int
+    const position: int
+    const is_default: bool
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const image: Image
+    const location: Location
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : ImageLocation
 
 class Link
-    const id
-    const user_id
-    const title
-    const url
-    const created
-    const modified
-    const user
-    const stories
-    const chapters
-    const scenes
-    const characters
-    const events
-    const locations
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const title: str
+    const url: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const stories: List[LinkStory]
+    const chapters: List[ChapterLink]
+    const scenes: List[LinkScene]
+    const characters: List[CharacterLink]
+    const events: List[EventLink]
+    const locations: List[LinkLocation]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( ) : data: dict ) : Link
 
 class LinkLocation
-    const user_id
-    const link_id
-    const location_id
-    const created
-    const user
-    const link
-    const location
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const link_id: int
+    const location_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const link: Link
+    const location: Location
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : LinkLocation
 
 class LinkScene
-    const user_id
-    const link_id
-    const scene_id
-    const created
-    const user
-    const link
-    const scene
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const link_id: int
+    const scene_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const link: Link
+    const scene: Scene
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : LinkScene
 
 class LinkStory
-    const user_id
-    const link_id
-    const story_id
-    const created
-    const user
-    const link
-    const story
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const link_id: int
+    const story_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const link: Link
+    const story: Story
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : LinkStory
 
 class Location
-    const id
-    const user_id
-    const title
-    const description
-    const address
-    const city
-    const state
-    const country
-    const zip_code
-    const latitude
-    const longitude
-    const created
-    const modified
-    const user
-    const images
-    const links
-    const events
-    const notes
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: id
+    const user_id: id
+    const title: str
+    const description: str
+    const address: str
+    const city: str
+    const state: str
+    const country: str
+    const zip_code: str
+    const latitude: float
+    const longitude: float
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const images: List[ImageLocation]
+    const links: List[LinkLocation]
+    const events: List[EventLocation]
+    const notes: List[LocationNote]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Location
 
 class LocationNote
-    const user_id
-    const location_id
-    const note_id
-    const created
-    const user
-    const location
-    const note
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const location_id: int
+    const note_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const location: Location
+    const note: Note
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : LocationNote
 
 class Note
-    const id
-    const user_id
-    const title
-    const content
-    const created
-    const modified
-    const user
-    const stories
-    const chapters
-    const scenes
-    const characters
-    const events
-    const locations
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const title: str
+    const content: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const stories: List[NoteStory]
+    const chapters: List[ChapterNote]
+    const scenes: List[NoteScene]
+    const characters: List[CharacterNote]
+    const events: List[EventNote]
+    const locations: List[LocationNote]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Note
 
 class NoteScene
-    const user_id
-    const note_id
-    const scene_id
-    const created
-    const user
-    const note
-    const scene
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const note_id: int
+    const scene_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const note: Note
+    const scene: Scene
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : NoteScene
 
 class NoteStory
-    const user_id
-    const note_id
-    const story_id
-    const created
-    const user
-    const note
-    const story
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const user_id: int
+    const note_id: int
+    const story_id: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const note: Note
+    const story: Story
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ): NoteStory
 
 class Scene
-    const id
-    const user_id
-    const story_id
-    const chapter_id
-    const position
-    const title
-    const description
-    const content
-    const created
-    const modified
-    const chapter
-    const user
-    const links
-    const notes
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const story_id: int
+    const chapter_id: int
+    const position: int
+    const title: str
+    const description: str
+    const content: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const chapter: Chapter
+    const user: User
+    const links: List[LinkScene]
+    const notes: List[NoteScene]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Scene
 
 class Story
-    const id
-    const user_id
-    const title
-    const description
-    const created
-    const modified
-    const user
-    const chapters
-    const authors
-    const references
-    const submissions
-    const links
-    const notes
-    const characters
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const title: str
+    const description: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const chapters: List[Chapter]
+    const authors: List[AuthorStory]
+    const references: List[Bibliography]
+    const submissions: List[Submission]
+    const links: List[LinkStory]
+    const notes: List[NoteStory]
+    const characters: List[CharacterStory]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Story
 
 class SubmissionResultType
-    const ACCEPTED
-    const REJECTED
-    const REWRITE_REQUESTED
-    const PENDING
-    const WITHDRAWN
-    const IGNORED
+    const ACCEPTED: str "Accepted"
+    const REJECTED: str "Rejected"
+    const REWRITE_REQUESTED: str "Rewrite Requested"
+    const PENDING: str "Pending"
+    const WITHDRAWN: str "Withdrawn"
+    const IGNORED: str "Ignored"
 
 class Submission
-    const id
-    const user_id
-    const story_id
-    const submitted_to
-    const date_sent
-    const date_reply_received
-    const date_published
-    const date_paid
-    const result
-    const amount
-    const created
-    const modified
-    const user
-    const story
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const user_id: int
+    const story_id: int
+    const submitted_to: str
+    const date_sent: str for input/output, datetime.date object otherwise
+    const date_reply_received: str for input/output, datetime.date object otherwise
+    const date_published: str for input/output, datetime.date object otherwise
+    const date_paid: str for input/output, datetime.date object otherwise
+    const result: str
+    const amount: float
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const user: User
+    const story: Story
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : Submission
 
 class User
-    const id
-    const uuid
-    const username
-    const email
-    const password
-    const is_active
-    const is_banned
-    const created
-    const modified
-    const activities
-    const authors
-    const characters
-    const events
-    const images
-    const links
-    const locations
-    const notes
-    const stories
-    const submissions
-    func __repr__
-    func __str__
-    func serialize
-    func unserialize
+    const id: int
+    const uuid: str
+    const username: str
+    const email: str
+    const password: str
+    const is_active: bool
+    const is_banned: bool
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    const activities: List[Activity]
+    const authors: List[Author]
+    const characters: List[Character]
+    const events: List[Event]
+    const images: List[Image]
+    const links: List[Link]
+    const locations: List[Location]
+    const notes: List[Note]
+    const stories: List[Story]
+    const submissions: List[Submission]
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : User
 
