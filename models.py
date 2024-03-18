@@ -1241,7 +1241,13 @@ class Character(Base):
             A string representation of the character
         """
 
-        return f'Character: {self.title} {self.first_name} {self.middle_name} {self.last_name} ({self.nickname})'
+        title = f'{self.title}' if self.title else ""
+        first_name = f' {self.first_name}' if self.first_name else ""
+        middle_name = f' {self.middle_name}' if self.middle_name else ""
+        last_name = f' {self.last_name}' if self.last_name else ""
+        nickname = f' ({self.nickname})' if self.nickname else ""
+
+        return f'{title}{first_name}{middle_name}{last_name}{nickname}'
 
     def serialize(self) -> dict:
         """Returns a dictionary representation of the character.
@@ -2973,7 +2979,7 @@ class Image(Base):
             A string representation of the image
         """
 
-        return f'{self.caption}'
+        return f'{self.caption!r}' if self.caption else f'{self.filename!r}'
 
     def serialize(self) -> dict:
         """Returns a dictionary representation of the image.
