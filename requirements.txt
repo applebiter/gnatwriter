@@ -1,0 +1,10 @@
+PySide6
+PySide6-Addons
+PySide6-Essentials
+SQLAlchemy
+bcrypt
+mysql-connector-python
+psycopg
+typing_extensions
+uuid
+validators

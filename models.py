@@ -811,7 +811,7 @@ class Chapter(Base):
             A string representation of the chapter
         """
 
-        return f'Chapter {self.position}: {self.title}'
+        return f'{self.title}'
 
     def serialize(self) -> dict:
         """Returns a dictionary representation of the chapter.
@@ -2979,7 +2979,7 @@ class Image(Base):
             A string representation of the image
         """
 
-        return f'{self.caption!r}' if self.caption else f'{self.filename!r}'
+        return f'{self.caption}' if self.caption else f'{self.filename}'
 
     def serialize(self) -> dict:
         """Returns a dictionary representation of the image.
