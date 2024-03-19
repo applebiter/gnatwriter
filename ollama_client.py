@@ -6,6 +6,13 @@ from ollama import Options, Message
 
 
 class OllamaClient:
+    """Singleton class for the Ollama client
+
+    This class is a Singleton class that wraps the Ollama client. It is used to
+    interact with the Ollama API. It is a Singleton class to ensure that only
+    one instance of the Ollama client is created and used throughout the
+    application.
+    """
     _self = None
     _client = None
 
@@ -36,6 +43,7 @@ class OllamaClient:
         options: Optional[Options] = None,
         keep_alive: Optional[Union[float, str]] = None,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        """Generate text using the Ollama API"""
         try:
             return self._client.generate(
                 model=model,
@@ -63,6 +71,7 @@ class OllamaClient:
         options: Optional[Options] = None,
         keep_alive: Optional[Union[float, str]] = None,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        """Chat with the Ollama API"""
         try:
             return self._client.chat(
                 model=model,
@@ -83,6 +92,7 @@ class OllamaClient:
         options: Optional[Options] = None,
         keep_alive: Optional[Union[float, str]] = None,
     ) -> Sequence[float]:
+        """Set embeddings using the Ollama API"""
         try:
             return self._client.embeddings(
                 model=model,
@@ -100,6 +110,7 @@ class OllamaClient:
         insecure: bool = False,
         stream: bool = False,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        """Pull a model from the Ollama API"""
         try:
             return self._client.pull(
                 model=model,
@@ -116,6 +127,7 @@ class OllamaClient:
         insecure: bool = False,
         stream: bool = False,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        """Push a model to the Ollama API"""
         try:
             return self._client.push(
                 model=model,
@@ -133,6 +145,7 @@ class OllamaClient:
         modelfile: Optional[str] = None,
         stream: bool = False,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        """Create a model using the Ollama API"""
         try:
             return self._client.create(
                 model=model,
@@ -145,6 +158,7 @@ class OllamaClient:
             raise e
 
     def delete(self, model: str) -> Mapping[str, Any]:
+        """Delete a model using the Ollama API"""
         try:
             return self._client.delete(model)
 
@@ -152,6 +166,7 @@ class OllamaClient:
             raise e
 
     def list(self) -> Mapping[str, Any]:
+        """List models using the Ollama API"""
         try:
             return self._client.list()
 
@@ -159,6 +174,7 @@ class OllamaClient:
             raise e
 
     def copy(self, source: str, destination: str) -> Mapping[str, Any]:
+        """Copy a model using the Ollama API"""
         try:
             return self._client.copy(source, destination)
 
@@ -166,6 +182,7 @@ class OllamaClient:
             raise e
 
     def show(self, model: str) -> Mapping[str, Any]:
+        """Show a model using the Ollama API"""
         try:
             return self._client.show(model)
 
