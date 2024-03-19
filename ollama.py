@@ -1,0 +1,173 @@
+from os import PathLike
+from typing import Any, AnyStr, Union, Optional, Sequence, Mapping, Literal, \
+    Iterator
+import ollama
+from ollama import Options, Message
+
+
+class OllamaClient:
+    _self = None
+    _client = None
+
+    def __new__(cls):
+        """Enforce Singleton pattern"""
+
+        if cls._self is None:
+            cls._self = super().__new__(cls)
+
+        return cls._self
+
+    def __init__(self):
+        """Initialize the class"""
+
+        self._client = ollama.Client()
+
+    def generate(
+        self,
+        model: str = '',
+        prompt: str = '',
+        system: str = '',
+        template: str = '',
+        context: Optional[Sequence[int]] = None,
+        stream: bool = False,
+        raw: bool = False,
+        return_format: Literal['', 'json'] = '',
+        images: Optional[Sequence[AnyStr]] = None,
+        options: Optional[Options] = None,
+        keep_alive: Optional[Union[float, str]] = None,
+    ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        try:
+            return self._client.generate(
+                model=model,
+                prompt=prompt,
+                system=system,
+                template=template,
+                context=context,
+                stream=stream,
+                raw=raw,
+                format=return_format,
+                images=images,
+                options=options,
+                keep_alive=keep_alive
+            )
+
+        except Exception as e:
+            raise e
+
+    def chat(
+        self,
+        model: str = '',
+        messages: Optional[Sequence[Message]] = None,
+        stream: bool = False,
+        return_format: Literal['', 'json'] = '',
+        options: Optional[Options] = None,
+        keep_alive: Optional[Union[float, str]] = None,
+    ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        try:
+            return self._client.chat(
+                model=model,
+                messages=messages,
+                stream=stream,
+                format=return_format,
+                options=options,
+                keep_alive=keep_alive
+            )
+
+        except Exception as e:
+            raise e
+
+    def embeddings(
+        self,
+        model: str = '',
+        prompt: str = '',
+        options: Optional[Options] = None,
+        keep_alive: Optional[Union[float, str]] = None,
+    ) -> Sequence[float]:
+        try:
+            return self._client.embeddings(
+                model=model,
+                prompt=prompt,
+                options=options,
+                keep_alive=keep_alive
+            )
+
+        except Exception as e:
+            raise e
+
+    def pull(
+        self,
+        model: str,
+        insecure: bool = False,
+        stream: bool = False,
+    ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        try:
+            return self._client.pull(
+                model=model,
+                insecure=insecure,
+                stream=stream
+            )
+
+        except Exception as e:
+            raise e
+
+    def push(
+        self,
+        model: str,
+        insecure: bool = False,
+        stream: bool = False,
+    ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        try:
+            return self._client.push(
+                model=model,
+                insecure=insecure,
+                stream=stream
+            )
+
+        except Exception as e:
+            raise e
+
+    def create(
+        self,
+        model: str,
+        path: Optional[Union[str, PathLike]] = None,
+        modelfile: Optional[str] = None,
+        stream: bool = False,
+    ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
+        try:
+            return self._client.create(
+                model=model,
+                path=path,
+                modelfile=modelfile,
+                stream=stream
+            )
+
+        except Exception as e:
+            raise e
+
+    def delete(self, model: str) -> Mapping[str, Any]:
+        try:
+            return self._client.delete(model)
+
+        except Exception as e:
+            raise e
+
+    def list(self) -> Mapping[str, Any]:
+        try:
+            return self._client.list()
+
+        except Exception as e:
+            raise e
+
+    def copy(self, source: str, destination: str) -> Mapping[str, Any]:
+        try:
+            return self._client.copy(source, destination)
+
+        except Exception as e:
+            raise e
+
+    def show(self, model: str) -> Mapping[str, Any]:
+        try:
+            return self._client.show(model)
+
+        except Exception as e:
+            raise e
