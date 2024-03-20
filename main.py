@@ -29,6 +29,7 @@ if verify_password(password, user.password):
 else:
     print(f"Password '{password}' incorrect!")
 
+# Get all stories
 stories = app("story").get_all_stories()
 print("Stories:")
 for story in stories:
@@ -36,14 +37,14 @@ for story in stories:
     print("--------------------")
     print(" ")
 
+# Get some test images and have the llava model describe them
 images = [
-    "images/college_library.jpeg",
-    "images/john_jacob_jingleheimer_schmidt.jpeg",
+    # "images/college_library.jpeg",
+    # "images/john_jacob_jingleheimer_schmidt.jpeg",
     "images/miss_mary_mack.jpeg",
-    "images/workshop.jpeg",
-    "images/kungfu.jpeg",
+    # "images/workshop.jpeg",
+    # "images/kungfu.jpeg",
 ]
 assistant = AssistantRegistry()
 response = assistant("image").describe(images)
-
 print(response["message"]["content"])

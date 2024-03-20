@@ -1,5 +1,4 @@
 from typing import List
-
 from ollamasubsystem import OllamaClient
 
 
@@ -69,6 +68,7 @@ class ImageAssistant(Assistant):
                     'images': encoded
                 },
             ],
+            return_format='json'
         )
 
     def __str__(self):
