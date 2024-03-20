@@ -1,4 +1,7 @@
-from typing import List
+from typing import List, Literal, Optional
+
+from ollama import Message
+
 from ollamasubsystem import OllamaClient
 
 
@@ -51,7 +54,8 @@ class ImageAssistant(Assistant):
     def describe(
             self,
             images: List[str],
-            prompt: str = "Describe the contents of the image:"
+            prompt: Optional[str] = "Describe the contents of the image:",
+            options: Optional[dict] = None
     ):
         encoded = []
 
@@ -59,16 +63,26 @@ class ImageAssistant(Assistant):
             with open(image, "rb") as file:
                 encoded.append(file.read())
 
+        priming = """Image Assistant is ready to describe the contents of the \
+                    image ."""
+        message0 = Message(role="system", content=priming)
+        message1 = Message(role="user", content=prompt, images=encoded)
+
+        if not options:
+            options = {
+                "max_tokens": 100,
+                "temperature": 0.5,
+                "top_p": 1.0,
+                "frequency_penalty": 0.0,
+                "presence_penalty": 0.0,
+                "stop": ["\n"]
+            }
+
         return self._client.chat(
             model=self._model,
-            messages=[
-                {
-                    'role': 'user',
-                    'content': prompt,
-                    'images': encoded
-                },
-            ],
-            return_format='json'
+            messages=[message0, message1],
+            options=options,
+            return_format="json"
         )
 
     def __str__(self):
