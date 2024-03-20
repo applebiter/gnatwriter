@@ -166,7 +166,9 @@ class Author(Base):
     name: Mapped[str] = mapped_column(String(150), nullable=False)
     initials: Mapped[str] = mapped_column(String(10), nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User", back_populates="authors")
     stories: Mapped[Optional[List["AuthorStory"]]] = relationship(
         "AuthorStory", back_populates="author",
@@ -418,7 +420,9 @@ class Bibliography(Base):
     publication_date: Mapped[str] = mapped_column(Date, nullable=True)
     editor: Mapped[str] = mapped_column(String(100), nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User")
     story: Mapped["Story"] = relationship("Story", back_populates="references")
     authors: Mapped[Optional[List["BibliographyAuthor"]]] = relationship(
@@ -787,7 +791,9 @@ class Chapter(Base):
     title: Mapped[str] = mapped_column(String(250), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     scenes: Mapped[Optional[List["Scene"]]] = relationship(
         "Scene", back_populates="chapter", lazy="joined",
         cascade="all, delete, delete-orphan")
@@ -2478,7 +2484,9 @@ class Event(Base):
     start_datetime: Mapped[str] = mapped_column(DateTime, nullable=True)
     end_datetime: Mapped[str] = mapped_column(DateTime, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User", back_populates="events")
     links: Mapped[Optional[List["EventLink"]]] = relationship(
         "EventLink", back_populates="event", lazy="joined",
@@ -3335,7 +3343,9 @@ class Link(Base):
     title: Mapped[str] = mapped_column(String(250), nullable=False)
     url: Mapped[str] = mapped_column(String(200), nullable=False)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User", back_populates="links")
     stories: Mapped[Optional[List["LinkStory"]]] = relationship(
         "LinkStory", back_populates="link",
