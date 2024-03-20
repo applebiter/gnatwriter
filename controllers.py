@@ -162,6 +162,7 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(func.count(Activity.id)).filter(
                 Activity.user_id == self._owner.id
             ).scalar()
@@ -181,6 +182,7 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Activity).filter(
                 Activity.summary.like(f'%{search}%'),
                 Activity.user_id == self._owner.id
@@ -231,7 +233,7 @@ class AuthorController(BaseController):
         super().__init__(session, owner)
 
     def create_author(
-            self, name: str, initials: str = None, is_pseudonym: bool = False
+        self, name: str, initials: str = None, is_pseudonym: bool = False
     ) -> Author:
         """Create a new author
 
@@ -288,7 +290,7 @@ class AuthorController(BaseController):
                 return author
 
     def update_author(
-            self, author_id: int, name: str, initials: str = None
+        self, author_id: int, name: str, initials: str = None
     ) -> Type[Author]:
         """Update an author
 
@@ -349,7 +351,7 @@ class AuthorController(BaseController):
                 return author
 
     def change_pseudonym_status(
-            self, author_id: int, is_pseudonym: bool
+        self, author_id: int, is_pseudonym: bool
     ) -> Type[Author]:
         """Change the pseudonym status of an author
 
@@ -552,6 +554,7 @@ class AuthorController(BaseController):
         list
             A list of author objects
         """
+
         with self._session as session:
 
             story = session.query(Story).filter(
@@ -629,8 +632,10 @@ class BibliographyController(BaseController):
 
         super().__init__(session, owner)
 
-    def create_bibliography(self, story_id: int, title: str, pages: str = None, publication_date: str = None,
-                            other_text: str = None) -> Bibliography:
+    def create_bibliography(
+        self, story_id: int, title: str, pages: str = None,
+        publication_date: str = None, other_text: str = None
+    ) -> Bibliography:
         """Create a new bibliography
 
         Parameters
@@ -653,25 +658,33 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 title_exists = session.query(Bibliography).filter(
-                    Bibliography.title == title, Bibliography.story_id == story_id,
+                    Bibliography.title == title,
+                    Bibliography.story_id == story_id,
                     Bibliography.user_id == self._owner.id
                 ).first()
 
                 if title_exists:
-                    raise Exception('A reference with the same title is already associated with that story.')
+                    raise Exception('A reference with the same title is already \
+                        associated with that story.')
 
                 created = datetime.now()
                 modified = created
 
-                bibliography = Bibliography(user_id=self._owner.id, story_id=story_id, title=title, pages=pages,
-                                            publication_date=publication_date, other_text=other_text, created=created,
-                                            modified=modified)
+                bibliography = Bibliography(
+                    user_id=self._owner.id, story_id=story_id, title=title,
+                    pages=pages, publication_date=publication_date,
+                    other_text=other_text, created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Bibliography {bibliography.title[:50]} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Bibliography \
+                    {bibliography.title[:50]} created by \
+                    {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(bibliography)
                 session.add(activity)
@@ -684,8 +697,10 @@ class BibliographyController(BaseController):
                 session.commit()
                 return bibliography
 
-    def update_bibliography(self, bibliography_id: int, story_id: int, title: str, pages: str = None,
-                            publication_date: str = None, other_text: str = None) -> Type[Bibliography]:
+    def update_bibliography(
+        self, bibliography_id: int, story_id: int, title: str,
+        pages: str = None, publication_date: str = None, other_text: str = None
+    ) -> Type[Bibliography]:
         """Update a bibliography
 
         Parameters
@@ -710,20 +725,25 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 bibliography = session.query(Bibliography).filter(
-                    Bibliography.id == bibliography_id, Bibliography.user_id == self._owner.id
+                    Bibliography.id == bibliography_id,
+                    Bibliography.user_id == self._owner.id
                 ).first()
 
                 if not bibliography:
                     raise ValueError('Bibliography not found.')
 
                 title_exists = session.query(Bibliography).filter(
-                    Bibliography.title == title, Bibliography.story_id == story_id
+                    Bibliography.title == title,
+                    Bibliography.story_id == story_id
                 ).first()
 
                 if title_exists:
-                    raise Exception('A reference with the same title is already associated with that story.')
+                    raise Exception('A reference with the same title is already\
+                     associated with that story.')
 
                 bibliography.story_id = story_id
                 bibliography.title = title
@@ -732,9 +752,11 @@ class BibliographyController(BaseController):
                 bibliography.other_text = other_text
                 bibliography.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Bibliography {bibliography.title} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Bibliography \
+                    {bibliography.title} updated by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -765,6 +787,7 @@ class BibliographyController(BaseController):
         with self._session as session:
 
             try:
+
                 bibliography = session.query(Bibliography).filter(
                     Bibliography.id == bibliography_id,
                     Bibliography.user_id == self._owner.id
@@ -773,9 +796,11 @@ class BibliographyController(BaseController):
                 if not bibliography:
                     raise ValueError('Bibliography not found.')
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Bibliography {bibliography.title} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Bibliography \
+                    {bibliography.title} deleted by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.delete(bibliography)
                 session.add(activity)
@@ -788,7 +813,9 @@ class BibliographyController(BaseController):
                 session.commit()
                 return True
 
-    def get_bibliography_by_id(self, bibliography_id: int) -> Type[Bibliography] | None:
+    def get_bibliography_by_id(
+            self, bibliography_id: int
+    ) -> Type[Bibliography] | None:
         """Get a bibliography by id
 
         Parameters
@@ -803,12 +830,17 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
+
             bibliography = session.query(Bibliography).filter(
-                Bibliography.id == bibliography_id, Bibliography.user_id == self._owner.id
+                Bibliography.id == bibliography_id,
+                Bibliography.user_id == self._owner.id
             ).first()
+
             return bibliography if bibliography else None
 
-    def get_bibliography_by_title(self, title: str) -> Type[Bibliography] | None:
+    def get_bibliography_by_title(
+            self, title: str
+    ) -> Type[Bibliography] | None:
         """Get a bibliography by title
 
         Parameters
@@ -823,9 +855,12 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
+
             bibliography = session.query(Bibliography).filter(
-                Bibliography.title == title, Bibliography.user_id == self._owner.id
+                Bibliography.title == title,
+                Bibliography.user_id == self._owner.id
             ).first()
+
             return bibliography if bibliography else None
 
     def get_bibliography_count(self) -> int:
@@ -838,7 +873,10 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Bibliography.id)).filter(Bibliography.user_id == self._owner.id).scalar()
+
+            return session.query(func.count(Bibliography.id)).filter(
+                Bibliography.user_id == self._owner.id
+            ).scalar()
 
     def get_all_bibliographies(self) -> list:
         """Get all bibliographies associated with a user
@@ -850,7 +888,10 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Bibliography).filter(Bibliography.user_id == self._owner.id).all()
+
+            return session.query(Bibliography).filter(
+                Bibliography.user_id == self._owner.id
+            ).all()
 
     def get_bibliographies_page(self, page: int, per_page: int) -> list:
         """Get a single page of bibliographies from the database associated with a user
@@ -869,7 +910,9 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
+
             offset = (page - 1) * per_page
+
             return session.query(Bibliography).filter(
                 Bibliography.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
@@ -889,12 +932,17 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
+
             bibliographies = session.query(Bibliography).filter(
-                Bibliography.story_id == story_id, Bibliography.user_id == self._owner.id
+                Bibliography.story_id == story_id,
+                Bibliography.user_id == self._owner.id
             ).all()
+
             return bibliographies if bibliographies else None
 
-    def get_bibliographies_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
+    def get_bibliographies_page_by_story_id(
+        self, story_id: int, page: int, per_page: int
+    ) -> list:
         """Get a single page of bibliographies associated with a story from the database
 
         Parameters
@@ -913,10 +961,14 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
+
             offset = (page - 1) * per_page
+
             bibliographies = session.query(Bibliography).filter(
-                Bibliography.story_id == story_id, Bibliography.user_id == self._owner.id
+                Bibliography.story_id == story_id,
+                Bibliography.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
+
             return bibliographies if bibliographies else None
 
     def search_bibliographies(self, search: str) -> list:
@@ -934,11 +986,15 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Bibliography).filter(
-                Bibliography.title.like(f'%{search}%'), Bibliography.user_id == self._owner.id
+                Bibliography.title.like(f'%{search}%'),
+                Bibliography.user_id == self._owner.id
             ).all()
 
-    def search_bibliographies_by_story_id(self, story_id: int, search: str) -> list:
+    def search_bibliographies_by_story_id(
+        self, story_id: int, search: str
+    ) -> list:
         """Search for bibliographies by title associated with a story
 
         Parameters
@@ -955,8 +1011,10 @@ class BibliographyController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Bibliography).filter(
-                Bibliography.story_id == story_id, Bibliography.title.like(f'%{search}%'),
+                Bibliography.story_id == story_id,
+                Bibliography.title.like(f'%{search}%'),
                 Bibliography.user_id == self._owner.id
             ).all()
 
@@ -1014,7 +1072,9 @@ class ChapterController(BaseController):
 
         super().__init__(session, owner)
 
-    def create_chapter(self, story_id: int, title: str, description: str = None) -> Chapter:
+    def create_chapter(
+        self, story_id: int, title: str, description: str = None
+    ) -> Chapter:
         """Create a new chapter
 
         Parameters
@@ -1033,7 +1093,9 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 title_exists = session.query(Chapter).filter(
                     Chapter.title == title, Chapter.story_id == story_id, Chapter.user_id == self._owner.id
                 ).first()
@@ -1048,12 +1110,17 @@ class ChapterController(BaseController):
                 created = datetime.now()
                 modified = created
 
-                chapter = Chapter(user_id=self._owner.id, story_id=story_id, position=position, title=title,
-                                  description=description, created=created, modified=modified)
+                chapter = Chapter(
+                    user_id=self._owner.id, story_id=story_id,
+                    position=position, title=title, description=description,
+                    created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Chapter {chapter.title[:50]} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Chapter \
+                    {chapter.title[:50]} created by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(chapter)
                 session.add(activity)
@@ -1066,7 +1133,9 @@ class ChapterController(BaseController):
                 session.commit()
                 return chapter
 
-    def update_chapter(self, chapter_id: int, title: str, description: str = None) -> Type[Chapter]:
+    def update_chapter(
+        self, chapter_id: int, title: str, description: str = None
+    ) -> Type[Chapter]:
         """Update a chapter
 
         Parameters
@@ -1085,29 +1154,35 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 chapter = session.query(Chapter).filter(
-                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                    Chapter.id == chapter_id,
+                    Chapter.user_id == self._owner.id
                 ).first()
 
                 if not chapter:
                     raise ValueError('Chapter not found.')
 
                 title_exists = session.query(Chapter).filter(
-                    Chapter.title == title, Chapter.story_id == chapter.story_id,
+                    Chapter.title == title,
+                    Chapter.story_id == chapter.story_id,
                     Chapter.user_id == self._owner.id
                 ).first()
 
                 if title_exists:
-                    raise Exception('This story already has a chapter with the same title.')
+                    raise Exception('This story already has a chapter with the \
+                    same title.')
 
                 chapter.title = title
                 chapter.description = description
                 chapter.modified = str(datetime.now())
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Chapter {chapter.title} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Chapter {chapter.title} \
+                    updated by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -1142,27 +1217,34 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 chapter = session.query(Chapter).filter(
-                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                    Chapter.id == chapter_id,
+                    Chapter.user_id == self._owner.id
                 ).first()
 
                 if not chapter:
                     raise ValueError('Chapter not found.')
 
                 siblings = session.query(Chapter).filter(
-                    Chapter.story_id == chapter.story_id, Chapter.user_id == self._owner.id,
+                    Chapter.story_id == chapter.story_id,
+                    Chapter.user_id == self._owner.id,
                     Chapter.position > chapter.position
                 ).all()
 
                 for sibling in siblings:
                     sibling.position -= 1
-                    sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                    sibling.created = datetime.strptime(
+                        str(sibling.created), datetime_format
+                    )
                     sibling.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Chapter {chapter.title} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Chapter {chapter.title} \
+                    deleted by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(chapter)
                 session.add(activity)
@@ -1175,7 +1257,9 @@ class ChapterController(BaseController):
                 session.commit()
                 return True
 
-    def change_chapter_position(self, chapter_id: int, position: int) -> Type[Chapter]:
+    def change_chapter_position(
+        self, chapter_id: int, position: int
+    ) -> Type[Chapter]:
         """Set the position of a chapter
 
         First, determine whether the new position is closer to 1 or further from 1. If closer to one, get all sibling
@@ -1199,9 +1283,12 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 chapter = session.query(Chapter).filter(
-                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                    Chapter.id == chapter_id,
+                    Chapter.user_id == self._owner.id
                 ).first()
 
                 if not chapter:
@@ -1211,43 +1298,53 @@ class ChapterController(BaseController):
                     raise ValueError('Position must be greater than 0.')
 
                 highest_position = session.query(func.max(Chapter.position)).filter(
-                    Chapter.story_id == chapter.story_id, Chapter.user_id == self._owner.id
+                    Chapter.story_id == chapter.story_id,
+                    Chapter.user_id == self._owner.id
                 ).scalar()
 
                 if position > highest_position:
-                    raise ValueError(f'Position must be less than or equal to {highest_position}.')
+                    raise ValueError(f'Position must be less than or equal to \
+                    {highest_position}.')
 
                 if position == chapter.position:
                     return chapter.position
 
                 if position < chapter.position:
                     siblings = session.query(Chapter).filter(
-                        Chapter.story_id == chapter.story_id, Chapter.user_id == self._owner.id,
-                        Chapter.position >= position, Chapter.position < chapter.position
+                        Chapter.story_id == chapter.story_id,
+                        Chapter.user_id == self._owner.id,
+                        Chapter.position >= position,
+                        Chapter.position < chapter.position
                     ).all()
 
                     for sibling in siblings:
                         sibling.position += 1
-                        sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                        sibling.created = datetime.strptime(
+                            str(sibling.created), datetime_format)
                         sibling.modified = datetime.now()
 
                 else:
                     siblings = session.query(Chapter).filter(
-                        Chapter.story_id == chapter.story_id, Chapter.user_id == self._owner.id,
-                        Chapter.position > chapter.position, Chapter.position <= position
+                        Chapter.story_id == chapter.story_id,
+                        Chapter.user_id == self._owner.id,
+                        Chapter.position > chapter.position,
+                        Chapter.position <= position
                     ).all()
 
                     for sibling in siblings:
                         sibling.position -= 1
-                        sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                        sibling.created = datetime.strptime(
+                            str(sibling.created), datetime_format)
                         sibling.modified = datetime.now()
 
                 chapter.position = position
                 chapter.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Chapter {chapter.title[:50]} position changed by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Chapter \
+                    {chapter.title[:50]} position changed by \
+                    {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -1274,9 +1371,12 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             chapter = session.query(Chapter).filter(
-                Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                Chapter.id == chapter_id,
+                Chapter.user_id == self._owner.id
             ).first()
+
             return chapter if chapter else None
 
     def get_all_chapters(self) -> list | None:
@@ -1291,6 +1391,7 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Chapter).filter(
                 Chapter.user_id == self._owner.id
             ).order_by(Chapter.story_id, Chapter.position).all()
@@ -1314,10 +1415,14 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             offset = (page - 1) * per_page
+
             return session.query(Chapter).filter(
                 Chapter.user_id == self._owner.id
-            ).order_by(Chapter.story_id, Chapter.position).offset(offset).limit(per_page).all()
+            ).order_by(
+                Chapter.story_id, Chapter.position
+            ).offset(offset).limit(per_page).all()
 
     def get_chapter_count(self) -> int:
         """Get chapter count associated with a user
@@ -1329,7 +1434,10 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Chapter.id)).filter(Chapter.user_id == self._owner.id).scalar()
+
+            return session.query(func.count(Chapter.id)).filter(
+                Chapter.user_id == self._owner.id
+            ).scalar()
 
     def get_chapters_by_story_id(self, story_id: int) -> list | None:
         """Get all chapters associated with a story
@@ -1348,11 +1456,15 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Chapter).filter(
-                Chapter.story_id == story_id, Chapter.user_id == self._owner.id
+                Chapter.story_id == story_id,
+                Chapter.user_id == self._owner.id
             ).order_by(Chapter.position).all()
 
-    def get_chapters_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list | None:
+    def get_chapters_page_by_story_id(
+        self, story_id: int, page: int, per_page: int
+    ) -> list | None:
         """Get a single page of chapters associated with a story from the database
 
         The returned list will be sorted by the position.
@@ -1373,10 +1485,15 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             offset = (page - 1) * per_page
+
             return session.query(Chapter).filter(
-                Chapter.story_id == story_id, Chapter.user_id == self._owner.id
-            ).order_by(Chapter.position).offset(offset).limit(per_page).all()
+                Chapter.story_id == story_id,
+                Chapter.user_id == self._owner.id
+            ).order_by(
+                Chapter.position
+            ).offset(offset).limit(per_page).all()
 
     def get_chapter_count_by_story_id(self, story_id: int) -> int:
         """Get chapter count associated with a story
@@ -1393,8 +1510,10 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(func.count(Chapter.id)).filter(
-                Chapter.story_id == story_id, Chapter.user_id == self._owner.id
+                Chapter.story_id == story_id,
+                Chapter.user_id == self._owner.id
             ).scalar()
 
     def search_chapters(self, search: str) -> list:
@@ -1412,8 +1531,10 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Chapter).filter(
-                or_(Chapter.title.like(f'%{search}%'), Chapter.description.like(f'%{search}%')),
+                or_(Chapter.title.like(f'%{search}%'),
+                Chapter.description.like(f'%{search}%')),
                 Chapter.user_id == self._owner.id
             ).all()
 
@@ -1434,12 +1555,17 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Chapter).filter(
-                or_(Chapter.title.like(f'%{search}%'), Chapter.description.like(f'%{search}%')),
-                Chapter.story_id == story_id, Chapter.user_id == self._owner.id
+                or_(Chapter.title.like(f'%{search}%'),
+                Chapter.description.like(f'%{search}%')),
+                Chapter.story_id == story_id,
+                Chapter.user_id == self._owner.id
             ).all()
 
-    def append_links_to_chapter(self, chapter_id: int, link_ids: list) -> Type[Chapter]:
+    def append_links_to_chapter(
+        self, chapter_id: int, link_ids: list
+    ) -> Type[Chapter]:
         """Append links to a chapter
 
         Parameters
@@ -1456,9 +1582,12 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 chapter = session.query(Chapter).filter(
-                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                    Chapter.id == chapter_id,
+                    Chapter.user_id == self._owner.id
                 ).first()
 
                 if not chapter:
@@ -1470,11 +1599,18 @@ class ChapterController(BaseController):
                     if not link:
                         raise ValueError('Link not found.')
 
-                    chapter_link = ChapterLink(user_id=self._owner.id, story_id=chapter.story_id,
-                                               chapter_id=chapter_id, link_id=link_id, created=datetime.now())
+                    chapter_link = ChapterLink(
+                        user_id=self._owner.id, story_id=chapter.story_id,
+                        chapter_id=chapter_id, link_id=link_id,
+                        created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Link {link.title[:50]} associated with \
-                                        chapter {chapter.title[:50]} by {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Link \
+                        {link.title[:50]} associated with chapter \
+                        {chapter.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(chapter_link)
                     session.add(activity)
@@ -1502,11 +1638,17 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Link).join(ChapterLink, Link.id == ChapterLink.link_id).filter(
-                ChapterLink.chapter_id == chapter_id, ChapterLink.user_id == self._owner.id
+
+            return session.query(Link).join(
+                ChapterLink, Link.id == ChapterLink.link_id
+            ).filter(
+                ChapterLink.chapter_id == chapter_id,
+                ChapterLink.user_id == self._owner.id
             ).all()
 
-    def append_notes_to_chapter(self, chapter_id: int, note_ids: list) -> Type[Chapter]:
+    def append_notes_to_chapter(
+            self, chapter_id: int, note_ids: list
+    ) -> Type[Chapter]:
         """Append notes to a chapter
 
         Parameters
@@ -1523,9 +1665,12 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 chapter = session.query(Chapter).filter(
-                    Chapter.id == chapter_id, Chapter.user_id == self._owner.id
+                    Chapter.id == chapter_id,
+                    Chapter.user_id == self._owner.id
                 ).first()
 
                 if not chapter:
@@ -1533,17 +1678,25 @@ class ChapterController(BaseController):
 
                 for note_id in note_ids:
                     note = session.query(Note).filter(
-                        Note.id == note_id, Note.user_id == self._owner.id
+                        Note.id == note_id,
+                        Note.user_id == self._owner.id
                     ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
 
-                    chapter_note = ChapterNote(user_id=self._owner.id, story_id=chapter.story_id, chapter_id=chapter_id,
-                                               note_id=note_id, created=datetime.now())
+                    chapter_note = ChapterNote(
+                        user_id=self._owner.id, story_id=chapter.story_id,
+                        chapter_id=chapter_id, note_id=note_id,
+                        created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Note {note.title[:50]} associated with \
-                                        chapter {chapter.title[:50]} by {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Note\
+                        {note.title[:50]} associated with chapter \
+                        {chapter.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(chapter_note)
                     session.add(activity)
@@ -1571,8 +1724,12 @@ class ChapterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Note).join(ChapterNote, Note.id == ChapterNote.note_id).filter(
-                ChapterNote.chapter_id == chapter_id, ChapterNote.user_id == self._owner.id
+
+            return session.query(Note).join(
+                ChapterNote, Note.id == ChapterNote.note_id
+            ).filter(
+                ChapterNote.chapter_id == chapter_id,
+                ChapterNote.user_id == self._owner.id
             ).all()
 
 
@@ -1687,9 +1844,12 @@ class CharacterController(BaseController):
 
         super().__init__(session, owner)
 
-    def create_character(self, title: str = None, first_name: str = None, middle_name: str = None,
-                         last_name: str = None, nickname: str = None, gender: str = None, sex: str = None,
-                         date_of_birth: str = None, date_of_death: str = None, description: str = None) -> Character:
+    def create_character(
+        self, title: str = None, first_name: str = None,
+        middle_name: str = None, last_name: str = None, nickname: str = None,
+        gender: str = None, sex: str = None, date_of_birth: str = None,
+        date_of_death: str = None, description: str = None
+    ) -> Character:
         """Create a new character
 
         Although all the attributes are technically optional, at least one of the following fields must be provided:
@@ -1725,21 +1885,28 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 if not title and not first_name and not last_name and not middle_name and not nickname:
-                    raise ValueError('At least one of the following fields must be provided: title, first name, \
-                                      middle name, last name, nickname.')
+                    raise ValueError("""At least one of the following fields 
+                    must be provided: title, first name, middle name, last name, 
+                    nickname.""")
 
                 created = datetime.now()
                 modified = created
-                character = Character(user_id=self._owner.id, title=title, first_name=first_name,
-                                      middle_name=middle_name, last_name=last_name, nickname=nickname, gender=gender,
-                                      sex=sex, date_of_birth=date_of_birth, date_of_death=date_of_death,
-                                      description=description, created=created, modified=modified)
+                character = Character(
+                    user_id=self._owner.id, title=title, first_name=first_name,
+                    middle_name=middle_name, last_name=last_name,
+                    nickname=nickname, gender=gender, sex=sex,
+                    date_of_birth=date_of_birth, date_of_death=date_of_death,
+                    description=description, created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'{character.__str__} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'{character.__str__} \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(character)
                 session.add(activity)
@@ -1752,10 +1919,13 @@ class CharacterController(BaseController):
                 session.commit()
                 return character
 
-    def update_character(self, character_id: int = None, title: str = None, first_name: str = None,
-                         middle_name: str = None, last_name: str = None, nickname: str = None, gender: str = None,
-                         sex: str = None, date_of_birth: str = None, date_of_death: str = None,
-                         description: str = None) -> Type[Character]:
+    def update_character(
+        self, character_id: int = None, title: str = None,
+        first_name: str = None, middle_name: str = None, last_name: str = None,
+        nickname: str = None, gender: str = None, sex: str = None,
+        date_of_birth: str = None, date_of_death: str = None,
+        description: str = None
+    ) -> Type[Character]:
         """Update a character
 
         Parameters
@@ -1790,9 +1960,12 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 character = session.query(Character).filter(
-                    Character.id == character_id, Character.user_id == self._owner.id
+                    Character.id == character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
                 if not character:
@@ -1810,8 +1983,10 @@ class CharacterController(BaseController):
                 character.description = description
                 character.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id, summary=f'{character.__str__} updated by \
-                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'{character.__str__} \
+                    updated by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -1845,16 +2020,21 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 character = session.query(Character).filter(
-                    Character.id == character_id, Character.user_id == self._owner.id
+                    Character.id == character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
                 if not character:
                     raise ValueError('Character not found.')
 
-                activity = Activity(user_id=self._owner.id, summary=f'{character.__str__} deleted by \
-                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'{character.__str__} \
+                    deleted by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(character)
                 session.add(activity)
