@@ -168,7 +168,9 @@ class Author(Base):
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
     user: Mapped["User"] = relationship("User", back_populates="authors")
-    stories: Mapped[Optional[List["AuthorStory"]]] = relationship("AuthorStory", back_populates="author")
+    stories: Mapped[Optional[List["AuthorStory"]]] = relationship(
+        "AuthorStory", back_populates="author",
+        cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the author.
@@ -420,7 +422,8 @@ class Bibliography(Base):
     user: Mapped["User"] = relationship("User")
     story: Mapped["Story"] = relationship("Story", back_populates="references")
     authors: Mapped[Optional[List["BibliographyAuthor"]]] = relationship(
-        "BibliographyAuthor", back_populates="reference", lazy="joined"
+        "BibliographyAuthor", back_populates="reference",
+        lazy="joined", cascade="all, delete, delete-orphan"
     )
 
     def __repr__(self):
@@ -785,11 +788,17 @@ class Chapter(Base):
     description: Mapped[str] = mapped_column(Text, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
-    scenes: Mapped[Optional[List["Scene"]]] = relationship("Scene", back_populates="chapter", lazy="joined")
+    scenes: Mapped[Optional[List["Scene"]]] = relationship(
+        "Scene", back_populates="chapter", lazy="joined",
+        cascade="all, delete, delete-orphan")
     user: Mapped["User"] = relationship("User")
     story: Mapped["Story"] = relationship("Story", back_populates="chapters")
-    links: Mapped[Optional[List["ChapterLink"]]] = relationship("ChapterLink", back_populates="chapter", lazy="joined")
-    notes: Mapped[Optional[List["ChapterNote"]]] = relationship("ChapterNote", back_populates="chapter", lazy="joined")
+    links: Mapped[Optional[List["ChapterLink"]]] = relationship(
+        "ChapterLink", back_populates="chapter", lazy="joined",
+        cascade="all, delete, delete-orphan")
+    notes: Mapped[Optional[List["ChapterNote"]]] = relationship(
+        "ChapterNote", back_populates="chapter", lazy="joined",
+        cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the chapter.
@@ -1196,29 +1205,38 @@ class Character(Base):
     date_of_death: Mapped[str] = mapped_column(Date, nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User", back_populates="characters")
     character_relationships: Mapped[Optional[List["CharacterRelationship"]]] = relationship(
-        "CharacterRelationship", back_populates="related_character", foreign_keys="[CharacterRelationship.related_id]",
-        lazy="joined"
+        "CharacterRelationship", back_populates="related_character",
+        foreign_keys="[CharacterRelationship.related_id]", lazy="joined",
+        cascade="all, delete, delete-orphan"
     )
     traits: Mapped[Optional[List["CharacterTrait"]]] = relationship(
-        "CharacterTrait", back_populates="character", lazy="joined"
+        "CharacterTrait", back_populates="character", lazy="joined",
+        cascade="all, delete, delete-orphan"
     )
     events: Mapped[Optional[List["CharacterEvent"]]] = relationship(
-        "CharacterEvent", back_populates="character"
+        "CharacterEvent", back_populates="character",
+        cascade="all, delete, delete-orphan"
     )
     images: Mapped[Optional[List["CharacterImage"]]] = relationship(
-        "CharacterImage", back_populates="character", lazy="joined"
+        "CharacterImage", back_populates="character", lazy="joined",
+        cascade="all, delete, delete-orphan"
     )
     links: Mapped[Optional[List["CharacterLink"]]] = relationship(
-        "CharacterLink", back_populates="character", lazy="joined"
+        "CharacterLink", back_populates="character", lazy="joined",
+        cascade="all, delete, delete-orphan"
     )
     notes: Mapped[Optional[List["CharacterNote"]]] = relationship(
-        "CharacterNote", back_populates="character", lazy="joined"
+        "CharacterNote", back_populates="character", lazy="joined",
+        cascade="all, delete, delete-orphan"
     )
     stories: Mapped[Optional[List["CharacterStory"]]] = relationship(
-        "CharacterStory", back_populates="character", lazy="joined"
+        "CharacterStory", back_populates="character", lazy="joined",
+        cascade="all, delete, delete-orphan"
     )
 
     def __repr__(self):
@@ -2462,10 +2480,18 @@ class Event(Base):
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
     user: Mapped["User"] = relationship("User", back_populates="events")
-    links: Mapped[Optional[List["EventLink"]]] = relationship("EventLink", back_populates="event", lazy="joined")
-    characters: Mapped[Optional[List["CharacterEvent"]]] = relationship("CharacterEvent", back_populates="event", lazy="joined")
-    notes: Mapped[Optional[List["EventNote"]]] = relationship("EventNote", back_populates="event", lazy="joined")
-    locations: Mapped[Optional[List["EventLocation"]]] = relationship("EventLocation", back_populates="event", lazy="joined")
+    links: Mapped[Optional[List["EventLink"]]] = relationship(
+        "EventLink", back_populates="event", lazy="joined",
+        cascade="all, delete, delete-orphan")
+    characters: Mapped[Optional[List["CharacterEvent"]]] = relationship(
+        "CharacterEvent", back_populates="event", lazy="joined",
+        cascade="all, delete, delete-orphan")
+    notes: Mapped[Optional[List["EventNote"]]] = relationship(
+        "EventNote", back_populates="event", lazy="joined",
+        cascade="all, delete, delete-orphan")
+    locations: Mapped[Optional[List["EventLocation"]]] = relationship(
+        "EventLocation", back_populates="event", lazy="joined",
+        cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the event.
@@ -2954,10 +2980,16 @@ class Image(Base):
     mime_type: Mapped[ImageMimeTypes] = mapped_column(String(50), nullable=False)
     caption: Mapped[str] = mapped_column(String(250), nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User", back_populates="images")
-    character: Mapped[Optional[List["CharacterImage"]]] = relationship("CharacterImage", back_populates="image")
-    location: Mapped[Optional[List["ImageLocation"]]] = relationship("ImageLocation", back_populates="image")
+    character: Mapped[Optional[List["CharacterImage"]]] = relationship(
+        "CharacterImage", back_populates="image",
+        cascade="all, delete, delete-orphan")
+    location: Mapped[Optional[List["ImageLocation"]]] = relationship(
+        "ImageLocation", back_populates="image",
+        cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the image.
@@ -3305,14 +3337,24 @@ class Link(Base):
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
     user: Mapped["User"] = relationship("User", back_populates="links")
-    stories: Mapped[Optional[List["LinkStory"]]] = relationship("LinkStory", back_populates="link")
-    chapters: Mapped[Optional[List["ChapterLink"]]] = relationship("ChapterLink", back_populates="link")
+    stories: Mapped[Optional[List["LinkStory"]]] = relationship(
+        "LinkStory", back_populates="link",
+        cascade="all, delete, delete-orphan")
+    chapters: Mapped[Optional[List["ChapterLink"]]] = relationship(
+        "ChapterLink", back_populates="link",
+        cascade="all, delete, delete-orphan")
     scenes: Mapped[Optional[List["LinkScene"]]] = relationship(
         "LinkScene", back_populates="link",
         cascade="all, delete, delete-orphan")
-    characters: Mapped[Optional[List["CharacterLink"]]] = relationship("CharacterLink", back_populates="link")
-    events: Mapped[Optional[List["EventLink"]]] = relationship("EventLink", back_populates="link")
-    locations: Mapped[Optional[List["LinkLocation"]]] = relationship("LinkLocation", back_populates="link")
+    characters: Mapped[Optional[List["CharacterLink"]]] = relationship(
+        "CharacterLink", back_populates="link",
+        cascade="all, delete, delete-orphan")
+    events: Mapped[Optional[List["EventLink"]]] = relationship(
+        "EventLink", back_populates="link",
+        cascade="all, delete, delete-orphan")
+    locations: Mapped[Optional[List["LinkLocation"]]] = relationship(
+        "LinkLocation", back_populates="link",
+        cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the link.
@@ -3812,15 +3854,22 @@ class Location(Base):
     latitude: Mapped[float] = mapped_column(Float, nullable=True)
     longitude: Mapped[float] = mapped_column(Float, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User", back_populates="locations")
-    images: Mapped[Optional[List["ImageLocation"]]] = relationship("ImageLocation", back_populates="location")
-    links: Mapped[Optional[List["LinkLocation"]]] = relationship("LinkLocation", back_populates="location",
-                                                                 lazy="joined")
-    events: Mapped[Optional[List["EventLocation"]]] = relationship("EventLocation", back_populates="location",
-                                                                   lazy="joined")
-    notes: Mapped[Optional[List["LocationNote"]]] = relationship("LocationNote", back_populates="location",
-                                                                 lazy="joined")
+    images: Mapped[Optional[List["ImageLocation"]]] = relationship(
+        "ImageLocation", back_populates="location",
+        cascade="all, delete, delete-orphan")
+    links: Mapped[Optional[List["LinkLocation"]]] = relationship(
+        "LinkLocation", back_populates="location",
+        cascade="all, delete, delete-orphan", lazy="joined")
+    events: Mapped[Optional[List["EventLocation"]]] = relationship(
+        "EventLocation", back_populates="location",
+        cascade="all, delete, delete-orphan", lazy="joined")
+    notes: Mapped[Optional[List["LocationNote"]]] = relationship(
+        "LocationNote", back_populates="location",
+        cascade="all, delete, delete-orphan", lazy="joined")
 
     def __repr__(self):
         """Returns a string representation of the location.
@@ -4231,16 +4280,28 @@ class Note(Base):
     title: Mapped[str] = mapped_column(String(250), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User", back_populates="notes")
-    stories: Mapped[Optional[List["NoteStory"]]] = relationship("NoteStory", back_populates="note")
-    chapters: Mapped[Optional[List["ChapterNote"]]] = relationship("ChapterNote", back_populates="note")
+    stories: Mapped[Optional[List["NoteStory"]]] = relationship(
+        "NoteStory", back_populates="note",
+        cascade="all, delete, delete-orphan")
+    chapters: Mapped[Optional[List["ChapterNote"]]] = relationship(
+        "ChapterNote", back_populates="note",
+        cascade="all, delete, delete-orphan")
     scenes: Mapped[Optional[List["NoteScene"]]] = relationship(
         "NoteScene", back_populates="note",
         cascade="all, delete, delete-orphan")
-    characters: Mapped[Optional[List["CharacterNote"]]] = relationship("CharacterNote", back_populates="note")
-    events: Mapped[Optional[List["EventNote"]]] = relationship("EventNote", back_populates="note")
-    locations: Mapped[Optional[List["LocationNote"]]] = relationship("LocationNote", back_populates="note")
+    characters: Mapped[Optional[List["CharacterNote"]]] = relationship(
+        "CharacterNote", back_populates="note",
+        cascade="all, delete, delete-orphan")
+    events: Mapped[Optional[List["EventNote"]]] = relationship(
+        "EventNote", back_populates="note",
+        cascade="all, delete, delete-orphan")
+    locations: Mapped[Optional[List["LocationNote"]]] = relationship(
+        "LocationNote", back_populates="note",
+        cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the note.
@@ -4610,13 +4671,17 @@ class Scene(Base):
     description: Mapped[str] = mapped_column(Text, nullable=True)
     content: Mapped[str] = mapped_column(Text, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     chapter: Mapped["Chapter"] = relationship("Chapter", back_populates="scenes")
     user: Mapped["User"] = relationship("User")
-    links: Mapped[Optional[List["LinkScene"]]] = relationship("LinkScene", back_populates="scene",
-                    lazy="joined", cascade="all, delete, delete-orphan")
-    notes: Mapped[Optional[List["NoteScene"]]] = relationship("NoteScene", back_populates="scene",
-                    lazy="joined", cascade="all, delete, delete-orphan")
+    links: Mapped[Optional[List["LinkScene"]]] = relationship(
+        "LinkScene", back_populates="scene", lazy="joined",
+        cascade="all, delete, delete-orphan")
+    notes: Mapped[Optional[List["NoteScene"]]] = relationship(
+        "NoteScene", back_populates="scene", lazy="joined",
+        cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the scene.
@@ -4803,17 +4868,31 @@ class Story(Base):
     title: Mapped[str] = mapped_column(String(250), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
-    user: Mapped["User"] = relationship("User", back_populates="stories")
-    chapters: Mapped[Optional[List["Chapter"]]] = relationship("Chapter", back_populates="story")
-    authors: Mapped[Optional[List["AuthorStory"]]] = relationship("AuthorStory", back_populates="story", lazy="joined")
-    references: Mapped[Optional[List["Bibliography"]]] = relationship("Bibliography", back_populates="story")
-    submissions: Mapped[Optional[List["Submission"]]] = relationship("Submission", back_populates="story")
-    links: Mapped[Optional[List["LinkStory"]]] = relationship("LinkStory", back_populates="story")
-    notes: Mapped[Optional[List["NoteStory"]]] = relationship("NoteStory", back_populates="story")
-    characters: Mapped[Optional[List["CharacterStory"]]] = relationship(
-        "CharacterStory", back_populates="story", lazy="joined"
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
     )
+    user: Mapped["User"] = relationship("User", back_populates="stories")
+    chapters: Mapped[Optional[List["Chapter"]]] = relationship(
+        "Chapter", back_populates="story",
+        cascade="all, delete, delete-orphan")
+    authors: Mapped[Optional[List["AuthorStory"]]] = relationship(
+        "AuthorStory", back_populates="story", lazy="joined",
+        cascade="all, delete, delete-orphan")
+    references: Mapped[Optional[List["Bibliography"]]] = relationship(
+        "Bibliography", back_populates="story",
+        cascade="all, delete, delete-orphan")
+    submissions: Mapped[Optional[List["Submission"]]] = relationship(
+        "Submission", back_populates="story",
+        cascade="all, delete, delete-orphan")
+    links: Mapped[Optional[List["LinkStory"]]] = relationship(
+        "LinkStory", back_populates="story",
+        cascade="all, delete, delete-orphan")
+    notes: Mapped[Optional[List["NoteStory"]]] = relationship(
+        "NoteStory", back_populates="story",
+        cascade="all, delete, delete-orphan")
+    characters: Mapped[Optional[List["CharacterStory"]]] = relationship(
+        "CharacterStory", back_populates="story", lazy="joined",
+        cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the story.
@@ -5295,17 +5374,39 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=False)
     is_banned: Mapped[bool] = mapped_column(Boolean, default=False)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
-    activities: Mapped[Optional[List["Activity"]]] = relationship("Activity", back_populates="user")
-    authors: Mapped[Optional[List["Author"]]] = relationship("Author", back_populates="user", lazy="joined")
-    characters: Mapped[Optional[List["Character"]]] = relationship("Character", back_populates="user")
-    events: Mapped[Optional[List["Event"]]] = relationship("Event", back_populates="user")
-    images: Mapped[Optional[List["Image"]]] = relationship("Image", back_populates="user")
-    links: Mapped[Optional[List["Link"]]] = relationship("Link", back_populates="user")
-    locations: Mapped[Optional[List["Location"]]] = relationship("Location", back_populates="user")
-    notes: Mapped[Optional[List["Note"]]] = relationship("Note", back_populates="user")
-    stories: Mapped[Optional[List["Story"]]] = relationship("Story", back_populates="user")
-    submissions: Mapped[Optional[List["Submission"]]] = relationship("Submission", back_populates="user")
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
+    activities: Mapped[Optional[List["Activity"]]] = relationship(
+        "Activity", back_populates="user",
+        cascade="all, delete, delete-orphan")
+    authors: Mapped[Optional[List["Author"]]] = relationship(
+        "Author", back_populates="user", lazy="joined",
+        cascade="all, delete, delete-orphan")
+    characters: Mapped[Optional[List["Character"]]] = relationship(
+        "Character", back_populates="user",
+        cascade="all, delete, delete-orphan")
+    events: Mapped[Optional[List["Event"]]] = relationship(
+        "Event", back_populates="user",
+        cascade="all, delete, delete-orphan")
+    images: Mapped[Optional[List["Image"]]] = relationship(
+        "Image", back_populates="user",
+        cascade="all, delete, delete-orphan")
+    links: Mapped[Optional[List["Link"]]] = relationship(
+        "Link", back_populates="user",
+        cascade="all, delete, delete-orphan")
+    locations: Mapped[Optional[List["Location"]]] = relationship(
+        "Location", back_populates="user",
+        cascade="all, delete, delete-orphan")
+    notes: Mapped[Optional[List["Note"]]] = relationship(
+        "Note", back_populates="user",
+        cascade="all, delete, delete-orphan")
+    stories: Mapped[Optional[List["Story"]]] = relationship(
+        "Story", back_populates="user",
+        cascade="all, delete, delete-orphan")
+    submissions: Mapped[Optional[List["Submission"]]] = relationship(
+        "Submission", back_populates="user",
+        cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the user.
