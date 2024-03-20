@@ -3307,7 +3307,9 @@ class Link(Base):
     user: Mapped["User"] = relationship("User", back_populates="links")
     stories: Mapped[Optional[List["LinkStory"]]] = relationship("LinkStory", back_populates="link")
     chapters: Mapped[Optional[List["ChapterLink"]]] = relationship("ChapterLink", back_populates="link")
-    scenes: Mapped[Optional[List["LinkScene"]]] = relationship("LinkScene", back_populates="link")
+    scenes: Mapped[Optional[List["LinkScene"]]] = relationship(
+        "LinkScene", back_populates="link",
+        cascade="all, delete, delete-orphan")
     characters: Mapped[Optional[List["CharacterLink"]]] = relationship("CharacterLink", back_populates="link")
     events: Mapped[Optional[List["EventLink"]]] = relationship("EventLink", back_populates="link")
     locations: Mapped[Optional[List["LinkLocation"]]] = relationship("LinkLocation", back_populates="link")
@@ -4233,7 +4235,9 @@ class Note(Base):
     user: Mapped["User"] = relationship("User", back_populates="notes")
     stories: Mapped[Optional[List["NoteStory"]]] = relationship("NoteStory", back_populates="note")
     chapters: Mapped[Optional[List["ChapterNote"]]] = relationship("ChapterNote", back_populates="note")
-    scenes: Mapped[Optional[List["NoteScene"]]] = relationship("NoteScene", back_populates="note")
+    scenes: Mapped[Optional[List["NoteScene"]]] = relationship(
+        "NoteScene", back_populates="note",
+        cascade="all, delete, delete-orphan")
     characters: Mapped[Optional[List["CharacterNote"]]] = relationship("CharacterNote", back_populates="note")
     events: Mapped[Optional[List["EventNote"]]] = relationship("EventNote", back_populates="note")
     locations: Mapped[Optional[List["LocationNote"]]] = relationship("LocationNote", back_populates="note")
@@ -4609,8 +4613,10 @@ class Scene(Base):
     modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
     chapter: Mapped["Chapter"] = relationship("Chapter", back_populates="scenes")
     user: Mapped["User"] = relationship("User")
-    links: Mapped[Optional[List["LinkScene"]]] = relationship("LinkScene", back_populates="scene", lazy="joined")
-    notes: Mapped[Optional[List["NoteScene"]]] = relationship("NoteScene", back_populates="scene", lazy="joined")
+    links: Mapped[Optional[List["LinkScene"]]] = relationship("LinkScene", back_populates="scene",
+                    lazy="joined", cascade="all, delete, delete-orphan")
+    notes: Mapped[Optional[List["NoteScene"]]] = relationship("NoteScene", back_populates="scene",
+                    lazy="joined", cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Returns a string representation of the scene.

@@ -5704,24 +5704,16 @@ class SceneController(BaseController):
         with self._session as session:
             try:
                 scene = session.query(Scene).filter(
-                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                    Scene.id == scene_id,
+                    Scene.user_id == self._owner.id
                 ).first()
 
                 if not scene:
                     raise ValueError('Scene not found.')
 
-                for link in scene.links:
-                    session.query(Link).filter(Link.id == link.link_id).delete()
-                    session.delete(link)
-
-                for note in scene.notes:
-                    session.query(Note).filter(
-                        Note.id == note.note_id, Note.user_id == self._owner.id
-                    ).delete()
-                    session.delete(note)
-
                 siblings = session.query(Scene).filter(
-                    Scene.chapter_id == scene.chapter_id, Scene.user_id == self._owner.id,
+                    Scene.chapter_id == scene.chapter_id,
+                    Scene.user_id == self._owner.id,
                     Scene.position > scene.position
                 ).all()
 

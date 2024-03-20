@@ -45,6 +45,55 @@ class Assistant:
         return f"{self.__class__.__name__}({self._name}, {self._model})"
 
 
+class ChapterAssistant(Assistant):
+    def __init__(self):
+        super().__init__("Chapter Assistant", "dolphin-phi")
+
+    def summarize(
+            self,
+            chapter_id: int,
+            prompt: Optional[str] = "Summarize the chapter:",
+            options: Optional[dict] = None
+    ):
+        """Summarize a chapter using the Ollama API.
+        """
+        app = Application("sqlite:///noveler.db")
+        chapter_title = app("chapter").get_chapter_by_id(chapter_id).title
+        prompt += f'Chapter Title: {chapter_title}\n\n'
+
+        for scene in app("scene").get_scenes_by_chapter_id(chapter_id):
+            prompt += f'Scene Title: {scene.title}\n\n'
+            prompt += f'{scene.content}\n\n'
+
+        priming = """Chapter Assistant is ready to summarize the chapter."""
+        message0 = Message(role="system", content=priming)
+        message1 = Message(role="user", content=prompt)
+
+        if not options:
+            options = {
+                "temperature": 0.5,
+            }
+
+        try:
+            response = self._client.chat(
+                model=self._model,
+                messages=[message0, message1],
+                options=options
+            )
+
+        except Exception as e:
+            raise e
+
+        else:
+            return response
+
+    def __str__(self):
+        return f"Noveler Application [alpha] Chapter Assistant"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}()"
+
+
 class ImageAssistant(Assistant):
     def __init__(self):
         super().__init__("Image Assistant", "llava")
