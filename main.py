@@ -44,4 +44,5 @@ images = [
     # "images/kungfu.jpeg",
 ]
 response = app.assistant("image").describe(images)
+
 print(response)
