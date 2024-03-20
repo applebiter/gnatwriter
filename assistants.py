@@ -55,6 +55,37 @@ class ImageAssistant(Assistant):
             prompt: Optional[str] = "Describe the contents of the image:",
             options: Optional[dict] = None
     ):
+        """Describe the contents of an image using the Ollama API.
+
+        This is an example of the JSON response from the Ollama API:
+            {
+                'model': 'llava',
+                'created_at': '2024-03-20T02:52:27.742885501Z',
+                'message': {
+                    'role': 'assistant',
+                    'content': {
+                        "text":"In the image, there is a bearded man with gray
+                            hair, wearing a brown apron over a white shirt. He
+                            appears to be working in a workshop setting. The man is
+                            standing next to an open metal safe or box, which has a
+                            key inserted into it. Inside the safe, we can see
+                            various tools and equipment. The background suggests a
+                            well-equipped workshop with wooden shelves and what
+                            looks like machinery or machinery parts. Natural light
+                            seems to be coming from a window on the left side of the
+                            image. The man is focused on his task, possibly related
+                            to crafting or repair work.",
+                    },
+                },
+                'done': True,
+                'total_duration': 78227562692,
+                'load_duration': 3307143035,
+                'prompt_eval_count': 1,
+                'prompt_eval_duration': 15251524000,
+                'eval_count': 128,
+                'eval_duration': 59658313000
+            }
+        """
         encoded = []
 
         for image in images:
@@ -68,12 +99,7 @@ class ImageAssistant(Assistant):
 
         if not options:
             options = {
-                "max_tokens": 100,
                 "temperature": 0.5,
-                "top_p": 1.0,
-                "frequency_penalty": 0.0,
-                "presence_penalty": 0.0,
-                "stop": ["\n"]
             }
 
         return self._client.chat(

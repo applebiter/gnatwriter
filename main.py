@@ -38,10 +38,10 @@ for story in stories:
 # Get some test images and have the llava model describe them
 images = [
     # "images/college_library.jpeg",
-    # "images/john_jacob_jingleheimer_schmidt.jpeg",
+    "images/john_jacob_jingleheimer_schmidt.jpeg",
     # "images/miss_mary_mack.jpeg",
-    "images/workshop.jpeg",
+    # "images/workshop.jpeg",
     # "images/kungfu.jpeg",
 ]
 response = app.assistant("image").describe(images)
-print(response["message"]["content"])
+print(response)
