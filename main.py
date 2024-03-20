@@ -1,5 +1,7 @@
 from application import Application
 from controllers import verify_password
+from ollamasubsystem import OllamaClient
+from assistants import AssistantRegistry
 
 """Example database connection strings
 
@@ -28,7 +30,20 @@ else:
     print(f"Password '{password}' incorrect!")
 
 stories = app("story").get_all_stories()
-
+print("Stories:")
 for story in stories:
-    print(story.title)
-    
+    print(story.serialize())
+    print("--------------------")
+    print(" ")
+
+images = [
+    "images/college_library.jpeg",
+    "images/john_jacob_jingleheimer_schmidt.jpeg",
+    "images/miss_mary_mack.jpeg",
+    "images/workshop.jpeg",
+    "images/kungfu.jpeg",
+]
+assistant = AssistantRegistry()
+response = assistant("image").describe(images)
+
+print(response["message"]["content"])

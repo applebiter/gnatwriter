@@ -6,23 +6,10 @@ from ollama import Options, Message
 
 
 class OllamaClient:
-    """Singleton class for the Ollama client
-
-    This class is a Singleton class that wraps the Ollama client. It is used to
-    interact with the Ollama API. It is a Singleton class to ensure that only
-    one instance of the Ollama client is created and used throughout the
-    application.
     """
-    _self = None
+
+    """
     _client = None
-
-    def __new__(cls):
-        """Enforce Singleton pattern"""
-
-        if cls._self is None:
-            cls._self = super().__new__(cls)
-
-        return cls._self
 
     def __init__(self):
         """Initialize the class"""
@@ -30,18 +17,18 @@ class OllamaClient:
         self._client = ollama.Client()
 
     def generate(
-        self,
-        model: str = '',
-        prompt: str = '',
-        system: str = '',
-        template: str = '',
-        context: Optional[Sequence[int]] = None,
-        stream: bool = False,
-        raw: bool = False,
-        return_format: Literal['', 'json'] = '',
-        images: Optional[Sequence[AnyStr]] = None,
-        options: Optional[Options] = None,
-        keep_alive: Optional[Union[float, str]] = None,
+            self,
+            model: str = '',
+            prompt: str = '',
+            system: str = '',
+            template: str = '',
+            context: Optional[Sequence[int]] = None,
+            stream: bool = False,
+            raw: bool = False,
+            return_format: Literal['', 'json'] = '',
+            images: Optional[Sequence[AnyStr]] = None,
+            options: Optional[Options] = None,
+            keep_alive: Optional[Union[float, str]] = None,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
         """Generate text using the Ollama API"""
         try:
@@ -63,13 +50,13 @@ class OllamaClient:
             raise e
 
     def chat(
-        self,
-        model: str = '',
-        messages: Optional[Sequence[Message]] = None,
-        stream: bool = False,
-        return_format: Literal['', 'json'] = '',
-        options: Optional[Options] = None,
-        keep_alive: Optional[Union[float, str]] = None,
+            self,
+            model: str = '',
+            messages: Optional[Sequence[Message]] = None,
+            stream: bool = False,
+            return_format: Literal['', 'json'] = '',
+            options: Optional[Options] = None,
+            keep_alive: Optional[Union[float, str]] = None,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
         """Chat with the Ollama API"""
         try:
@@ -86,11 +73,11 @@ class OllamaClient:
             raise e
 
     def embeddings(
-        self,
-        model: str = '',
-        prompt: str = '',
-        options: Optional[Options] = None,
-        keep_alive: Optional[Union[float, str]] = None,
+            self,
+            model: str = '',
+            prompt: str = '',
+            options: Optional[Options] = None,
+            keep_alive: Optional[Union[float, str]] = None,
     ) -> Sequence[float]:
         """Set embeddings using the Ollama API"""
         try:
@@ -105,10 +92,10 @@ class OllamaClient:
             raise e
 
     def pull(
-        self,
-        model: str,
-        insecure: bool = False,
-        stream: bool = False,
+            self,
+            model: str,
+            insecure: bool = False,
+            stream: bool = False,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
         """Pull a model from the Ollama API"""
         try:
@@ -122,10 +109,10 @@ class OllamaClient:
             raise e
 
     def push(
-        self,
-        model: str,
-        insecure: bool = False,
-        stream: bool = False,
+            self,
+            model: str,
+            insecure: bool = False,
+            stream: bool = False,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
         """Push a model to the Ollama API"""
         try:
@@ -139,11 +126,11 @@ class OllamaClient:
             raise e
 
     def create(
-        self,
-        model: str,
-        path: Optional[Union[str, PathLike]] = None,
-        modelfile: Optional[str] = None,
-        stream: bool = False,
+            self,
+            model: str,
+            path: Optional[Union[str, PathLike]] = None,
+            modelfile: Optional[str] = None,
+            stream: bool = False,
     ) -> Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]:
         """Create a model using the Ollama API"""
         try:
