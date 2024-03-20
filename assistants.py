@@ -1,21 +1,34 @@
-from typing import List, Optional
+from typing import List, Optional, Type
+
+import uuid
 from ollama import Message
+from sqlalchemy.orm import Session
+from controllers import BaseController
+from models import *
 from ollamasubsystem import OllamaClient
 
+noveler_chat_model = "dolphin-phi"
+noveler_image_model = "llava"
 
-class AssistantRegistry:
 
-    _self = None
+class AssistantRegistry(BaseController):
+    """Assistant Registry
+
+    The Assistant Registry is a class that manages the various assistants
+    available to the user. It is a singleton class that is responsible for
+    creating and managing the various assistants available to the user.
+    """
+
     _assistants = {}
 
-    def __new__(cls):
-        if cls._self is None:
-            cls._self = super().__new__(cls)
-        return cls._self
+    def __init__(self, session: Session, owner: Type[User]):
+        """Initialize the class"""
 
-    def __init__(self):
+        super().__init__(session, owner)
+
         self._assistants = {
-            "image": ImageAssistant()
+            "chat": ChatAssistant(session, owner),
+            "image": ImageAssistant(session, owner)
         }
 
     def __call__(self, *args, **kwargs):
@@ -32,79 +45,206 @@ class AssistantRegistry:
         return self._assistants
 
 
-class Assistant:
-    def __init__(self, name: str, model: str):
-        self._name = name
-        self._model = model
+class Assistant(BaseController):
+    """Assistant"""
+
+    def __init__(self, session: Session, owner: Type[User]):
+        super().__init__(session, owner)
+
+        uuid4 = str(uuid.uuid4())
+        uuid_exists = session.query(Assistance).filter(
+            Assistance.session_uuid == uuid4
+        ).first()
+
+        while uuid_exists:
+            uuid4 = str(uuid.uuid4())
+            uuid_exists = session.query(Assistance).filter(
+                Assistance.session_uuid == uuid4
+            ).first()
+
+        self._session_uuid = uuid4
         self._client = OllamaClient()
-
-    def __str__(self):
-        return f"Noveler Application [alpha] Assistant: {self._name}"
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}({self._name}, {self._model})"
+        self._chat_model = noveler_chat_model
+        self._image_model = noveler_image_model
 
 
-class ChapterAssistant(Assistant):
-    def __init__(self):
-        super().__init__("Chapter Assistant", "dolphin-phi")
+class ChatAssistant(Assistant):
+    """Chat Assistant
 
-    def summarize(
+    The Chat Assistant is a specialized assistant that uses the Ollama API to
+    chat with the user.
+    """
+
+    def __init__(self, session: Session, owner: Type[User]):
+        super().__init__(session, owner)
+
+        self._name = "Chat Assistant"
+
+    def chat(
             self,
-            chapter_id: int,
-            prompt: Optional[str] = "Summarize the chapter:",
-            options: Optional[dict] = None
+            prompt: str,
+            temperature: Optional[float] = 0.5,
+            seed: Optional[int] = None,
+            priming: str = None,
+            options: Optional[dict] = None,
+            session_uuid: str = None,
     ):
-        """Summarize a chapter using the Ollama API.
+        """Chat with the Chat Assistant.
+
+        The temperature parameter is a float value between 0 and 1. Anything
+        greater than 0 will make the assistant more creative, but also more
+        unpredictable. The seed parameter is an integer value that can be used
+        to make the assistant's responses more predictable. If the temperature
+        is set to 0, then the assistant's response will be reproducible, given
+        the same seed value.
+
+        Parameters
+        ----------
+        prompt : str
+            The prompt to be used when chatting with the assistant.
+        temperature : Optional[float]
+            The temperature to be used when making the request. Defaults to
+            0.5.
+        seed : Optional[int]
+            The seed to be used when making the request. Defaults to None.
+        priming : Optional[str]
+            The priming to be used when chatting with the assistant. Defaults to
+            None.
+        options : Optional[dict]
+            The options to be used when making the request.
+        session_uuid : str
+            The UUID of the session to be used when making the request.
         """
-        app = Application("sqlite:///noveler.db")
-        chapter_title = app("chapter").get_chapter_by_id(chapter_id).title
-        prompt += f'Chapter Title: {chapter_title}\n\n'
 
-        for scene in app("scene").get_scenes_by_chapter_id(chapter_id):
-            prompt += f'Scene Title: {scene.title}\n\n'
-            prompt += f'{scene.content}\n\n'
+        if not priming:
+            priming = """Chat Assistant is an expert in creative writing, style, 
+                and literary theory who can explain the fine points of plot and 
+                the sophisticated nuance of tone, and who also knows the human 
+                subject very well."""
 
-        priming = """Chapter Assistant is ready to summarize the chapter."""
-        message0 = Message(role="system", content=priming)
-        message1 = Message(role="user", content=prompt)
+        messages = [Message(role="system", content=priming)]
+
+        session_uuid = self._session_uuid if not session_uuid else session_uuid
+
+        for message in self.get_by_session_uuid(session_uuid):
+            messages.append(Message(
+                role=message.role, content=message.content
+            ))
+
+        messages.append(Message(
+            role="user", content=prompt
+        ))
 
         if not options:
             options = {
-                "temperature": 0.5,
+                "temperature": temperature,
             }
 
-        try:
-            response = self._client.chat(
-                model=self._model,
-                messages=[message0, message1],
-                options=options
-            )
+        if not options.get("temperature"):
+            options["temperature"] = temperature
 
-        except Exception as e:
-            raise e
+        with self._session as session:
 
-        else:
-            return response
+            try:
+
+                response = self._client.chat(
+                    model=self._chat_model,
+                    messages=messages,
+                    options=options
+                )
+
+                assistance = Assistance(
+                    user_id=self._owner.id,
+                    session_uuid=session_uuid,
+                    assistant=self._name,
+                    role="user",
+                    model=self._chat_model,
+                    priming=priming,
+                    prompt=prompt,
+                    temperature=temperature,
+                    seed=seed,
+                    content=response["message"]["content"],
+                    done=response["done"],
+                    total_duration=response["total_duration"],
+                    load_duration=response["load_duration"],
+                    prompt_eval_count=response["prompt_eval_count"],
+                    prompt_eval_duration=response["prompt_eval_duration"],
+                    eval_count=response["eval_count"],
+                    eval_duration=response["eval_duration"],
+                    created=datetime.now()
+                )
+
+                session.add(assistance)
+
+                summary = f"{self._owner.username} used the Chat Assistant"
+                activity = Activity(
+                    user_id=self._owner.id, summary=summary,
+                    created=datetime.now()
+                )
+
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return response
 
     def __str__(self):
-        return f"Noveler Application [alpha] Chapter Assistant"
+        """Return the class string representation."""
+        return f"Noveler Application [alpha] {self._name}"
 
     def __repr__(self):
+        """Return the class representation."""
         return f"{self.__class__.__name__}()"
+
+    def get_by_session_uuid(self, session_uuid: str):
+        """Get all messages by session UUID."""
+
+        with self._session as session:
+
+            messages = session.query(Assistance).filter_by(
+                session_uuid=session_uuid
+            ).order_by(Assistance.created).all()
+
+            return messages
 
 
 class ImageAssistant(Assistant):
-    def __init__(self):
-        super().__init__("Image Assistant", "llava")
+    """Image Assistant
+
+    The Image Assistant is a specialized assistant that uses the Ollama API to
+    describe the contents of an image.
+    """
+
+    def __init__(self, session: Session, owner: Type[User]):
+        super().__init__(session, owner)
+
+        self._name = "Image Assistant"
 
     def describe(
             self,
             images: List[str],
+            temperature: Optional[float] = 0.5,
             prompt: Optional[str] = "Describe the contents of the image:",
             options: Optional[dict] = None
     ):
         """Describe the contents of an image using the Ollama API.
+
+        Parameters
+        ----------
+        images : List[str]
+            A list of image file paths to be described.
+        temperature : Optional[float]
+            The temperature to be used when making the request. Defaults to
+            0.5.
+        prompt : Optional[str]
+            The prompt to be used when requesting the description. Defaults to
+            "Describe the contents of the image:".
+        options : Optional[dict]
+            The options to be used when making the request.
         """
         encoded = []
 
@@ -112,31 +252,46 @@ class ImageAssistant(Assistant):
             with open(image, "rb") as file:
                 encoded.append(file.read())
 
-        priming = """Image Assistant is ready to describe the contents of the \
-                    image ."""
+        priming = """Image Assistant is ready to describe the contents of the
+                    image."""
         message0 = Message(role="system", content=priming)
         message1 = Message(role="user", content=prompt, images=encoded)
 
         if not options:
             options = {
-                "temperature": 0.5,
+                "temperature": temperature,
             }
 
-        try:
-            response = self._client.chat(
-                model=self._model,
-                messages=[message0, message1],
-                options=options
-            )
+        if not options.get("temperature"):
+            options["temperature"] = temperature
 
-        except Exception as e:
-            raise e
+        with self._session as session:
 
-        else:
-            return response
+            try:
+
+                response = self._client.chat(
+                    model=self._image_model,
+                    messages=[message0, message1],
+                    options=options
+                )
+                summary = f"{self._owner.username} used the Image Assistant"
+                activity = Activity(
+                    user_id=self._owner.id, summary=summary,
+                    created=datetime.now()
+                )
+
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return response
 
     def __str__(self):
-        return f"Noveler Application [alpha] Image Assistant"
+        return f"Noveler Application [alpha] {self._name}"
 
     def __repr__(self):
         return f"{self.__class__.__name__}()"

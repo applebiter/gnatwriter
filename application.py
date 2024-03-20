@@ -8,11 +8,15 @@ from models import *
 
 class Application:
     def __init__(self, engine: str, echo: bool = False):
-        self.assistant = AssistantRegistry()
+
         self._engine = create_engine(engine, echo=echo)
         Base.metadata.create_all(self._engine)
         self._session = Session(bind=self._engine, expire_on_commit=False)
-        self._owner = self._session.query(User).filter(User.username == "noveler").first()
+
+        self._owner = self._session.query(User).filter(
+            User.username == "noveler"
+        ).first()
+
         if self._owner is None:
             new_uuid = str(uniqueid.uuid4())
             username = "noveler"
@@ -22,10 +26,14 @@ class Application:
             is_banned = False
             created = datetime.now()
             modified = created
-            user = User(uuid=new_uuid, username=username, password=password, email=email, is_active=is_active,
-                        is_banned=is_banned, created=created, modified=modified)
+            user = User(
+                uuid=new_uuid, username=username, password=password,
+                email=email, is_active=is_active, is_banned=is_banned,
+                created=created, modified=modified
+            )
             self._session.add(user)
             self._session.commit()
+
         self._controllers = {
             "activity": ActivityController(self._session, self._owner),
             "author": AuthorController(self._session, self._owner),
@@ -42,6 +50,9 @@ class Application:
             "submission": SubmissionController(self._session, self._owner),
             "user": UserController(self._session, self._owner)
         }
+        self.assistant = AssistantRegistry(
+            session=self._session, owner=self._owner
+        )
 
     def __call__(self, *args, **kwargs):
         return self._controllers[args[0]]

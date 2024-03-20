@@ -298,8 +298,6 @@ class AuthorController(BaseController):
         ----------
         author_id : int
             The id of the author to update
-        is_pseudonym : bool
-            Whether the author is a pseudonym
         name : str
             The name of the author
         initials : str
