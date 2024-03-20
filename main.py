@@ -1,6 +1,5 @@
 from application import Application
 from controllers import verify_password
-from ollamasubsystem import OllamaClient
 from assistants import AssistantRegistry
 
 """Example database connection strings
