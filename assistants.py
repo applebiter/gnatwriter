@@ -1,7 +1,5 @@
-from typing import List, Literal, Optional
-
+from typing import List, Optional
 from ollama import Message
-
 from ollamasubsystem import OllamaClient
 
 
