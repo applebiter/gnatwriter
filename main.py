@@ -1,6 +1,5 @@
 from application import Application
 from controllers import verify_password
-from assistants import AssistantRegistry
 
 """Example database connection strings
 
@@ -40,10 +39,9 @@ for story in stories:
 images = [
     # "images/college_library.jpeg",
     # "images/john_jacob_jingleheimer_schmidt.jpeg",
-    "images/miss_mary_mack.jpeg",
-    # "images/workshop.jpeg",
+    # "images/miss_mary_mack.jpeg",
+    "images/workshop.jpeg",
     # "images/kungfu.jpeg",
 ]
-assistant = AssistantRegistry()
-response = assistant("image").describe(images)
+response = app.assistant("image").describe(images)
 print(response["message"]["content"])

@@ -1,12 +1,14 @@
 import json
 import uuid as uniqueid
 from sqlalchemy import create_engine
+from assistants import AssistantRegistry
 from controllers import *
 from models import *
 
 
 class Application:
     def __init__(self, engine: str, echo: bool = False):
+        self.assistant = AssistantRegistry()
         self._engine = create_engine(engine, echo=echo)
         Base.metadata.create_all(self._engine)
         self._session = Session(bind=self._engine, expire_on_commit=False)
