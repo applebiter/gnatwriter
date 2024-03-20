@@ -105,9 +105,12 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
+
             activity = session.query(Activity).filter(
-                Activity.id == activity_id, Activity.user_id == self._owner.id
+                Activity.id == activity_id,
+                Activity.user_id == self._owner.id
             ).first()
+
             return activity if activity else None
 
     def get_activities(self) -> list:
@@ -120,6 +123,7 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Activity).filter(
                 Activity.user_id == self._owner.id
             ).order_by(Activity.created.desc()).all()
@@ -141,7 +145,9 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
+
             offset = (page - 1) * per_page
+
             return session.query(Activity).filter(
                 Activity.user_id == self._owner.id
             ).order_by(Activity.created.desc()).offset(offset).limit(per_page).all()
@@ -156,7 +162,9 @@ class ActivityController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Activity.id)).filter(Activity.user_id == self._owner.id).scalar()
+            return session.query(func.count(Activity.id)).filter(
+                Activity.user_id == self._owner.id
+            ).scalar()
 
     def search_activities(self, search: str) -> list:
         """Search for activities by summary
@@ -174,7 +182,8 @@ class ActivityController(BaseController):
 
         with self._session as session:
             return session.query(Activity).filter(
-                Activity.summary.like(f'%{search}%'), Activity.user_id == self._owner.id
+                Activity.summary.like(f'%{search}%'),
+                Activity.user_id == self._owner.id
             ).all()
 
 
@@ -221,7 +230,9 @@ class AuthorController(BaseController):
 
         super().__init__(session, owner)
 
-    def create_author(self, name: str, initials: str = None, is_pseudonym: bool = False) -> Author:
+    def create_author(
+            self, name: str, initials: str = None, is_pseudonym: bool = False
+    ) -> Author:
         """Create a new author
 
         Parameters
@@ -242,8 +253,10 @@ class AuthorController(BaseController):
         with self._session as session:
 
             try:
+
                 name_exists = session.query(Author).filter(
-                    Author.name == name, Author.user_id == self._owner.id
+                    Author.name == name,
+                    Author.user_id == self._owner.id
                 ).first()
 
                 if name_exists:
@@ -252,12 +265,16 @@ class AuthorController(BaseController):
                 created = datetime.now()
                 modified = created
 
-                author = Author(user_id=self._owner.id, name=name, initials=initials, is_pseudonym=is_pseudonym,
-                                created=created, modified=modified)
+                author = Author(
+                    user_id=self._owner.id, name=name, initials=initials,
+                    is_pseudonym=is_pseudonym, created=created,
+                    modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Author {author.name} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Author {author.name} \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(author)
                 session.add(activity)
@@ -270,7 +287,9 @@ class AuthorController(BaseController):
                 session.commit()
                 return author
 
-    def update_author(self, author_id: int, name: str, initials: str = None) -> Type[Author]:
+    def update_author(
+            self, author_id: int, name: str, initials: str = None
+    ) -> Type[Author]:
         """Update an author
 
         Parameters
@@ -293,15 +312,18 @@ class AuthorController(BaseController):
         with self._session as session:
 
             try:
+
                 author = session.query(Author).filter(
-                    Author.id == author_id, Author.user_id == self._owner.id
+                    Author.id == author_id,
+                    Author.user_id == self._owner.id
                 ).first()
 
                 if not author:
                     raise ValueError('Author not found.')
 
                 name_exists = session.query(Author).filter(
-                    Author.name == name, Author.user_id == self._owner.id
+                    Author.name == name,
+                    Author.user_id == self._owner.id
                 ).first()
 
                 if name_exists:
@@ -311,9 +333,10 @@ class AuthorController(BaseController):
                 author.initials = initials
                 author.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Author {author.name} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Author {author.name} \
+                    updated by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -325,7 +348,9 @@ class AuthorController(BaseController):
                 session.commit()
                 return author
 
-    def change_pseudonym_status(self, author_id: int, is_pseudonym: bool) -> Type[Author]:
+    def change_pseudonym_status(
+            self, author_id: int, is_pseudonym: bool
+    ) -> Type[Author]:
         """Change the pseudonym status of an author
 
         Parameters
@@ -344,8 +369,10 @@ class AuthorController(BaseController):
         with self._session as session:
 
             try:
+
                 author = session.query(Author).filter(
-                    Author.id == author_id, Author.user_id == self._owner.id
+                    Author.id == author_id,
+                    Author.user_id == self._owner.id
                 ).first()
 
                 if not author:
@@ -354,9 +381,11 @@ class AuthorController(BaseController):
                 author.is_pseudonym = is_pseudonym
                 author.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Author {author.name} pseudonym status changed by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Author {author.name} \
+                    pseudonym status changed by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -385,16 +414,19 @@ class AuthorController(BaseController):
         with self._session as session:
 
             try:
+
                 author = session.query(Author).filter(
-                    Author.id == author_id, Author.user_id == self._owner.id
+                    Author.id == author_id,
+                    Author.user_id == self._owner.id
                 ).first()
 
                 if not author:
                     raise ValueError('Author not found.')
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Author {author.name} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Author {author.name} \
+                    deleted by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(author)
                 session.add(activity)
@@ -422,9 +454,12 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
+
             author = session.query(Author).filter(
-                Author.id == author_id, Author.user_id == self._owner.id
+                Author.id == author_id,
+                Author.user_id == self._owner.id
             ).first()
+
             return author if author else None
 
     def get_author_by_name(self, name: str) -> Type[Author] | None:
@@ -442,9 +477,12 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
+
             author = session.query(Author).filter(
-                Author.name == name, Author.user_id == self._owner.id
+                Author.name == name,
+                Author.user_id == self._owner.id
             ).first()
+
             return author if author else None
 
     def get_author_count(self) -> int:
@@ -457,7 +495,10 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(Author.id)).filter(Author.user_id == self._owner.id).scalar()
+
+            return session.query(func.count(Author.id)).filter(
+                Author.user_id == self._owner.id
+            ).scalar()
 
     def get_all_authors(self) -> list:
         """Get all authors associated with a user
@@ -469,7 +510,10 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Author).filter(Author.user_id == self._owner.id).all()
+
+            return session.query(Author).filter(
+                Author.user_id == self._owner.id
+            ).all()
 
     def get_authors_page(self, page: int, per_page: int) -> list:
         """Get a single page of authors from the database associated with a user
@@ -488,8 +532,12 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
+
             offset = (page - 1) * per_page
-            return session.query(Author).filter(Author.user_id == self._owner.id).offset(offset).limit(per_page).all()
+
+            return session.query(Author).filter(
+                Author.user_id == self._owner.id
+            ).offset(offset).limit(per_page).all()
 
     def get_authors_by_story_id(self, story_id: int) -> list:
         """Get all authors associated with a story
@@ -505,9 +553,12 @@ class AuthorController(BaseController):
             A list of author objects
         """
         with self._session as session:
+
             story = session.query(Story).filter(
-                Story.id == story_id, Story.user_id == self._owner.id
+                Story.id == story_id,
+                Story.user_id == self._owner.id
             ).first()
+
             return story.authors if story else None
 
     def search_authors(self, search: str) -> list:
@@ -525,8 +576,10 @@ class AuthorController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Author).filter(
-                Author.name.like(f'%{search}%'), Author.user_id == self._owner.id
+                Author.name.like(f'%{search}%'),
+                Author.user_id == self._owner.id
             ).all()
 
 
@@ -713,13 +766,12 @@ class BibliographyController(BaseController):
 
             try:
                 bibliography = session.query(Bibliography).filter(
-                    Bibliography.id == bibliography_id, Bibliography.user_id == self._owner.id
+                    Bibliography.id == bibliography_id,
+                    Bibliography.user_id == self._owner.id
                 ).first()
 
                 if not bibliography:
                     raise ValueError('Bibliography not found.')
-
-                session.query(BibliographyAuthor).filter(BibliographyAuthor.bibliography_id == bibliography_id).delete()
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Bibliography {bibliography.title} deleted by {self._owner.username}',
@@ -1097,21 +1149,6 @@ class ChapterController(BaseController):
 
                 if not chapter:
                     raise ValueError('Chapter not found.')
-
-                scene_controller = SceneController(session, self._owner)
-                for scene in chapter.scenes:
-                    scene_controller.delete_scene(scene.id)
-                    session.delete(scene)
-
-                for link in chapter.links:
-                    session.query(Link).filter(Link.id == link.link_id).delete()
-                    session.delete(link)
-
-                for note in chapter.notes:
-                    session.query(Note).filter(
-                        Note.id == note.note_id, Note.user_id == self._owner.id
-                    ).delete()
-                    session.delete(note)
 
                 siblings = session.query(Chapter).filter(
                     Chapter.story_id == chapter.story_id, Chapter.user_id == self._owner.id,
@@ -1815,33 +1852,6 @@ class CharacterController(BaseController):
 
                 if not character:
                     raise ValueError('Character not found.')
-
-                for link in character.links:
-                    session.query(Link).filter(
-                        Link.id == link.link_id, Link.user_id == self._owner.id
-                    ).delete()
-                    session.delete(link)
-
-                for note in character.notes:
-                    session.query(Note).filter(
-                        Note.id == note.note_id, Note.user_id == self._owner.id
-                    ).delete()
-                    session.delete(note)
-
-                for image in character.images:
-                    session.query(Image).filter(
-                        Image.id == image.id, Image.user_id == self._owner.id
-                    ).delete()
-                    session.delete(image)
-
-                for character_relationship in character.character_relationships:
-                    session.delete(character_relationship)
-
-                for trait in character.traits:
-                    session.delete(trait)
-
-                for event in character.events:
-                    session.delete(event)
 
                 activity = Activity(user_id=self._owner.id, summary=f'{character.__str__} deleted by \
                     {self._owner.username}', created=datetime.now())
@@ -3463,26 +3473,6 @@ class EventController(BaseController):
                 if not event:
                     raise ValueError('Event not found.')
 
-                for character_event in session.query(CharacterEvent).filter(
-                    CharacterEvent.event_id == event_id, CharacterEvent.user_id == self._owner.id
-                ).all():
-                    session.delete(character_event)
-
-                for event_location in session.query(EventLocation).filter(
-                    EventLocation.event_id == event_id, EventLocation.user_id == self._owner.id
-                ).all():
-                    session.delete(event_location)
-
-                for event_link in session.query(EventLink).filter(
-                    EventLink.event_id == event_id, EventLink.user_id == self._owner.id
-                ).all():
-                    session.delete(event_link)
-
-                for event_note in session.query(EventNote).filter(
-                    EventNote.event_id == event_id, EventNote.user_id == self._owner.id
-                ).all():
-                    session.delete(event_note)
-
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Event {event.id} deleted by {self._owner.username}',
                                     created=datetime.now())
@@ -4049,16 +4039,6 @@ class ImageController(BaseController):
                 if not image:
                     raise ValueError('Image not found.')
 
-                for character_image in session.query(CharacterImage).filter(
-                    CharacterImage.image_id == image_id, CharacterImage.user_id == self._owner.id
-                ).all():
-                    session.delete(character_image)
-
-                for image_location in session.query(ImageLocation).filter(
-                    ImageLocation.image_id == image_id, ImageLocation.user_id == self._owner.id
-                ).all():
-                    session.delete(image_location)
-
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Image {image.id} deleted by {self._owner.username}',
                                     created=datetime.now())
@@ -4368,36 +4348,6 @@ class LinkController(BaseController):
 
                 if not link:
                     raise ValueError('Link not found.')
-
-                for chapter_link in session.query(ChapterLink).filter(
-                    ChapterLink.link_id == link_id, ChapterLink.user_id == self._owner.id
-                ).all():
-                    session.delete(chapter_link)
-
-                for character_link in session.query(CharacterLink).filter(
-                    CharacterLink.link_id == link_id, CharacterLink.user_id == self._owner.id
-                ).all():
-                    session.delete(character_link)
-
-                for event_link in session.query(EventLink).filter(
-                    EventLink.link_id == link_id, EventLink.user_id == self._owner.id
-                ).all():
-                    session.delete(event_link)
-
-                for link_location in session.query(LinkLocation).filter(
-                    LinkLocation.link_id == link_id, LinkLocation.user_id == self._owner.id
-                ).all():
-                    session.delete(link_location)
-
-                for link_scene in session.query(LinkScene).filter(
-                    LinkScene.link_id == link_id, LinkScene.user_id == self._owner.id
-                ).all():
-                    session.delete(link_scene)
-
-                for link_story in session.query(LinkStory).filter(
-                    LinkStory.link_id == link_id, LinkStory.user_id == self._owner.id
-                ).all():
-                    session.delete(link_story)
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Link {link.id} deleted by {self._owner.username}',
@@ -4716,26 +4666,6 @@ class LocationController(BaseController):
 
                 if not location:
                     raise ValueError('Location not found.')
-
-                for event_location in session.query(EventLocation).filter(
-                    EventLocation.location_id == location_id, EventLocation.user_id == self._owner.id
-                ).all():
-                    session.delete(event_location)
-
-                for image_location in session.query(ImageLocation).filter(
-                    ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
-                ).all():
-                    session.delete(image_location)
-
-                for link_location in session.query(LinkLocation).filter(
-                    LinkLocation.location_id == location_id, LinkLocation.user_id == self._owner.id
-                ).all():
-                    session.delete(link_location)
-
-                for location_note in session.query(LocationNote).filter(
-                    LocationNote.location_id == location_id, LocationNote.user_id == self._owner.id
-                ).all():
-                    session.delete(location_note)
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Location {location.id} deleted by {self._owner.username}',
@@ -5341,36 +5271,6 @@ class NoteController(BaseController):
 
                 if not note:
                     raise ValueError('Note not found.')
-
-                for chapter_note in session.query(ChapterNote).filter(
-                    ChapterNote.note_id == note_id, ChapterNote.user_id == self._owner.id
-                ).all():
-                    session.delete(chapter_note)
-
-                for character_note in session.query(CharacterNote).filter(
-                    CharacterNote.note_id == note_id, CharacterNote.user_id == self._owner.id
-                ).all():
-                    session.delete(character_note)
-
-                for event_note in session.query(EventNote).filter(
-                    EventNote.note_id == note_id, EventNote.user_id == self._owner.id
-                ).all():
-                    session.delete(event_note)
-
-                for location_note in session.query(LocationNote).filter(
-                    LocationNote.note_id == note_id, LocationNote.user_id == self._owner.id
-                ).all():
-                    session.delete(location_note)
-
-                for note_scene in session.query(NoteScene).filter(
-                    NoteScene.note_id == note_id, NoteScene.user_id == self._owner.id
-                ).all():
-                    session.delete(note_scene)
-
-                for note_story in session.query(NoteStory).filter(
-                    NoteStory.note_id == note_id, NoteStory.user_id == self._owner.id
-                ).all():
-                    session.delete(note_story)
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Note {note.id} deleted by {self._owner.username}',
@@ -6186,20 +6086,6 @@ class StoryController(BaseController):
 
                 if not story:
                     raise ValueError('Story not found.')
-
-                for link in story.links:
-                    session.query(Link).filter(Link.id == link.link_id).delete()
-                    session.delete(link)
-
-                for note in story.notes:
-                    session.query(Note).filter(
-                        Note.id == note.note_id, Note.user_id == self._owner.id
-                    ).delete()
-                    session.delete(note)
-
-                chapter_controller = ChapterController(session, self._owner)
-                for chapter in story.chapters:
-                    chapter_controller.delete_chapter(chapter.id)
 
                 activity = Activity(user_id=self._owner.id,
                                     summary=f'Story {story.id} deleted by {self._owner.username}',
