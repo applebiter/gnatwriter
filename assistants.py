@@ -21,7 +21,6 @@ class AssistantRegistry(BaseController):
     """
 
     _assistants = {}
-    _templates = {}
 
     def __init__(self, session: Session, owner: Type[User]):
         """Initialize the class"""
@@ -50,6 +49,8 @@ class AssistantRegistry(BaseController):
 class Assistant(BaseController):
     """Assistant"""
 
+    _templates = {}
+
     def __init__(self, session: Session, owner: Type[User]):
         super().__init__(session, owner)
 
@@ -70,6 +71,75 @@ class Assistant(BaseController):
         self._image_model = noveler_image_model
         self._num_ctx = ollama_context_window
         self._keep_alive = ollama_model_memory
+        self._templates = {
+            "codellama:13b": """[INST] <<SYS>>{{ .System }}<</SYS>>
+
+{{ .Prompt }} [/INST]
+            """,
+            "codellama:7b": """[INST] <<SYS>>{{ .System }}<</SYS>>
+
+{{ .Prompt }} [/INST]
+            """,
+            "gemma:2b": """<start_of_turn>user
+{{ if .System }}{{ .System }} {{ end }}{{ .Prompt }}<end_of_turn>
+<start_of_turn>model
+{{ .Response }}<end_of_turn>
+            """,
+            "llama2:13b": """[INST] <<SYS>>{{ .System }}<</SYS>>
+
+{{ .Prompt }} [/INST]
+            """,
+            "llama2:7b": """[INST] <<SYS>>{{ .System }}<</SYS>>
+
+{{ .Prompt }} [/INST]
+            """,
+            "llama2-uncensored:7b": """[INST] <<SYS>>{{ .System }}<</SYS>>
+
+{{ .Prompt }} [/INST]
+            """,
+            "llava:13b": """[INST] {{ if .System }}{{ .System }} {{ end }}{{ .Prompt }} [/INST]
+            """,
+            "llava:7b": """[INST] {{ if .System }}{{ .System }} {{ end }}{{ .Prompt }} [/INST]
+            """,
+            "mistral:7b": """[INST] {{ .System }} {{ .Prompt }} [/INST]
+            """,
+            "orca2:13b": """<|im_start|>system
+{{ .System }}<|im_end|>
+<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+            """,
+            "orca2:7b": """<|im_start|>system
+{{ .System }}<|im_end|>
+<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+            """,
+            "wizard-vicuna-uncensored:13b": """{{ .System }}
+USER: {{ .Prompt }}
+ASSISTANT:
+            """,
+            "wizardcoder:13b-python": """{{ .System }}
+
+### Instruction:
+{{ .Prompt }}
+
+### Response:
+            """,
+            "wizardcoder:7b-python": """{{ .System }}
+
+### Instruction:
+{{ .Prompt }}
+
+### Response:
+            """,
+            "writer:7b": """<|im_start|>system
+{system_message}<|im_end|>
+<|im_start|>user
+{prompt}<|im_end|>
+<|im_start|>assistant
+            """
+        }
 
     @property
     def session_uuid(self):
@@ -278,10 +348,6 @@ class ImageAssistant(Assistant):
             priming = """Image Assistant is ready to describe the image."""
 
         session_uuid = self._session_uuid if not session_uuid else session_uuid
-        messages = [
-            Message(role="system", content=priming),
-            Message(role="user", content=prompt)
-        ]
 
         if not options:
             options = {
@@ -303,7 +369,9 @@ class ImageAssistant(Assistant):
 
                 response = self._client.generate(
                     model=self._image_model,
-                    messages=messages,
+                    prompt=prompt,
+                    system=priming,
+                    template=self._templates[self._image_model],
                     images=encoded,
                     options=options,
                     keep_alive=keep_alive
