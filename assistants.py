@@ -370,7 +370,7 @@ class ImageAssistant(Assistant):
                     model=self._image_model,
                     prompt=prompt,
                     system=priming,
-                    # template=self._templates[self._image_model],
+                    template=self._templates[self._image_model],
                     images=encoded,
                     options=options,
                     keep_alive=keep_alive
