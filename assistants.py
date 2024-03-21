@@ -340,7 +340,6 @@ class ImageAssistant(Assistant):
         encoded = []
 
         for image in images:
-            print(type(image))
             with open(image, "rb") as file:
                 encoded.append(file.read())
 
