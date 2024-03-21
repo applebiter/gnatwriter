@@ -44,7 +44,9 @@ class Activity(Base):
     """
 
     __tablename__ = 'activities'
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     summary: Mapped[str] = mapped_column(String(250), nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
@@ -411,7 +413,9 @@ class Assistance(Base):
     """
 
     __tablename__ = 'assistances'
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     session_uuid: Mapped[str] = mapped_column(String(36), nullable=False)
     assistant: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -425,22 +429,22 @@ class Assistance(Base):
     content: Mapped[str] = mapped_column(Text, nullable=True)
     done: Mapped[bool] = mapped_column(Boolean, default=False)
     total_duration: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0
+        Integer, nullable=True, default=0
     )
     load_duration: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0
+        Integer, nullable=True, default=0
     )
     prompt_eval_count: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0,
+        Integer, nullable=True, default=0,
     )
     prompt_eval_duration: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0
+        Integer, nullable=True, default=0
     )
     eval_count: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0
+        Integer, nullable=True, default=0
     )
     eval_duration: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0
+        Integer, nullable=True, default=0
     )
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship(

@@ -166,16 +166,14 @@ class ChatAssistant(Assistant):
                     seed=seed,
                     content=response["message"]["content"],
                     done=response["done"],
-                    total_duration=response["total_duration"],
-                    load_duration=response["load_duration"],
-                    prompt_eval_count=response["prompt_eval_count"],
-                    prompt_eval_duration=response["prompt_eval_duration"],
-                    eval_count=response["eval_count"],
-                    eval_duration=response["eval_duration"],
+                    total_duration=response["total_duration"] if response.get("total_duration") else None,
+                    load_duration=response["load_duration"] if response.get("load_duration") else None,
+                    prompt_eval_count=response["prompt_eval_count"] if response.get("prompt_eval_count") else None,
+                    prompt_eval_duration=response["prompt_eval_duration"] if response.get("prompt_eval_duration") else None,
+                    eval_count=response["eval_count"] if response.get("eval_count") else None,
+                    eval_duration=response["eval_duration"] if response.get("eval_duration") else None,
                     created=datetime.now()
                 )
-
-                session.add(assistance)
 
                 summary = f"{self._owner.username} used the Chat Assistant"
                 activity = Activity(
@@ -183,6 +181,7 @@ class ChatAssistant(Assistant):
                     created=datetime.now()
                 )
 
+                session.add(assistance)
                 session.add(activity)
 
             except Exception as e:

@@ -1,3 +1,4 @@
+import json
 from application import Application
 from controllers import verify_password
 
@@ -31,18 +32,26 @@ else:
 stories = app("story").get_all_stories()
 print("Stories:")
 for story in stories:
-    print(story.serialize())
-    print("--------------------")
-    print(" ")
+    print(story.title)
+
+# LM Assistant session UUID
+suuid = "637e3585-be1d-4c01-af98-8176e9b92883"
 
 # Get some test images and have the llava model describe them
-images = [
+# images = [
     # "images/college_library.jpeg",
-    "images/john_jacob_jingleheimer_schmidt.jpeg",
+    # "images/john_jacob_jingleheimer_schmidt.jpeg",
     # "images/miss_mary_mack.jpeg",
     # "images/workshop.jpeg",
     # "images/kungfu.jpeg",
-]
-response = app.assistant("image").describe(images)
+#     "images/turquoise_fairy.jpg",
+# ]
+# response = app.assistant("image").describe(images, 1.0)
 
+# Chat with the chat assistant
+prompt = """Can you write a limerick about how delicious cheddar cheese is on 
+    warm roast beef? 
+    """
+response = app.assistant("chat").chat(prompt=prompt, session_uuid=suuid)
+print(f'Response Type: {type(response)}')
 print(response)
