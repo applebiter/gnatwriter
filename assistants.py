@@ -7,7 +7,7 @@ from models import *
 from ollamasubsystem import OllamaClient
 
 noveler_chat_model = "llama2:7b"
-noveler_image_model = "llava:13b"
+noveler_image_model = "llava:7b"
 ollama_model_memory = "7m"  # How long to keep the model in memory
 ollama_context_window = 4096  # The number of tokens to use as context for the model
 
@@ -370,7 +370,7 @@ class ImageAssistant(Assistant):
                     model=self._image_model,
                     prompt=prompt,
                     system=priming,
-                    template=self._templates[self._image_model],
+                    # template=self._templates[self._image_model],
                     images=encoded,
                     options=options,
                     keep_alive=keep_alive
@@ -385,7 +385,7 @@ class ImageAssistant(Assistant):
                     prompt=prompt,
                     temperature=temperature,
                     seed=seed,
-                    content=response["message"]["content"] if response.get("message") else None,
+                    content=response["response"] if response.get("response") else None,
                     done=response["done"],
                     total_duration=response["total_duration"] if response.get("total_duration") else None,
                     load_duration=response["load_duration"] if response.get("load_duration") else None,
