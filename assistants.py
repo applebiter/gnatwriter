@@ -66,6 +66,10 @@ class Assistant(BaseController):
         self._chat_model = noveler_chat_model
         self._image_model = noveler_image_model
 
+    @property
+    def session_uuid(self):
+        return self._session_uuid
+
 
 class ChatAssistant(Assistant):
     """Chat Assistant
@@ -152,7 +156,8 @@ class ChatAssistant(Assistant):
                 response = self._client.chat(
                     model=self._chat_model,
                     messages=messages,
-                    options=options
+                    options=options,
+                    keep_alive=0
                 )
 
                 assistance = Assistance(
@@ -164,7 +169,7 @@ class ChatAssistant(Assistant):
                     prompt=prompt,
                     temperature=temperature,
                     seed=seed,
-                    content=response["message"]["content"],
+                    content=response["message"]["content"] if response.get("message") else None,
                     done=response["done"],
                     total_duration=response["total_duration"] if response.get("total_duration") else None,
                     load_duration=response["load_duration"] if response.get("load_duration") else None,
@@ -227,9 +232,12 @@ class ImageAssistant(Assistant):
     def describe(
             self,
             images: List[str],
+            prompt: Optional[str] = "Describe the image",
             temperature: Optional[float] = 0.5,
-            prompt: Optional[str] = "Describe the contents of the image:",
-            options: Optional[dict] = None
+            seed: Optional[int] = None,
+            priming: Optional[str] = None,
+            options: Optional[dict] = None,
+            session_uuid: str = None,
     ):
         """Describe the contents of an image using the Ollama API.
 
@@ -240,11 +248,17 @@ class ImageAssistant(Assistant):
         temperature : Optional[float]
             The temperature to be used when making the request. Defaults to
             0.5.
+        seed : Optional[int]
+            The seed to be used when making the request. Defaults to None.
         prompt : Optional[str]
             The prompt to be used when requesting the description. Defaults to
             "Describe the contents of the image:".
+        priming : Optional[str]
+            The priming to be used when describing the image.
         options : Optional[dict]
             The options to be used when making the request.
+        session_uuid : str
+            The UUID of the session to be used when making the request.
         """
         encoded = []
 
@@ -252,10 +266,24 @@ class ImageAssistant(Assistant):
             with open(image, "rb") as file:
                 encoded.append(file.read())
 
-        priming = """Image Assistant is ready to describe the contents of the
-                    image."""
-        message0 = Message(role="system", content=priming)
-        message1 = Message(role="user", content=prompt, images=encoded)
+        if not priming:
+            priming = """Image Assistant is ready to describe the image."""
+
+        messages = [Message(role="system", content=priming)]
+
+        session_uuid = self._session_uuid if not session_uuid else session_uuid
+
+        for message in self.get_by_session_uuid(session_uuid):
+            messages.append(Message(
+                role="user", content=message.prompt
+            ))
+            messages.append(Message(
+                role="assistant", content=message.content
+            ))
+
+        messages.append(Message(
+            role="user", content=prompt
+        ))
 
         if not options:
             options = {
@@ -271,15 +299,38 @@ class ImageAssistant(Assistant):
 
                 response = self._client.chat(
                     model=self._image_model,
-                    messages=[message0, message1],
-                    options=options
+                    messages=messages,
+                    options=options,
+                    keep_alive=0
                 )
+
+                assistance = Assistance(
+                    user_id=self._owner.id,
+                    session_uuid=session_uuid,
+                    assistant=self._name,
+                    model=self._image_model,
+                    priming=priming,
+                    prompt=prompt,
+                    temperature=temperature,
+                    seed=seed,
+                    content=response["message"]["content"] if response.get("message") else None,
+                    done=response["done"],
+                    total_duration=response["total_duration"] if response.get("total_duration") else None,
+                    load_duration=response["load_duration"] if response.get("load_duration") else None,
+                    prompt_eval_count=response["prompt_eval_count"] if response.get("prompt_eval_count") else None,
+                    prompt_eval_duration=response["prompt_eval_duration"] if response.get("prompt_eval_duration") else None,
+                    eval_count=response["eval_count"] if response.get("eval_count") else None,
+                    eval_duration=response["eval_duration"] if response.get("eval_duration") else None,
+                    created=datetime.now()
+                )
+
                 summary = f"{self._owner.username} used the Image Assistant"
                 activity = Activity(
                     user_id=self._owner.id, summary=summary,
                     created=datetime.now()
                 )
 
+                session.add(assistance)
                 session.add(activity)
 
             except Exception as e:
@@ -295,3 +346,14 @@ class ImageAssistant(Assistant):
 
     def __repr__(self):
         return f"{self.__class__.__name__}()"
+
+    def get_by_session_uuid(self, session_uuid: str):
+        """Get all messages by session UUID."""
+
+        with self._session as session:
+
+            messages = session.query(Assistance).filter_by(
+                session_uuid=session_uuid
+            ).order_by(Assistance.created).all()
+
+            return messages

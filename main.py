@@ -35,23 +35,27 @@ for story in stories:
     print(story.title)
 
 # LM Assistant session UUID
-suuid = "637e3585-be1d-4c01-af98-8176e9b92883"
+suuid = app.assistant("image").session_uuid
+print(suuid)
 
 # Get some test images and have the llava model describe them
-# images = [
+images = [
     # "images/college_library.jpeg",
     # "images/john_jacob_jingleheimer_schmidt.jpeg",
     # "images/miss_mary_mack.jpeg",
     # "images/workshop.jpeg",
-    # "images/kungfu.jpeg",
-#     "images/turquoise_fairy.jpg",
-# ]
-# response = app.assistant("image").describe(images, 1.0)
+    "images/kungfu.jpeg",
+    # "images/turquoise_fairy.jpg",
+]
+response1 = app.assistant("image").describe(
+    images=images, temperature=0.5, session_uuid=suuid
+)
+print(response1)
 
 # Chat with the chat assistant
-prompt = """Can you write a limerick about how delicious cheddar cheese is on 
-    warm roast beef? 
-    """
-response = app.assistant("chat").chat(prompt=prompt, session_uuid=suuid)
-print(f'Response Type: {type(response)}')
-print(response)
+# prompt = """What is the oldest form of Chinese kung-fu?
+#     """
+# response2 = app.assistant("chat").chat(
+#     prompt=prompt, session_uuid=suuid, temperature=1.0
+# )
+# print(response2)
