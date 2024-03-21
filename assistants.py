@@ -7,7 +7,7 @@ from models import *
 from ollamasubsystem import OllamaClient
 
 noveler_chat_model = "llama2:7b"
-noveler_image_model = "llava:7b"
+noveler_image_model = "llava:13b"
 ollama_model_memory = "7m"  # How long to keep the model in memory
 ollama_context_window = 4096  # The number of tokens to use as context for the model
 
@@ -301,7 +301,7 @@ class ImageAssistant(Assistant):
 
             try:
 
-                response = self._client.chat(
+                response = self._client.generate(
                     model=self._image_model,
                     messages=messages,
                     images=encoded,
