@@ -364,24 +364,6 @@ class AuthorStory(Base):
         return self
 
 
-class AssistanceRoles(Enum):
-    """The AssistanceRoles class represents the roles that the user can have in the assistance system.
-
-    Attributes
-    ----------
-        USER: str "user"
-            The user role
-        ASSISTANT: str "assistant"
-            The assistant role
-        SYSTEM: str "system"
-            The priming role
-    """
-
-    USER = "user"
-    ASSISTANT = "assistant"
-    SYSTEM = "system"
-
-
 class Assistance(Base):
     """The Assistance class represents an assistance request.
 
@@ -398,8 +380,6 @@ class Assistance(Base):
         from the last message in the session.
     assistant: str
         The assistant to be used when making the request.
-    role: str
-        The role to be used when making the request.
     model: str
         The model to be used when making the request.
     priming: str
@@ -435,7 +415,6 @@ class Assistance(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     session_uuid: Mapped[str] = mapped_column(String(36), nullable=False)
     assistant: Mapped[str] = mapped_column(String(100), nullable=False)
-    role: Mapped[AssistanceRoles] = mapped_column(String(10), nullable=False)
     model: Mapped[str] = mapped_column(String(100), nullable=False)
     priming: Mapped[str] = mapped_column(Text, nullable=True)
     prompt: Mapped[str] = mapped_column(Text, nullable=True)

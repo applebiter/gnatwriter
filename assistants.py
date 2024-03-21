@@ -1,5 +1,4 @@
 from typing import List, Optional, Type
-
 import uuid
 from ollama import Message
 from sqlalchemy.orm import Session
@@ -7,7 +6,7 @@ from controllers import BaseController
 from models import *
 from ollamasubsystem import OllamaClient
 
-noveler_chat_model = "dolphin-phi"
+noveler_chat_model = "llama2-uncensored"
 noveler_image_model = "llava"
 
 
@@ -128,7 +127,10 @@ class ChatAssistant(Assistant):
 
         for message in self.get_by_session_uuid(session_uuid):
             messages.append(Message(
-                role=message.role, content=message.content
+                role="user", content=message.prompt
+            ))
+            messages.append(Message(
+                role="assistant", content=message.content
             ))
 
         messages.append(Message(
@@ -157,7 +159,6 @@ class ChatAssistant(Assistant):
                     user_id=self._owner.id,
                     session_uuid=session_uuid,
                     assistant=self._name,
-                    role="user",
                     model=self._chat_model,
                     priming=priming,
                     prompt=prompt,
