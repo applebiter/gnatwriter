@@ -36,7 +36,7 @@ for story in stories:
 
 # LM Assistant session UUID
 suuid = app.assistant("image").session_uuid
-print(suuid)
+print(f'Session UUID: {suuid}')
 
 # Get some test images and have the llava model describe them
 images = [
@@ -44,11 +44,11 @@ images = [
     # "images/john_jacob_jingleheimer_schmidt.jpeg",
     # "images/miss_mary_mack.jpeg",
     # "images/workshop.jpeg",
-    "images/kungfu.jpeg",
-    # "images/turquoise_fairy.jpg",
+    # "images/kungfu.jpeg",
+    "images/turquoise_fairy.jpg",
 ]
 response1 = app.assistant("image").describe(
-    images=images, temperature=0.5, session_uuid=suuid
+    images=images, temperature=1.0, session_uuid=suuid
 )
 print(response1)
 

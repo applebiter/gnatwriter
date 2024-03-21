@@ -6,8 +6,8 @@ from controllers import BaseController
 from models import *
 from ollamasubsystem import OllamaClient
 
-noveler_chat_model = "llama2:13b"
-noveler_image_model = "llava:13b"
+noveler_chat_model = "llama2:7b"
+noveler_image_model = "llava:7b"
 ollama_model_memory = "7m"  # How long to keep the model in memory
 ollama_context_window = 4096  # The number of tokens to use as context for the model
 
@@ -270,6 +270,7 @@ class ImageAssistant(Assistant):
         encoded = []
 
         for image in images:
+            print(type(image))
             with open(image, "rb") as file:
                 encoded.append(file.read())
 
@@ -303,6 +304,7 @@ class ImageAssistant(Assistant):
                 response = self._client.chat(
                     model=self._image_model,
                     messages=messages,
+                    images=encoded,
                     options=options,
                     keep_alive=keep_alive
                 )
