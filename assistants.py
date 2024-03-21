@@ -1,4 +1,4 @@
-from typing import List, Optional, Type
+from typing import List, Optional, Type, Union
 import uuid
 from ollama import Message
 from sqlalchemy.orm import Session
@@ -6,8 +6,10 @@ from controllers import BaseController
 from models import *
 from ollamasubsystem import OllamaClient
 
-noveler_chat_model = "llama2-uncensored"
-noveler_image_model = "llava"
+noveler_chat_model = "llama2:13b"
+noveler_image_model = "llava:13b"
+ollama_model_memory = "7m"  # How long to keep the model in memory
+ollama_context_window = 4096  # The number of tokens to use as context for the model
 
 
 class AssistantRegistry(BaseController):
@@ -19,6 +21,7 @@ class AssistantRegistry(BaseController):
     """
 
     _assistants = {}
+    _templates = {}
 
     def __init__(self, session: Session, owner: Type[User]):
         """Initialize the class"""
@@ -65,6 +68,8 @@ class Assistant(BaseController):
         self._client = OllamaClient()
         self._chat_model = noveler_chat_model
         self._image_model = noveler_image_model
+        self._num_ctx = ollama_context_window
+        self._keep_alive = ollama_model_memory
 
     @property
     def session_uuid(self):
@@ -91,6 +96,7 @@ class ChatAssistant(Assistant):
             priming: str = None,
             options: Optional[dict] = None,
             session_uuid: str = None,
+            keep_alive: Optional[Union[float, str]] = None
     ):
         """Chat with the Chat Assistant.
 
@@ -116,7 +122,9 @@ class ChatAssistant(Assistant):
         options : Optional[dict]
             The options to be used when making the request.
         session_uuid : str
-            The UUID of the session to be used when making the request.
+            The UUID of the LM session to be used when making the request.
+        keep_alive : Optional[Union[float, str]]
+            The keep alive value to be used when making the request.
         """
 
         if not priming:
@@ -125,29 +133,25 @@ class ChatAssistant(Assistant):
                 the sophisticated nuance of tone, and who also knows the human 
                 subject very well."""
 
-        messages = [Message(role="system", content=priming)]
-
         session_uuid = self._session_uuid if not session_uuid else session_uuid
-
-        for message in self.get_by_session_uuid(session_uuid):
-            messages.append(Message(
-                role="user", content=message.prompt
-            ))
-            messages.append(Message(
-                role="assistant", content=message.content
-            ))
-
-        messages.append(Message(
-            role="user", content=prompt
-        ))
+        messages = [
+            Message(role="system", content=priming),
+            Message(role="user", content=prompt)
+        ]
 
         if not options:
             options = {
                 "temperature": temperature,
+                "num_ctx": self._num_ctx
             }
 
         if not options.get("temperature"):
             options["temperature"] = temperature
+
+        if not options.get("num_ctx"):
+            options["num_ctx"] = self._num_ctx
+
+        keep_alive = self._keep_alive if not keep_alive else keep_alive
 
         with self._session as session:
 
@@ -157,7 +161,7 @@ class ChatAssistant(Assistant):
                     model=self._chat_model,
                     messages=messages,
                     options=options,
-                    keep_alive=0
+                    keep_alive=keep_alive
                 )
 
                 assistance = Assistance(
@@ -238,6 +242,7 @@ class ImageAssistant(Assistant):
             priming: Optional[str] = None,
             options: Optional[dict] = None,
             session_uuid: str = None,
+            keep_alive: Optional[Union[float, str]] = None
     ):
         """Describe the contents of an image using the Ollama API.
 
@@ -259,6 +264,8 @@ class ImageAssistant(Assistant):
             The options to be used when making the request.
         session_uuid : str
             The UUID of the session to be used when making the request.
+        keep_alive : Optional[Union[float, str]]
+            The keep alive value to be used when making the request.
         """
         encoded = []
 
@@ -269,29 +276,25 @@ class ImageAssistant(Assistant):
         if not priming:
             priming = """Image Assistant is ready to describe the image."""
 
-        messages = [Message(role="system", content=priming)]
-
         session_uuid = self._session_uuid if not session_uuid else session_uuid
-
-        for message in self.get_by_session_uuid(session_uuid):
-            messages.append(Message(
-                role="user", content=message.prompt
-            ))
-            messages.append(Message(
-                role="assistant", content=message.content
-            ))
-
-        messages.append(Message(
-            role="user", content=prompt
-        ))
+        messages = [
+            Message(role="system", content=priming),
+            Message(role="user", content=prompt)
+        ]
 
         if not options:
             options = {
                 "temperature": temperature,
+                "num_ctx": self._num_ctx
             }
 
         if not options.get("temperature"):
             options["temperature"] = temperature
+
+        if not options.get("num_ctx"):
+            options["num_ctx"] = self._num_ctx
+
+        keep_alive = self._keep_alive if not keep_alive else keep_alive
 
         with self._session as session:
 
@@ -301,7 +304,7 @@ class ImageAssistant(Assistant):
                     model=self._image_model,
                     messages=messages,
                     options=options,
-                    keep_alive=0
+                    keep_alive=keep_alive
                 )
 
                 assistance = Assistance(
