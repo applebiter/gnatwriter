@@ -1,5 +1,5 @@
 import json
-from application import Application
+from application import Core
 from controllers import verify_password
 
 """Example database connection strings
@@ -16,10 +16,10 @@ defaults to False. If set to True, it will print all SQL commands to the console
 """
 
 # Create the application
-app = Application("sqlite:///noveler.db")
+noveler = Core("sqlite:///noveler.db")
 
 # Get the system user
-user = app("user").get_user_by_username("noveler")
+user = noveler("user").get_user_by_username("noveler")
 
 print("Is the password hasher working?")
 password = "password"
@@ -29,13 +29,13 @@ else:
     print(f"Password '{password}' incorrect!")
 
 # Get all stories
-stories = app("story").get_all_stories()
+stories = noveler("story").get_all_stories()
 print("Stories:")
 for story in stories:
     print(story.title)
 
 # LM Assistant session UUID
-suuid = app.assistant("image").session_uuid
+suuid = noveler.assistant("image").session_uuid
 print(f'Session UUID: {suuid}')
 
 # Get some test images and have the llava model describe them
@@ -47,7 +47,7 @@ images = [
     # "images/kungfu.jpeg",
     "images/turquoise_fairy.jpg",
 ]
-response1 = app.assistant("image").describe(
+response1 = noveler.assistant("image").describe(
     images=images, temperature=1.0, session_uuid=suuid
 )
 print(response1)
