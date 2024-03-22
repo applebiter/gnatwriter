@@ -6,9 +6,9 @@ from controllers import BaseController
 from models import *
 from ollamasubsystem import OllamaClient
 
-noveler_chat_model = "llama2:7b"
+noveler_chat_model = "phi:2.7b"
 noveler_image_model = "llava:7b"
-ollama_model_memory = "7m"  # How long to keep the model in memory
+ollama_model_memory = "1h"  # How long to keep the model in memory
 ollama_context_window = 4096  # The number of tokens to use as context for the model
 
 
@@ -114,6 +114,10 @@ class Assistant(BaseController):
 <|im_start|>user
 {{ .Prompt }}<|im_end|>
 <|im_start|>assistant
+            """,
+            "phi:2.7b": """{{ if .System }}System: {{ .System }}{{ end }}
+User: {{ .Prompt }}
+Assistant:
             """,
             "wizard-vicuna-uncensored:13b": """{{ .System }}
 USER: {{ .Prompt }}
