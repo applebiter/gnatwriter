@@ -6143,6 +6143,12 @@ class StoryController(BaseController):
         Append authors to a story
     get_authors_by_story_id(story_id: int)
         Get all authors associated with a story
+    append_characters_to_story(story_id: int, character_ids: list)
+        Append characters to a story
+    get_characters_by_story_id(story_id: int)
+        Get all characters associated with a story
+    get_characters_page_by_story_id(story_id: int, page: int, per_page: int)
+        Get a single page of characters associated with a story from the database
     append_links_to_story(story_id: int, link_ids: list)
         Append links to a story
     get_links_by_story_id(story_id: int)
@@ -6422,6 +6428,112 @@ class StoryController(BaseController):
             return session.query(Author).join(AuthorStory).filter(
                 AuthorStory.story_id == story_id, AuthorStory.user_id == self._owner.id
             ).all()
+
+    def append_characters_to_story(self, story_id: int, character_ids: list) -> Type[Story]:
+        """Append characters to a story
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+        character_ids : list
+            The ids of the characters to append
+
+        Returns
+        -------
+        Story
+            The updated story object
+        """
+
+        with self._session as session:
+
+            try:
+
+                story = session.query(Story).filter(
+                    Story.id == story_id,
+                    Story.user_id == self._owner.id
+                ).first()
+
+                if not story:
+                    raise ValueError('Story not found.')
+
+                for character_id in character_ids:
+                    character = session.query(Character).filter(
+                        Character.id == character_id,
+                        Character.user_id == self._owner.id
+                    ).first()
+
+                    if not character:
+                        raise ValueError('Character not found.')
+
+                    character_story = CharacterStory(
+                        user_id=self._owner.id, character_id=character_id,
+                        story_id=story_id, created=datetime.now()
+                    )
+
+                    story.characters.append(character_story)
+
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Characters appended to \
+                    story {story.title[:50]} by {self._owner.username}',
+                    created=datetime.now()
+                )
+
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return story
+
+    def get_characters_by_story_id(self, story_id: int) -> list:
+        """Get all characters associated with a story
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+
+        Returns
+        -------
+        list
+            A list of character objects
+        """
+
+        with self._session as session:
+
+            return session.query(Character).join(CharacterStory).filter(
+                CharacterStory.story_id == story_id, Character
+            ).all()
+
+    def get_characters_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
+        """Get a single page of characters associated with a story from the database
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+        page : int
+            The page number
+        per_page : int
+            The number of rows per page
+
+        Returns
+        -------
+        list
+            A list of character objects
+        """
+
+        with self._session as session:
+
+            offset = (page - 1) * per_page
+
+            return session.query(Character).join(CharacterStory).filter(
+                CharacterStory.story_id == story_id, Character
+            ).offset(offset).limit(per_page).all()
 
     def append_links_to_story(self, story_id: int, link_ids: list) -> Type[Story]:
         """Append links to a story

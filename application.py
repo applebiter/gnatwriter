@@ -6,7 +6,7 @@ from controllers import *
 from models import *
 
 
-class Application:
+class Core:
     def __init__(self, engine: str, echo: bool = False):
 
         self._engine = create_engine(engine, echo=echo)
