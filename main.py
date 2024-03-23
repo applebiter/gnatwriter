@@ -22,10 +22,12 @@ if noveler("story").count_stories() > 0:
         print(f"\t{story.title}")
         print("\t\tContents:")
         chapter_count = noveler("chapter").count_chapters_by_story_id(story.id)
-        for chapter in noveler("chapter").get_chapters_by_story_id(story.id):
-            print(f"\t\t\t{chapter.title}  # Chapter ID# {chapter.id}")
-            scene_count = noveler("scene").count_scenes_by_chapter_id(chapter.id)
-            for scene in noveler("scene").get_scenes_by_chapter_id(chapter.id):
-                print(f"\t\t\t\t{scene.title}  # Scene ID# {scene.id}")
+        if chapter_count > 0:
+            for chapter in noveler("chapter").get_chapters_by_story_id(story.id):
+                print(f"\t\t\t{chapter.title}  # Chapter ID# {chapter.id}")
+                scene_count = noveler("scene").count_scenes_by_chapter_id(chapter.id)
+                if scene_count > 0:
+                    for scene in noveler("scene").get_scenes_by_chapter_id(chapter.id):
+                        print(f"\t\t\t\t{scene.title}  # Scene ID# {scene.id}")
 else:
     print("No stories found")
