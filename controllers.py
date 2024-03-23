@@ -5,6 +5,7 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 import uuid
 from models import *
+from models import User
 
 
 def hash_password(password):
@@ -7249,7 +7250,7 @@ class UserController(BaseController):
                 session.commit()
                 return candidate
 
-    def change_password(self, user_id: int, old_password: str, new_password, repassword: str) -> Type[User]:
+    def change_password(self, user_id: int, old_password: str, new_password, repassword: str) -> User:
         """Change user password
 
         Parameters

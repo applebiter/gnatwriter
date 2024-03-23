@@ -5,7 +5,7 @@ from typing import Optional, List
 import validators
 from validators import url as url_validator
 from validators import uuid as uuid_validator
-from sqlalchemy import Integer, ForeignKey, String, DateTime, Boolean, Date, Text, Float
+from sqlalchemy import Integer, ForeignKey, String, DateTime, Boolean, Date, Text, Float, BigInteger
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship, validates
 
 Base = declarative_base()
@@ -429,22 +429,22 @@ class Assistance(Base):
     content: Mapped[str] = mapped_column(Text, nullable=True)
     done: Mapped[bool] = mapped_column(Boolean, default=False)
     total_duration: Mapped[int] = mapped_column(
-        Integer, nullable=True, default=0
+        BigInteger, nullable=True, default=0
     )
     load_duration: Mapped[int] = mapped_column(
-        Integer, nullable=True, default=0
+        BigInteger, nullable=True, default=0
     )
     prompt_eval_count: Mapped[int] = mapped_column(
-        Integer, nullable=True, default=0,
+        BigInteger, nullable=True, default=0,
     )
     prompt_eval_duration: Mapped[int] = mapped_column(
-        Integer, nullable=True, default=0
+        BigInteger, nullable=True, default=0
     )
     eval_count: Mapped[int] = mapped_column(
-        Integer, nullable=True, default=0
+        BigInteger, nullable=True, default=0
     )
     eval_duration: Mapped[int] = mapped_column(
-        Integer, nullable=True, default=0
+        BigInteger, nullable=True, default=0
     )
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship(

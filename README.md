@@ -1,23 +1,22 @@
 # noveler
-Noveler is a simple novel writing tool that allows you to write and organize your novel in a clean and simple interface. 
-It is designed to be easy to use and to help you focus on writing your novel. At this time, the app is in the early 
-stages of development and is not yet ready for use. There will be integration with the ollama ecosystem, and the use of 
-RAG and agent models to help the writer. I, for one, welcome our new language model _partners_, but I also want to do it 
-on my own hardware, working just fine even in offline mode. 100% free, 100% open source, 100% private. The user can use 
-which ever models they want, and the app will be able to use them, if the embeddings are compatible. 
+Noveler is a framework for building a novel, short-story, or serial-writing app. It can be used-as is in scripts or in a
+REPL, or it can be used as a back-end in a GUI app. Noveler uses a simple, plain-text format for writing and storing 
+stories. It's designed to be easy to use and easy to extend. The app has a set of Assistants that help with writing,
+editing, and managing stories. These Assistants are designed around the ollama ecosystem, allowing the user to use the 
+GGUF models of their choice, and different models for different kinds of tasks. 
 
-Noveler uses the SQLAlchemy 2.0 ORM in the backend, and by default it is set to use sqlite. The user can change this to 
-either postgres or mysql, but the user will have to set up the database themselves, though this is pretty easy, since 
-the app will create the database tables automatically once you've given it a valid connection string. My thinking was to 
-go ahead and build out the models and controllers into a working framework, and then to build the GUI on top of that. 
-This way, I am free to try out different GUI libraries, and I can also use the app in the terminal. 
+### How to install
+Clone the repo and run `pip install .` in the root directory. If you use PyCharm, you can also open the project folder 
+and the IDE will automatically install the dependencies. 
 
-### How it started and how it's going
-The plan was a full GUI app with a backend, but I realized that I could use the backend as a standalone library, and 
-then build the GUI on top of that. This way, I can use the app in the terminal, and I can also use it in a GUI. It's 
-actually a little more than a library and a little less than a full app. It's a framework that can be used to build an 
-app.
+### How to use
+Well, it's a framework without a front end, so the project becomes the basis of your own app. Consider this a skeleton 
+application. You can use the `noveler` module in your own scripts, or you can use the `noveler` module in a GUI app.
 
-Since I'm not bound to a front-end, I'm thinking that I go ahead and integrate the app with the ollama ecosystem at this 
-level. That will make building a different front-end easier, and it will also make it easier to use the app in the 
-terminal.
+## Getting started
+Open main.py and begin using the framework. More helpful instructions will be added as the project develops.
+
+### Examples
+I'm currently using the framework to write the documentation for the project. I am including the noveler.db file in the 
+project as both an example and documentation of how to use the framework. I will update the included database as I
+continue to develop the project.

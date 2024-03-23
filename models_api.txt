@@ -260,7 +260,7 @@ class CharacterTrait
     func __repr__( ) : str
     func __str__( ) : str
     func serialize( ) : dict
-    func unserialize( data: dict ) : Charactertrait
+    func unserialize( data: dict ) : CharacterTrait
 
 class Event
     const id: int
