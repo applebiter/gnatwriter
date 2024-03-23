@@ -1056,6 +1056,8 @@ class ChapterController(BaseController):
         Search for chapters by title and description belonging to a specific story
     add_scene_to_chapter(chapter_id: int, title: str, description: str, content: str)
         Add a scene to a chapter
+    has_scenes(chapter_id: int)
+        Check if a chapter has scenes
     get_scene_by_position(chapter_id: int, position: int)
         Get a scene by position
     get_all_scenes_by_chapter_id(chapter_id: int)
@@ -1602,6 +1604,27 @@ class ChapterController(BaseController):
             else:
                 session.commit()
                 return scene
+
+    def has_scenes(self, chapter_id: int) -> bool:
+        """Check if a chapter has scenes
+
+        Parameters
+        ----------
+        chapter_id : int
+            The id of the chapter
+
+        Returns
+        -------
+        bool
+            True if the chapter has scenes, False if not
+        """
+
+        with self._session as session:
+
+            return session.query(Scene).filter(
+                Scene.chapter_id == chapter_id,
+                Scene.user_id == self._owner.id
+            ).count() > 0
 
     def get_scene_by_position(self, chapter_id: int, position: int) -> Type[Scene] | None:
         """Get a scene by position
@@ -6259,6 +6282,8 @@ class StoryController(BaseController):
         Get all authors associated with a story
     add_chapter_to_story(story_id: int, title: str, description: str)
         Add a chapter to a story
+    has_chapters( story_id ) : bool
+        Check if a story has chapters
     get_chapter_by_position(story_id: int, position: int)
         Get a chapter by position
     get_all_chapters_by_story_id(story_id: int)
@@ -6623,6 +6648,27 @@ class StoryController(BaseController):
             else:
                 session.commit()
                 return chapter
+
+    def has_chapters(self, story_id: int) -> bool:
+        """Check if a story has chapters
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+
+        Returns
+        -------
+        bool
+            True if the story has chapters
+        """
+
+        with self._session as session:
+
+            return session.query(Chapter).filter(
+                Chapter.story_id == story_id,
+                Chapter.user_id == self._owner.id
+            ).count() > 0
 
     def get_chapter_by_position(self, story_id: int, position: int) -> Type[Chapter]:
         """Get a chapter by position
