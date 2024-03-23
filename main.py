@@ -1,12 +1,12 @@
-from noveler.noveler import Noveler
+from noveler.application import Noveler
 
 """Example database connection strings
 
-PostgreSQL = Noveler("postgresql+psycopg://{dbuser}:{dbpassword}@{dbhost}:{dbport}/{dbname}", echo=False)
+noveler = Noveler("postgresql+psycopg://{dbuser}:{dbpassword}@{dbhost}:{dbport}/{dbname}", echo=False)
     Shown here using the psycopg driver, also known as psycopg3
-MySQL = Noveler("mysql+mysqlconnector://{dbuser}:{dbpassword}@{dbhost}:{dbport}/{dbname}", echo=False)
+noveler = Noveler("mysql+mysqlconnector://{dbuser}:{dbpassword}@{dbhost}:{dbport}/{dbname}", echo=False)
     Shown here using the mysql-connector-python driver
-SQLite = Noveler("sqlite:///{dbname}.db", echo=False)
+noveler = Noveler("sqlite:///{dbname}.db", echo=False)
 
 You supply the connection string to the Noveler class, and it will automatically generate the database schema. Shown 
 here using the sqlite3 driver, which is included in the Python standard library. The echo parameter is optional and
