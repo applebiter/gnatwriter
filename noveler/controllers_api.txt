@@ -202,17 +202,21 @@ class StoryController
     get_all_stories_page ( page: int, per_page: int ) : list
     search_stories ( search: str ) : list
     append_authors_to_story ( story_id: int, author_ids: list ) : Type[Story]
+    has_authors ( story_id: int ) : bool
     get_authors_by_story_id ( story_id: int ) : list
     add_chapter_to_story ( story_id: int, title: str, description: str = None ) : Type[Chapter]
     has_chapters ( story_id: int ) : bool
     get_chapter_by_position ( story_id: int, position: int ) : Type[Chapter] | None
     get_all_chapters_by_story_id ( story_id: int ) : list
     append_characters_to_story ( story: int, character_ids: list ) : Type[Story]
+    has_characters ( story_id: int ) : bool
     get_characters_by_story_id ( story_id: int ) : list
     get_characters_page_by_story_id ( story_id: int ) : list
     append_links_to_story ( story_id: int, link_ids: list ) : Type[Story]
+    has_links ( story_id: int ) : bool
     get_links_by_story_id ( story_id: int ) : list
     append_notes_to_story ( story_id: int, mote_ids: list ) : Type[Story]
+    has_notes ( story_id: int ) : bool
     get_notes_by_story_id ( story_id: int ) : list
 
 class SubmissionController

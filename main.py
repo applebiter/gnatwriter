@@ -27,5 +27,6 @@ if noveler("story").has_stories():
                 if noveler("chapter").has_scenes(chapter.id):
                     for scene in noveler("scene").get_scenes_by_chapter_id(chapter.id):
                         print(f"\t\t\t\t{scene.title}  # Scene ID# {scene.id}")
+
 else:
     print("No stories found")
