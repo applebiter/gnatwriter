@@ -4,8 +4,8 @@ import bcrypt
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 import uuid
-from models import *
-from models import User
+from noveler.models import *
+from noveler.models import Chapter
 
 
 def hash_password(password):
@@ -1044,18 +1044,22 @@ class ChapterController(BaseController):
         Get all chapters associated with a user
     get_chapters_page(page: int, per_page: int)
         Get a single page of chapters from the database associated with a user
-    get_chapter_count()
-        Get chapter count associated with a user
     get_all_chapters_by_story_id(story_id: int)
         Get all chapters associated with a story
     get_chapters_page_by_story_id(story_id: int, page: int, per_page: int)
         Get a single page of chapters associated with a story from the database
-    get_chapter_count_by_story_id(story_id: int)
+    count_chapters_by_story_id(story_id: int)
         Get chapter count associated with a story
     search_chapters(search: str)
         Search for chapters by title and description belonging to a specific user
     search_chapters_by_story_id(story_id: int, search: str)
         Search for chapters by title and description belonging to a specific story
+    add_scene_to_chapter(chapter_id: int, title: str, description: str, content: str)
+        Add a scene to a chapter
+    get_scene_by_position(chapter_id: int, position: int)
+        Get a scene by position
+    get_all_scenes_by_chapter_id(chapter_id: int)
+        Get all scenes associated with a chapter
     append_links_to_chapter(chapter_id: int, links: list)
         Append links to a chapter
     get_links_by_chapter_id(chapter_id: int)
@@ -1423,21 +1427,6 @@ class ChapterController(BaseController):
                 Chapter.story_id, Chapter.position
             ).offset(offset).limit(per_page).all()
 
-    def get_chapter_count(self) -> int:
-        """Get chapter count associated with a user
-
-        Returns
-        -------
-        int
-            The number of chapters
-        """
-
-        with self._session as session:
-
-            return session.query(func.count(Chapter.id)).filter(
-                Chapter.user_id == self._owner.id
-            ).scalar()
-
     def get_chapters_by_story_id(self, story_id: int) -> list | None:
         """Get all chapters associated with a story
 
@@ -1494,7 +1483,7 @@ class ChapterController(BaseController):
                 Chapter.position
             ).offset(offset).limit(per_page).all()
 
-    def get_chapter_count_by_story_id(self, story_id: int) -> int:
+    def count_chapters_by_story_id(self, story_id: int) -> int:
         """Get chapter count associated with a story
 
         Parameters
@@ -1561,6 +1550,105 @@ class ChapterController(BaseController):
                 Chapter.story_id == story_id,
                 Chapter.user_id == self._owner.id
             ).all()
+
+    def add_scene_to_chapter(self, chapter_id: int, title: str, description: str, content: str) -> Scene:
+        """Add a scene to a chapter
+
+        Parameters
+        ----------
+        chapter_id : int
+            The id of the chapter
+        title : str
+            The title of the scene
+        description : str
+            The description of the scene
+        content : str
+            The content of the scene
+
+        Returns
+        -------
+        Scene
+            The new scene object
+        """
+
+        with self._session as session:
+
+            try:
+
+                chapter = session.query(Chapter).filter(
+                    Chapter.id == chapter_id,
+                    Chapter.user_id == self._owner.id
+                ).first()
+
+                scene = Scene(
+                    user_id=self._owner.id, story_id=chapter.story_id,
+                    chapter_id=chapter_id, title=title, description=description,
+                    content=content, created=datetime.now()
+                )
+
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Scene {scene.title} \
+                    added to chapter {chapter.title} by {self._owner.username}',
+                    created=datetime.now()
+                )
+
+                session.add(scene)
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return scene
+
+    def get_scene_by_position(self, chapter_id: int, position: int) -> Type[Scene] | None:
+        """Get a scene by position
+
+        Parameters
+        ----------
+        chapter_id : int
+            The id of the chapter
+        position : int
+            The position of the scene
+
+        Returns
+        -------
+        Scene | None
+            The scene object or None if not found
+        """
+
+        with self._session as session:
+
+            scene = session.query(Scene).filter(
+                Scene.chapter_id == chapter_id,
+                Scene.position == position,
+                Scene.user_id == self._owner.id
+            ).first()
+
+            return scene if scene else None
+
+    def get_all_scenes_by_chapter_id(self, chapter_id: int) -> list[Type[Scene]]:
+        """Get all scenes associated with a chapter
+
+        Parameters
+        ----------
+        chapter_id : int
+            The id of the chapter
+
+        Returns
+        -------
+        list
+            A list of scene objects
+        """
+
+        with self._session as session:
+
+            return session.query(Scene).filter(
+                Scene.chapter_id == chapter_id,
+                Scene.user_id == self._owner.id
+            ).order_by(Scene.position).all()
 
     def append_links_to_chapter(
         self, chapter_id: int, link_ids: list
@@ -5562,6 +5650,8 @@ class SceneController(BaseController):
         Change the position of a scene within a chapter
     delete_scene(scene_id: int)
         Delete a scene
+    count_scenes_by_chapter_id(chapter_id: int)
+        Count the number of scenes associated with a chapter
     get_all_scenes()
         Get all scenes associated with an owner
     get_all_scenes_page(page: int, per_page: int)
@@ -5815,6 +5905,27 @@ class SceneController(BaseController):
             else:
                 session.commit()
                 return True
+
+    def count_scenes_by_chapter_id(self, chapter_id: int) -> int:
+        """Count the number of scenes associated with a chapter
+
+        Parameters
+        ----------
+        chapter_id : int
+            The id of the chapter
+
+        Returns
+        -------
+        int
+            The number of scenes
+        """
+
+        with self._session as session:
+
+            return session.query(Scene).filter(
+                Scene.chapter_id == chapter_id,
+                Scene.user_id == self._owner.id
+            ).count()
 
     def get_all_scenes(self) -> list:
         """Get all scenes associated with an owner
@@ -6132,6 +6243,8 @@ class StoryController(BaseController):
         Update a story
     delete_story(story_id: int)
         Delete a story
+    count_stories()
+        Count the number of stories associated with a user
     get_story_by_id(story_id: int)
         Get a story by id
     get_all_stories()
@@ -6144,6 +6257,12 @@ class StoryController(BaseController):
         Append authors to a story
     get_authors_by_story_id(story_id: int)
         Get all authors associated with a story
+    add_chapter_to_story(story_id: int, title: str, description: str)
+        Add a chapter to a story
+    get_chapter_by_position(story_id: int, position: int)
+        Get a chapter by position
+    get_all_chapters_by_story_id(story_id: int)
+        Get all chapters associated with a story
     append_characters_to_story(story_id: int, character_ids: list)
         Append characters to a story
     get_characters_by_story_id(story_id: int)
@@ -6287,6 +6406,21 @@ class StoryController(BaseController):
                 session.commit()
                 return True
 
+    def count_stories(self) -> int:
+        """Count the number of stories associated with a user
+
+        Returns
+        -------
+        int
+            The number of stories
+        """
+
+        with self._session as session:
+
+            return session.query(Story).filter(
+                Story.user_id == self._owner.id
+            ).count()
+
     def get_story_by_id(self, story_id: int) -> Type[Story] | None:
         """Get a story by id
 
@@ -6429,6 +6563,111 @@ class StoryController(BaseController):
             return session.query(Author).join(AuthorStory).filter(
                 AuthorStory.story_id == story_id, AuthorStory.user_id == self._owner.id
             ).all()
+
+    def add_chapter_to_story(self, story_id: int, title: str, description: str = None) -> Chapter:
+        """Add a chapter to a story
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+        title : str
+            The title of the chapter
+        description : str
+            The description of the chapter
+
+        Returns
+        -------
+        Chapter
+            The new chapter object
+        """
+
+        with self._session as session:
+
+            try:
+
+                story = session.query(Story).filter(
+                    Story.id == story_id,
+                    Story.user_id == self._owner.id
+                ).first()
+
+                if not story:
+                    raise ValueError('Story not found.')
+
+                position = session.query(func.max(Chapter.position)).filter(
+                    Chapter.story_id == story_id
+                ).scalar()
+                position = int(position) + 1 if position else 1
+                created = datetime.now()
+                modified = created
+
+                chapter = Chapter(
+                    user_id=self._owner.id, story_id=story_id,
+                    position=position, title=title, description=description,
+                    created=created, modified=modified
+                )
+
+                activity = Activity(
+                    user_id=self._owner.id, created=datetime.now(),
+                    summary=f'Chapter {chapter.title[:50]} created by \
+                    {self._owner.username}'
+                )
+
+                session.add(chapter)
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return chapter
+
+    def get_chapter_by_position(self, story_id: int, position: int) -> Type[Chapter]:
+        """Get a chapter by position
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+        position : int
+            The position of the chapter
+
+        Returns
+        -------
+        Chapter
+            The chapter object
+        """
+
+        with self._session as session:
+
+            return session.query(Chapter).filter(
+                Chapter.story_id == story_id,
+                Chapter.user_id == self._owner.id,
+                Chapter.position == position
+            ).first()
+
+    def get_all_chapters_by_story_id(self, story_id: int) -> list:
+        """Get all chapters associated with a story
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+
+        Returns
+        -------
+        list
+            A list of chapter objects
+        """
+
+        with self._session as session:
+
+            return session.query(Chapter).filter(
+                Chapter.story_id == story_id,
+                Chapter.user_id == self._owner.id
+            ).order_by(Chapter.position).all()
 
     def append_characters_to_story(self, story_id: int, character_ids: list) -> Type[Story]:
         """Append characters to a story

@@ -2,9 +2,9 @@ from typing import List, Optional, Type, Union
 import uuid
 from ollama import Message
 from sqlalchemy.orm import Session
-from controllers import BaseController
-from models import *
-from ollamasubsystem import OllamaClient
+from noveler.controllers import BaseController
+from noveler.models import *
+from noveler.ollamasubsystem import OllamaClient
 
 noveler_chat_model = "gemma:2b"
 noveler_image_model = "llava:7b"

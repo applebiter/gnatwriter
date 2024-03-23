@@ -1,12 +1,15 @@
-import json
 import uuid as uniqueid
+from datetime import datetime
 from sqlalchemy import create_engine
-from assistants import AssistantRegistry
-from controllers import *
-from models import *
+from sqlalchemy.orm import declarative_base, Session
+from noveler.assistants import *
+from noveler.controllers import *
+from noveler.models import *
+
+Base = declarative_base()
 
 
-class Core:
+class Noveler:
     def __init__(self, engine: str, echo: bool = False):
 
         self._engine = create_engine(engine, echo=echo)

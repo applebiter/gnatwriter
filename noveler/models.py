@@ -1,7 +1,6 @@
 from datetime import datetime
 from enum import Enum
 from typing import Optional, List
-
 import validators
 from validators import url as url_validator
 from validators import uuid as uuid_validator
