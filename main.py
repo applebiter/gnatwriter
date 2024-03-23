@@ -17,23 +17,15 @@ noveler = Noveler("sqlite:///noveler/noveler.db")
 
 if noveler("story").count_stories() > 0:
     print("Stories found:")
+    print(" ")
     for story in noveler("story").get_all_stories():
-        print(f"\tID#:{story.id}  {story.title}")
+        print(f"\t{story.title}")
+        print("\t\tContents:")
         chapter_count = noveler("chapter").count_chapters_by_story_id(story.id)
-        print(f"\t\t{chapter_count} chapters:")
         for chapter in noveler("chapter").get_chapters_by_story_id(story.id):
-            print(f"\t\t\tID#:{chapter.id}  {chapter.title}")
+            print(f"\t\t\t{chapter.title}  # Chapter ID# {chapter.id}")
             scene_count = noveler("scene").count_scenes_by_chapter_id(chapter.id)
-            print(f"\t\t\t{scene_count} scenes:")
             for scene in noveler("scene").get_scenes_by_chapter_id(chapter.id):
-                print(f"\t\t\t\tID#:{scene.id}  {scene.title}")
-                event_count = noveler("event").count_events_by_scene_id(scene.id)
-                print(f"\t\t\t\t{event_count} events:")
-                for event in noveler("event").get_events_by_scene_id(scene.id):
-                    print(f"\t\t\t\t\tID#:{event.id}  {event.title}")
-                    note_count = noveler("note").count_notes_by_event_id(event.id)
-                    print(f"\t\t\t\t\t{note_count} notes:")
-                    for note in noveler("note").get_notes_by_event_id(event.id):
-                        print(f"\t\t\t\t\t\tID#:{note.id}  {note.title}")
+                print(f"\t\t\t\t{scene.title}  # Scene ID# {scene.id}")
 else:
     print("No stories found")
