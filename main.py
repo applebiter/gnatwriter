@@ -15,7 +15,7 @@ defaults to False. If set to True, it will print all SQL commands to the console
 
 noveler = Noveler("sqlite:///noveler/noveler.db")
 
-if noveler("story").count_stories() > 0:
+if noveler("story").has_stories():
     print("Stories found:")
     print(" ")
     for story in noveler("story").get_all_stories():
