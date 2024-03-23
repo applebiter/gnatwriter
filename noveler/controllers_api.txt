@@ -195,6 +195,7 @@ class StoryController
     create_story ( title: str, description: str = None ) : Story
     update_story ( story_id: int, title: str, description: str = None ) : Type[Story]
     delete_story ( story_id: int ) : bool
+    has_stories ( ) : bool
     count_stories ( ) : int
     get_story_by_id ( story_id: int ) : Type[Story] | None
     get_all_stories ( ) : list

@@ -6266,6 +6266,8 @@ class StoryController(BaseController):
         Update a story
     delete_story(story_id: int)
         Delete a story
+    has_stories() : bool
+        Check if a user has stories
     count_stories()
         Count the number of stories associated with a user
     get_story_by_id(story_id: int)
@@ -6430,6 +6432,21 @@ class StoryController(BaseController):
             else:
                 session.commit()
                 return True
+
+    def has_stories(self) -> bool:
+        """Check if a user has stories
+
+        Returns
+        -------
+        bool
+            True if the user has stories
+        """
+
+        with self._session as session:
+
+            return session.query(Story).filter(
+                Story.user_id == self._owner.id
+            ).count() > 0
 
     def count_stories(self) -> int:
         """Count the number of stories associated with a user
