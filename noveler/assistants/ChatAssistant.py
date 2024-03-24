@@ -1,9 +1,7 @@
 from datetime import datetime
 from typing import Type, Optional, Union
-
 from ollama import Message
 from sqlalchemy.orm import Session
-
 from noveler.assistants import Assistant
 from noveler.models import User, Activity, Assistance
 
