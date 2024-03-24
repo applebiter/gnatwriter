@@ -49,7 +49,6 @@ class ChapterController
     count_chapters_by_story_id ( story_id: int ) : int
     search_chapters ( search: str ) : list
     search_chapters_by_story_id ( story_id: int, search: str ) : list
-    add_scene_to_chapter ( chapter_id: int, title: str, description: str = None, content: str = None ) : Type[Scene]
     has_scenes ( chapter_id: int ) : bool
     get_scene_by_position ( chapter_id: int, position: int ) : Type[Scene] | None
     get_all_scenes_by_chapter_id ( chapter_id: int ) : list
