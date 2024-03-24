@@ -4,7 +4,9 @@ from noveler.controllers.AuthorController import AuthorController
 from noveler.controllers.BibliographyController import BibliographyController
 from noveler.controllers.ChapterController import ChapterController
 from noveler.controllers.CharacterController import CharacterController
+from noveler.controllers.ChatController import ChatController
 from noveler.controllers.EventController import EventController
+from noveler.controllers.GenerativeController import GenerativeController
 from noveler.controllers.ImageController import ImageController
 from noveler.controllers.LinkController import LinkController
 from noveler.controllers.LocationController import LocationController

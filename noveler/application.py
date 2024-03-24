@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from noveler.assistants import ChatAssistant, GenerativeAssistant, ImageAssistant
 from noveler.controllers import ActivityController, AuthorController, BibliographyController, \
     ChapterController, CharacterController, EventController, ImageController, LinkController, LocationController, \
-    NoteController, SceneController, StoryController, SubmissionController, UserController
+    NoteController, SceneController, StoryController, SubmissionController, UserController, ChatController, \
+    GenerativeController
 from noveler.models import User, Base
 
 datetime_format = "%Y-%m-%d %H:%M:%S.%f"
@@ -71,7 +72,9 @@ class Noveler:
             "bibliography": BibliographyController(self._session, self._owner),
             "chapter": ChapterController(self._session, self._owner),
             "character": CharacterController(self._session, self._owner),
+            "chat-assistant": ChatController(self._session, self._owner),
             "event": EventController(self._session, self._owner),
+            "generative-assistant": GenerativeController(self._session, self._owner),
             "image": ImageController(self._session, self._owner),
             "link": LinkController(self._session, self._owner),
             "location": LocationController(self._session, self._owner),
@@ -80,12 +83,6 @@ class Noveler:
             "story": StoryController(self._session, self._owner),
             "submission": SubmissionController(self._session, self._owner),
             "user": UserController(self._session, self._owner)
-        }
-
-        self.assistants = {
-            "chat": ChatAssistant(self._session, self._owner),
-            "generative": GenerativeAssistant(self._session, self._owner),
-            "image": ImageAssistant(self._session, self._owner)
         }
 
     def __call__(self, *args, **kwargs):

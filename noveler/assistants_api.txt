@@ -1,2 +1,0 @@
-class ImageAssistant
-    describe ( images: List[str], prompt: Optional[str], options: Optional[dict]) -> dict:

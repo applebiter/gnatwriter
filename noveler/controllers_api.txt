@@ -101,6 +101,17 @@ class CharacterController
     get_images_by_character_id ( character_id: int ) : list
     get_images_page_by_character_id ( character_id: int, page: int, per_page: int ) : list
 
+class ChatController
+    chat(
+        prompt: str,
+        temperature: Optional[float] = 0.5,
+        seed: Optional[int] = None,
+        priming: str = None,
+        options: Optional[dict] = None,
+        session_uuid: str = None,
+        keep_alive: Optional[Union[float, str]] = None
+    ) : Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]
+
 class EventController
     create_event ( title: str, description: str = None, start_datetime: str = None, end_datetime: str = None ) : Type[Event]    
     update_event ( event_id: int, title: str, description: str = None, start_datetime: str = None, end_datetime: str = None ) : Type[Event]    
@@ -118,6 +129,27 @@ class EventController
     append_notes_to_event ( event_id: int, note_ids: list ) : Type[Event]
     get_notes_by_event_id ( event_id: int ) : list
     get_notes_page_by_event_id ( event_id: int, page: int, per_page: int ) : list
+
+class GenerativeController
+    describe_image (
+        images: List[str],
+        prompt: Optional[str] = "Describe the image",
+        temperature: Optional[float] = 0.5,
+        seed: Optional[int] = None,
+        priming: Optional[str] = None,
+        options: Optional[dict] = None,
+        session_uuid: str = None,
+        keep_alive: Optional[Union[float, str]] = None
+    ) : Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]
+    generate (
+        prompt: str = None,
+        temperature: Optional[float] = 0.5,
+        seed: Optional[int] = None,
+        priming: Optional[str] = None,
+        options: Optional[dict] = None,
+        session_uuid: str = None,
+        keep_alive: Optional[Union[float, str]] = None
+    ) : Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]
 
 class ImageController
     create_image ( filename: str, dirname: str, size_in_bytes: int, mime_type: str, caption: str = None ) : Image

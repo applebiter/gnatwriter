@@ -30,3 +30,9 @@ if noveler("story").has_stories():
 
 else:
     print("No stories found")
+
+print("Invoking the Image Assistant...")
+response = noveler("generative-assistant").describe_image([
+    "/home/rick/Workspace/noveler/images/DM4ZW0H0.png",
+])
+print(response.get("response"))
