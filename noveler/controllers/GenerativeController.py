@@ -9,7 +9,7 @@ from noveler.ollamasubsystem import OllamaClient
 noveler_chat_model = "gemma:2b"
 noveler_image_model = "llava:7b"
 noveler_generate_model = "llama2:7b"
-ollama_model_memory_duration = "1h"  # How long to keep the model in memory
+ollama_model_memory_duration = "0"  # How long to keep the model in memory
 ollama_context_window = 4096  # The number of tokens to use as context for the model
 
 

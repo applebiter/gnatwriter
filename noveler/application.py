@@ -3,7 +3,6 @@ from datetime import datetime
 import bcrypt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from noveler.assistants import ChatAssistant, GenerativeAssistant, ImageAssistant
 from noveler.controllers import ActivityController, AuthorController, BibliographyController, \
     ChapterController, CharacterController, EventController, ImageController, LinkController, LocationController, \
     NoteController, SceneController, StoryController, SubmissionController, UserController, ChatController, \
