@@ -1,0 +1,5 @@
+from noveler.assistants.Assistant import Assistant
+from noveler.assistants.AssistantRegistry import AssistantRegistry
+from noveler.assistants.ChatAssistant import ChatAssistant
+from noveler.assistants.GenerativeAssistant import GenerativeAssistant
+from noveler.assistants.ImageAssistant import ImageAssistant

@@ -4,7 +4,10 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Character, CharacterStory, Activity, CharacterRelationship, CharacterTrait, Event, \
-    CharacterEvent, datetime_format, Link, CharacterLink, Note, CharacterNote, Image, CharacterImage
+    CharacterEvent, Link, CharacterLink, Note, CharacterNote, Image, CharacterImage
+
+datetime_format = "%Y-%m-%d %H:%M:%S.%f"
+date_format = "%Y-%m-%d"
 
 
 class CharacterController(BaseController):

@@ -41,6 +41,27 @@ class AuthorStory
     func serialize( ) : dict
     func unserialize( data: dict ) : AuthorStory
 
+class Assistance
+    const id: int
+    const user_id: int
+    const session_uuid: str
+    const assistant: str
+    const model: str
+    const priming: str
+    const prompt: str
+    const temperature: float 0.5 by default
+    seed: int,
+    content: str,
+    done: bool,
+    total_duration: int,
+    load_duration: int,
+    prompt_eval_count: int,
+    prompt_eval_duration: int,
+    eval_count: v,
+    eval_duration: int,
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+
 class Bibliography
     const id: int
     const user_id: int

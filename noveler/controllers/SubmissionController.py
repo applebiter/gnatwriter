@@ -4,7 +4,7 @@ from typing import Type
 from sqlalchemy.orm import Session
 
 from noveler.controllers.BaseController import BaseController
-from noveler.models import User, Submission, date_format, Activity
+from noveler.models import User, Submission, Activity
 
 
 class SubmissionController(BaseController):

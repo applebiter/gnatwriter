@@ -1,12 +1,37 @@
 import uuid as uniqueid
 from datetime import datetime
+import bcrypt
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, Session
-from noveler.assistants import *
-from noveler.controllers import *
-from noveler.models import *
+from sqlalchemy.orm import Session
+from noveler.assistants import AssistantRegistry
+from noveler.controllers import ActivityController, AuthorController, BibliographyController, \
+    ChapterController, CharacterController, EventController, ImageController, LinkController, LocationController, \
+    NoteController, SceneController, StoryController, SubmissionController, UserController
+from noveler.models import User, Base
 
-Base = declarative_base()
+datetime_format = "%Y-%m-%d %H:%M:%S.%f"
+date_format = "%Y-%m-%d"
+
+
+def hash_password(password):
+    """Hash a password, return hashed password"""
+
+    if password == '':
+        raise ValueError('The password cannot be empty.')
+
+    if len(password) < 8:
+        raise ValueError('The password must be at least 8 characters.')
+
+    if len(password) > 24:
+        raise ValueError('The password cannot be more than 24 characters.')
+
+    return bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt(rounds=12)).decode('utf8')
+
+
+def verify_password(password, hashed_password):
+    """Verify a password, return true if verified, false if not"""
+
+    return bcrypt.checkpw(password.encode('utf8'), hashed_password.encode('utf8'))
 
 
 class Noveler:

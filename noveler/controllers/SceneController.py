@@ -5,7 +5,7 @@ from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 
 from noveler.controllers.BaseController import BaseController
-from noveler.models import User, Scene, Link, LinkScene, Note, NoteScene, Activity, datetime_format
+from noveler.models import User, Scene, Link, LinkScene, Note, NoteScene, Activity
 
 
 class SceneController(BaseController):
