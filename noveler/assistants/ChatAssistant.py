@@ -2,11 +2,11 @@ from datetime import datetime
 from typing import Type, Optional, Union
 from ollama import Message
 from sqlalchemy.orm import Session
-from noveler.assistants import Assistant
+from noveler.assistants import BaseAssistant
 from noveler.models import User, Activity, Assistance
 
 
-class ChatAssistant(Assistant):
+class ChatAssistant(BaseAssistant):
     """Chat Assistant
 
     The Chat Assistant is a specialized assistant that uses the Ollama API to

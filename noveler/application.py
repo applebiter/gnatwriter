@@ -3,7 +3,7 @@ from datetime import datetime
 import bcrypt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from noveler.assistants import AssistantRegistry
+from noveler.assistants import ChatAssistant, GenerativeAssistant, ImageAssistant
 from noveler.controllers import ActivityController, AuthorController, BibliographyController, \
     ChapterController, CharacterController, EventController, ImageController, LinkController, LocationController, \
     NoteController, SceneController, StoryController, SubmissionController, UserController
@@ -35,6 +35,9 @@ def verify_password(password, hashed_password):
 
 
 class Noveler:
+
+    assistants: dict = {}
+
     def __init__(self, engine: str, echo: bool = False):
 
         self._engine = create_engine(engine, echo=echo)
@@ -78,9 +81,12 @@ class Noveler:
             "submission": SubmissionController(self._session, self._owner),
             "user": UserController(self._session, self._owner)
         }
-        # self.assistant = AssistantRegistry(
-        #     session=self._session, owner=self._owner
-        # )
+
+        self.assistants = {
+            "chat": ChatAssistant(self._session, self._owner),
+            "generative": GenerativeAssistant(self._session, self._owner),
+            "image": ImageAssistant(self._session, self._owner)
+        }
 
     def __call__(self, *args, **kwargs):
         return self._controllers[args[0]]

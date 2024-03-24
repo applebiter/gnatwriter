@@ -3,11 +3,11 @@ from typing import Type, List, Optional, Union
 
 from sqlalchemy.orm import Session
 
-from noveler.assistants import Assistant
+from noveler.assistants import BaseAssistant
 from noveler.models import User, Assistance, Activity
 
 
-class ImageAssistant(Assistant):
+class ImageAssistant(BaseAssistant):
     """Image Assistant
 
     The Image Assistant is a specialized assistant that uses the Ollama API to

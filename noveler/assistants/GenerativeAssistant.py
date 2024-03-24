@@ -3,11 +3,11 @@ from typing import Type, Optional, Union
 
 from sqlalchemy.orm import Session
 
-from noveler.assistants import Assistant
+from noveler.assistants import BaseAssistant
 from noveler.models import User, Activity, Assistance
 
 
-class GenerativeAssistant(Assistant):
+class GenerativeAssistant(BaseAssistant):
     def __init__(self, session: Session, owner: Type[User]):
         super().__init__(session, owner)
 

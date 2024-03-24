@@ -1,24 +1,33 @@
 import uuid
 from typing import Type
 from sqlalchemy.orm import Session
-from noveler.controllers import BaseController
 from noveler.models import User, Assistance
 from noveler.ollamasubsystem import OllamaClient
 
 noveler_chat_model = "gemma:2b"
 noveler_image_model = "llava:7b"
 noveler_generate_model = "llama2:7b"
-ollama_model_memory = "1h"  # How long to keep the model in memory
+ollama_model_memory_duration = "1h"  # How long to keep the model in memory
 ollama_context_window = 4096  # The number of tokens to use as context for the model
 
 
-class Assistant(BaseController):
-    """Assistant"""
+class BaseAssistant:
+    """BaseAssistant"""
 
+    _self = None
+    _owner = None
+    _session = None
     _templates = {}
 
+    def __new__(cls, session: Session, owner: Type[User]):
+        """Enforce Singleton pattern"""
+
+        if cls._self is None:
+            cls._self = super().__new__(cls)
+
+        return cls._self
+
     def __init__(self, session: Session, owner: Type[User]):
-        super().__init__(session, owner)
 
         uuid4 = str(uuid.uuid4())
         uuid_exists = session.query(Assistance).filter(
@@ -37,7 +46,7 @@ class Assistant(BaseController):
         self._image_model = noveler_image_model
         self._generative_model = noveler_generate_model
         self._num_ctx = ollama_context_window
-        self._keep_alive = ollama_model_memory
+        self._keep_alive = ollama_model_memory_duration
         self._templates = {
             "codellama:13b": """[INST] <<SYS>>{{ .System }}<</SYS>>
 
