@@ -47,8 +47,6 @@ class StoryController(BaseController):
         Check if a story has authors
     get_authors_by_story_id(story_id: int)
         Get all authors associated with a story
-    add_chapter_to_story(story_id: int, title: str, description: str)
-        Add a chapter to a story
     has_chapters( story_id ) : bool
         Check if a story has chapters
     get_chapter_by_position(story_id: int, position: int)
@@ -397,66 +395,6 @@ class StoryController(BaseController):
             return session.query(Author).join(AuthorStory).filter(
                 AuthorStory.story_id == story_id, AuthorStory.user_id == self._owner.id
             ).all()
-
-    def add_chapter_to_story(self, story_id: int, title: str, description: str = None) -> Chapter:
-        """Add a chapter to a story
-
-        Parameters
-        ----------
-        story_id : int
-            The id of the story
-        title : str
-            The title of the chapter
-        description : str
-            The description of the chapter
-
-        Returns
-        -------
-        Chapter
-            The new chapter object
-        """
-
-        with self._session as session:
-
-            try:
-
-                story = session.query(Story).filter(
-                    Story.id == story_id,
-                    Story.user_id == self._owner.id
-                ).first()
-
-                if not story:
-                    raise ValueError('Story not found.')
-
-                position = session.query(func.max(Chapter.position)).filter(
-                    Chapter.story_id == story_id
-                ).scalar()
-                position = int(position) + 1 if position else 1
-                created = datetime.now()
-                modified = created
-
-                chapter = Chapter(
-                    user_id=self._owner.id, story_id=story_id,
-                    position=position, title=title, description=description,
-                    created=created, modified=modified
-                )
-
-                activity = Activity(
-                    user_id=self._owner.id, created=datetime.now(),
-                    summary=f'Chapter {chapter.title[:50]} created by \
-                    {self._owner.username}'
-                )
-
-                session.add(chapter)
-                session.add(activity)
-
-            except Exception as e:
-                session.rollback()
-                raise e
-
-            else:
-                session.commit()
-                return chapter
 
     def has_chapters(self, story_id: int) -> bool:
         """Check if a story has chapters
