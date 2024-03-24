@@ -15,6 +15,17 @@ defaults to False. If set to True, it will print all SQL commands to the console
 
 noveler = Noveler("sqlite:///noveler/noveler.db")
 
+scene = noveler("chapter").add_scene_to_chapter(
+    chapter_id=5, title="Base", description="""This scene will provide info on the Base model
+    """, content="@todo: Write the content for this scene."
+)
+# scene = noveler("scene").create_scene(
+#     story_id=1, chapter_id=5, title="Assistance",
+#     description="This scene will provide instructions on how to use the Assistance model.",
+#     content="@todo: Write the content for this scene."
+# )
+scene = noveler("scene").change_scene_position(scene_id=scene.id, position=5)
+
 if noveler("story").has_stories():
     print("Stories found:")
     print(" ")

@@ -78,9 +78,9 @@ class Noveler:
             "submission": SubmissionController(self._session, self._owner),
             "user": UserController(self._session, self._owner)
         }
-        self.assistant = AssistantRegistry(
-            session=self._session, owner=self._owner
-        )
+        # self.assistant = AssistantRegistry(
+        #     session=self._session, owner=self._owner
+        # )
 
     def __call__(self, *args, **kwargs):
         return self._controllers[args[0]]

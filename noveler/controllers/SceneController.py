@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import Type
-
 from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
-
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Scene, Link, LinkScene, Note, NoteScene, Activity
+
+datetime_format = "%Y-%m-%d %H:%M:%S.%f"
+date_format = "%Y-%m-%d"
 
 
 class SceneController(BaseController):

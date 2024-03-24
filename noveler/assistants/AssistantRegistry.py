@@ -21,9 +21,9 @@ class AssistantRegistry(BaseController):
         super().__init__(session, owner)
 
         self._assistants = {
-            "chat": '',  # ChatAssistant(session, owner),
-            "image": '',  # ImageAssistant(session, owner),
-            "generative": ''  # GenerativeAssistant(session, owner)
+            "chat": ChatAssistant(session, owner),
+            "image": ImageAssistant(session, owner),
+            "generative": GenerativeAssistant(session, owner)
         }
 
     def __call__(self, *args, **kwargs):

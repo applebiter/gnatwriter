@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Type
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
-from noveler.controllers import BaseController
+from noveler.controllers import BaseController, SceneController
 from noveler.models import User, Chapter, Activity, Scene, Link, ChapterLink, Note, ChapterNote
 
 datetime_format = "%Y-%m-%d %H:%M:%S.%f"
@@ -45,8 +45,6 @@ class ChapterController(BaseController):
         Search for chapters by title and description belonging to a specific user
     search_chapters_by_story_id(story_id: int, search: str)
         Search for chapters by title and description belonging to a specific story
-    add_scene_to_chapter(chapter_id: int, title: str, description: str, content: str)
-        Add a scene to a chapter
     has_scenes(chapter_id: int)
         Check if a chapter has scenes
     get_scene_by_position(chapter_id: int, position: int)
@@ -543,58 +541,6 @@ class ChapterController(BaseController):
                 Chapter.story_id == story_id,
                 Chapter.user_id == self._owner.id
             ).all()
-
-    def add_scene_to_chapter(self, chapter_id: int, title: str, description: str, content: str) -> Scene:
-        """Add a scene to a chapter
-
-        Parameters
-        ----------
-        chapter_id : int
-            The id of the chapter
-        title : str
-            The title of the scene
-        description : str
-            The description of the scene
-        content : str
-            The content of the scene
-
-        Returns
-        -------
-        Scene
-            The new scene object
-        """
-
-        with self._session as session:
-
-            try:
-
-                chapter = session.query(Chapter).filter(
-                    Chapter.id == chapter_id,
-                    Chapter.user_id == self._owner.id
-                ).first()
-
-                scene = Scene(
-                    user_id=self._owner.id, story_id=chapter.story_id,
-                    chapter_id=chapter_id, title=title, description=description,
-                    content=content, created=datetime.now()
-                )
-
-                activity = Activity(
-                    user_id=self._owner.id, summary=f'Scene {scene.title} \
-                    added to chapter {chapter.title} by {self._owner.username}',
-                    created=datetime.now()
-                )
-
-                session.add(scene)
-                session.add(activity)
-
-            except Exception as e:
-                session.rollback()
-                raise e
-
-            else:
-                session.commit()
-                return scene
 
     def has_scenes(self, chapter_id: int) -> bool:
         """Check if a chapter has scenes
