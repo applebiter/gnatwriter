@@ -47,6 +47,7 @@ Noveler Documentation v.1.0
             Model Settings  # Scene ID# 16
         Models API  # Chapter ID# 5
             Activity  # Scene ID# 17
+            Assistance  # Scene ID# 72
             Author  # Scene ID# 18
             AuthorStory  # Scene ID# 19
             Bibliography  # Scene ID# 20
