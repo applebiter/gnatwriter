@@ -6,8 +6,7 @@ editing, and managing stories. These Assistants are designed around the ollama e
 GGUF models of their choice, and different models for different kinds of tasks. 
 
 ### How to install
-Clone the repo and run `pip install .` in the root directory. If you use PyCharm, you can also open the project folder 
-and the IDE will automatically install the dependencies. 
+Clone the repo and open it in a modern Python IDE, like PyCharm. PyCharm Community Edition is free. 
 
 ### How to use
 Well, it's a framework without a front end, so the project becomes the basis of your own app. Consider this a skeleton 
