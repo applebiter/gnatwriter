@@ -210,6 +210,7 @@ class SceneController
     change_scene_position ( scene_id: int, position: int ) : Type[Scene]
     delete_scene ( scene_id: int ) : bool
     count_scenes_by_chapter_id ( chapter_id: int ) : int
+    get_scene_by_id ( scene_id: int ) : Type[Scene] | None
     get_all_scenes ( ) : list
     get_all_scenes_page ( page: int, per_page: int ) : list
     get_scenes_by_story_id ( story_id: int ) : list

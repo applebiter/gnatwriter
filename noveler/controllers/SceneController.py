@@ -33,6 +33,8 @@ class SceneController(BaseController):
         Delete a scene
     count_scenes_by_chapter_id(chapter_id: int)
         Count the number of scenes associated with a chapter
+    get_scene_by_id(scene_id: int)
+        Get a scene by id
     get_all_scenes()
         Get all scenes associated with an owner
     get_all_scenes_page(page: int, per_page: int)
@@ -307,6 +309,27 @@ class SceneController(BaseController):
                 Scene.chapter_id == chapter_id,
                 Scene.user_id == self._owner.id
             ).count()
+
+    def get_scene_by_id(self, scene_id: int) -> Type[Scene]:
+        """Get a scene by id
+
+        Parameters
+        ----------
+        scene_id : int
+            The id of the scene
+
+        Returns
+        -------
+        Scene
+            The scene object
+        """
+
+        with self._session as session:
+
+            return session.query(Scene).filter(
+                Scene.id == scene_id,
+                Scene.user_id == self._owner.id
+            ).first()
 
     def get_all_scenes(self) -> list:
         """Get all scenes associated with an owner

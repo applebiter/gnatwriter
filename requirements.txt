@@ -1,8 +1,5 @@
 SQLAlchemy~=2.0.26
 bcrypt~=4.1.2
-mysql-connector-python
-psycopg
-typing_extensions
 uuid~=1.30
 validators~=0.22.0
 ollama~=0.1.7
