@@ -3,11 +3,10 @@ from datetime import datetime
 import bcrypt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from noveler.controllers import ActivityController, AuthorController, BibliographyController, \
-    ChapterController, CharacterController, EventController, ImageController, LinkController, LocationController, \
-    NoteController, SceneController, StoryController, SubmissionController, UserController, ChatController, \
-    GenerativeController
-from noveler.models import User, Base
+from noveler.controllers import ActivityController, AuthorController, BibliographyController,  ChapterController, \
+    CharacterController, ChatController, EventController, GenerativeController, ImageController, LinkController, \
+    LocationController, NoteController, SceneController, StoryController, SubmissionController, UserController
+from noveler.models import Base, User
 
 
 def hash_password(password: str) -> str:

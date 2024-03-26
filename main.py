@@ -16,23 +16,10 @@ defaults to False. If set to True, it will print all SQL commands to the console
 
 config = ConfigParser()
 config.read("config.cfg")
-noveler_db = config.get("sqlite-connection-data", "database")
-print(f"Connecting to database: {noveler_db}...")
-noveler = Noveler(f"sqlite:///noveler/{noveler_db}", echo=False)
-
-if noveler("story").has_stories():
-    print("Stories found:")
-    print(" ")
-    for story in noveler("story").get_all_stories():
-        print(f"\t{story.title}")
-        print("\t\tContents:")
-        if noveler("story").has_chapters(story.id):
-            for chapter in noveler("chapter").get_chapters_by_story_id(story.id):
-                print(f"\t\t\t{chapter.title}  # Chapter ID# {chapter.id}")
-                if noveler("chapter").has_scenes(chapter.id):
-                    for scene in noveler("scene").get_scenes_by_chapter_id(chapter.id):
-                        print(f"\t\t\t\t{scene.title}  # Scene ID# {scene.id}")
-                        # print(f"\t\t\t\t\t{scene.content}")
-
-else:
-    print("No stories found")
+user = config.get("mysql", "user")
+password = config.get("mysql", "password")
+host = config.get("mysql", "host")
+port = config.get("mysql", "port")
+database = config.get("mysql", "database")
+print(f"Connecting to database: {database}...")
+noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")

@@ -1,23 +1,23 @@
-[mysql-connection-data]
+[mysql]
 host = localhost
 port = 3306
 user = root
 password = password
 database = noveler
 
-[postgresql-connection-data]
+[postgresql]
 host = localhost
 port = 5432
 user = postgres
 password = password
 database = noveler
 
-[sqlite-connection-data]
+[sqlite]
 database = noveler.db
 
-[datetime]
-datetime_format = "%Y-%m-%d %H:%M:%S.%f"
-date_format = "%Y-%m-%d"
+[formats]
+datetime = "%Y-%m-%d %H:%M:%S.%f"
+date = "%Y-%m-%d"
 
 [ollama]
 chat_model = "phi:2.7b"

@@ -966,7 +966,7 @@ class CharacterController(BaseController):
 
                 config = ConfigParser()
                 config.read("config.cfg")
-                datetime_format = config.get("datetime", "datetime_format")
+                datetime_format = config.get("formats", "datetime")
                 character_trait = session.query(CharacterTrait).filter(
                     CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
                 ).first()
@@ -1049,7 +1049,7 @@ class CharacterController(BaseController):
 
                 config = ConfigParser()
                 config.read("config.cfg")
-                datetime_format = config.get("datetime", "datetime_format")
+                datetime_format = config.get("formats", "datetime")
 
                 character_trait = session.query(CharacterTrait).filter(
                     CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
@@ -1527,7 +1527,7 @@ class CharacterController(BaseController):
 
                 config = ConfigParser()
                 config.read("config.cfg")
-                datetime_format = config.get("datetime", "datetime_format")
+                datetime_format = config.get("formats", "datetime")
 
                 character_image = session.query(CharacterImage).filter(
                     CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id
@@ -1670,7 +1670,7 @@ class CharacterController(BaseController):
 
                 config = ConfigParser()
                 config.read("config.cfg")
-                datetime_format = config.get("datetime", "datetime_format")
+                datetime_format = config.get("formats", "datetime")
 
                 character_image = session.query(CharacterImage).filter(
                     CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id

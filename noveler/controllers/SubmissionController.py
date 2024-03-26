@@ -66,7 +66,7 @@ class SubmissionController(BaseController):
 
                 config = ConfigParser()
                 config.read("config.cfg")
-                date_format = config.get("datetime", "date_format")
+                date_format = config.get("formats", "date")
 
                 if date_sent is not None:
                     date_sent = datetime.strptime(date_sent, date_format)

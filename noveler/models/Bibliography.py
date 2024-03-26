@@ -1,11 +1,9 @@
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Optional, List
 from sqlalchemy import Integer, ForeignKey, String, Date, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from noveler.models import User, Story, BibliographyAuthor, Base
-
-datetime_format = "%Y-%m-%d %H:%M:%S.%f"
-date_format = "%Y-%m-%d"
 
 
 class Bibliography(Base):
@@ -111,7 +109,7 @@ class Bibliography(Base):
             'story_id': self.story_id,
             'title': self.title,
             'pages': self.pages,
-            'publication_date': self.publication_date,
+            'publication_date': str(self.publication_date),
             'created': str(self.created),
             'modified': str(self.modified),
         }
@@ -199,6 +197,10 @@ class Bibliography(Base):
         str
             The validated publication date
         """
+
+        config = ConfigParser()
+        config.read("config.cfg")
+        date_format = config.get("formats", "date")
 
         if publication_date is not None and bool(datetime.strptime(publication_date, date_format)) is False:
             raise ValueError("Reference publication date must be in the format 'YYYY-MM-DD'.")
