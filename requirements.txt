@@ -3,3 +3,4 @@ bcrypt~=4.1.2
 uuid~=1.30
 validators~=0.22.0
 ollama~=0.1.7
+requests~=2.31.0
