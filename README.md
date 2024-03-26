@@ -3,7 +3,9 @@ Noveler is a framework for building a novel, short-story, or serial-writing app.
 REPL, or it can be used as a back-end in a GUI app. Noveler uses a simple, plain-text format for writing and storing 
 stories. It's designed to be easy to use and easy to extend. The app has a set of Assistants that help with writing,
 editing, and managing stories. These Assistants are designed around the ollama ecosystem, allowing the user to use the 
-GGUF models of their choice, and different models for different kinds of tasks. 
+GGUF models of their choice, and different models for different kinds of tasks. Mom, that means there is a free, open 
+source program you can install on Windows, Linux, or Mac that allows you to interact with a variety of artificial 
+intelligence models to help you write your stories.
 
 ### How to install
 Clone the repo and open it in a modern Python IDE, like PyCharm. PyCharm Community Edition is free. 

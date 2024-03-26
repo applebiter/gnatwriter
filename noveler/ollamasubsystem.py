@@ -1,14 +1,11 @@
 from os import PathLike
-from typing import Any, AnyStr, Union, Optional, Sequence, Mapping, Literal, \
-    Iterator
+from typing import Any, AnyStr, Union, Optional, Sequence, Mapping, Literal, Iterator
 import ollama
 from ollama import Options, Message
 
 
 class OllamaClient:
-    """
-
-    """
+    """Ollama API client class for the Noveler"""
     _client = None
 
     def __init__(self):
