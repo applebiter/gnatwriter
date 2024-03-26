@@ -268,7 +268,7 @@ ASSISTANT:
                     created=datetime.now()
                 )
 
-                summary = f"{self._owner.username} used the Image Assistant"
+                summary = f"{self._owner.username} used the Multimodal Assistant"
                 activity = Activity(
                     user_id=self._owner.id, summary=summary,
                     created=datetime.now()

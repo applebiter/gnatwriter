@@ -1,12 +1,10 @@
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Optional, List
 from sqlalchemy import Integer, ForeignKey, String, Date, Text, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from noveler.models import User, CharacterRelationship, CharacterEvent, CharacterTrait, CharacterImage, CharacterLink, \
     CharacterNote, CharacterStory, Base
-
-datetime_format = "%Y-%m-%d %H:%M:%S.%f"
-date_format = "%Y-%m-%d"
 
 
 class Character(Base):
@@ -354,6 +352,10 @@ class Character(Base):
             The validated date of birth
         """
 
+        config = ConfigParser()
+        config.read("config.cfg")
+        date_format = config.get("datetime", "date_format")
+
         if date_of_birth and bool(datetime.strptime(date_of_birth, date_format)) is False:
             raise ValueError("The date of birth must be in the format 'YYYY-MM-DD'.")
 
@@ -377,6 +379,10 @@ class Character(Base):
         str
             The validated date of death
         """
+
+        config = ConfigParser()
+        config.read("config.cfg")
+        date_format = config.get("datetime", "date_format")
 
         if date_of_death and bool(datetime.strptime(date_of_death, date_format)) is False:
             raise ValueError("The date of death must be in the format 'YYYY-MM-DD'.")
