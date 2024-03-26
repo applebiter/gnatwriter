@@ -1,8 +1,7 @@
+from configparser import ConfigParser
 from datetime import datetime, date
 from typing import Type
-
 from sqlalchemy.orm import Session
-
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Submission, Activity
 
@@ -62,7 +61,13 @@ class SubmissionController(BaseController):
         """
 
         with (self._session as session):
+
             try:
+
+                config = ConfigParser()
+                config.read("config.cfg")
+                date_format = config.get("datetime", "date_format")
+
                 if date_sent is not None:
                     date_sent = datetime.strptime(date_sent, date_format)
                 else:
@@ -71,12 +76,17 @@ class SubmissionController(BaseController):
                 created = datetime.now()
                 modified = created
 
-                submission = Submission(user_id=self._owner.id, story_id=story_id, submitted_to=submitted_to,
-                                        date_sent=date_sent, created=created, modified=modified)
+                submission = Submission(
+                    user_id=self._owner.id, story_id=story_id,
+                    submitted_to=submitted_to, date_sent=date_sent,
+                    created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Submission {submission.id} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Submission \
+                    {submission.id} created by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(submission)
                 session.add(activity)
@@ -89,8 +99,11 @@ class SubmissionController(BaseController):
                 session.commit()
                 return submission
 
-    def update_submission(self, submission_id: int, submitted_to: str, date_sent: str, date_reply_received: str,
-                          date_published: str, date_paid: str, result: str, amount: float) -> Type[Submission]:
+    def update_submission(
+        self, submission_id: int, submitted_to: str, date_sent: str,
+            date_reply_received: str, date_published: str, date_paid: str,
+            result: str, amount: float
+    ) -> Type[Submission]:
         """Update a submission
 
         Parameters
@@ -121,7 +134,8 @@ class SubmissionController(BaseController):
         with self._session as session:
             try:
                 submission = session.query(Submission).filter(
-                    Submission.id == submission_id, Submission.user_id == self._owner.id
+                    Submission.id == submission_id,
+                    Submission.user_id == self._owner.id
                 ).first()
 
                 if not submission:
@@ -135,8 +149,11 @@ class SubmissionController(BaseController):
                 submission.result = result
                 submission.amount = amount
 
-                activity = Activity(user_id=self._owner.id, summary=f'Submission {submission.id} updated by \
-                                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Submission \
+                    {submission.id} updated by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -165,14 +182,18 @@ class SubmissionController(BaseController):
         with self._session as session:
             try:
                 submission = session.query(Submission).filter(
-                    Submission.id == submission_id, Submission.user_id == self._owner.id
+                    Submission.id == submission_id,
+                    Submission.user_id == self._owner.id
                 ).first()
 
                 if not submission:
                     raise ValueError('Submission not found.')
 
-                activity = Activity(user_id=self._owner.id, summary=f'Submission {submission.id} deleted by \
-                                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Submission \
+                    {submission.id} deleted by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.delete(submission)
                 session.add(activity)
@@ -195,7 +216,10 @@ class SubmissionController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Submission).filter(Submission.user_id == self._owner.id).all()
+
+            return session.query(Submission).filter(
+                Submission.user_id == self._owner.id
+            ).all()
 
     def get_all_submissions_page(self, page: int, per_page: int) -> list:
         """Get a single page of submissions associated with an owner from the database
@@ -214,7 +238,9 @@ class SubmissionController(BaseController):
         """
 
         with self._session as session:
+
             offset = (page - 1) * per_page
+
             return session.query(Submission).filter(
                 Submission.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
@@ -235,10 +261,13 @@ class SubmissionController(BaseController):
 
         with self._session as session:
             return session.query(Submission).filter(
-                Submission.story_id == story_id, Submission.user_id == self._owner.id
+                Submission.story_id == story_id,
+                Submission.user_id == self._owner.id
             ).all()
 
-    def get_submissions_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
+    def get_submissions_page_by_story_id(
+        self, story_id: int, page: int, per_page: int
+    ) -> list:
         """Get a single page of submissions associated with a story from the database
 
         Parameters
@@ -257,7 +286,10 @@ class SubmissionController(BaseController):
         """
 
         with self._session as session:
+
             offset = (page - 1) * per_page
+
             return session.query(Submission).filter(
-                Submission.story_id == story_id, Submission.user_id == self._owner.id
+                Submission.story_id == story_id,
+                Submission.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()

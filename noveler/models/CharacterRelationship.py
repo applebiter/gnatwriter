@@ -63,18 +63,25 @@ class CharacterRelationship(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     parent_id: Mapped[int] = mapped_column(Integer, ForeignKey('characters.id'))
     position: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
-    related_id: Mapped[int] = mapped_column(Integer, ForeignKey('characters.id'), )
+    related_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('characters.id')
+    )
     relationship_type: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[str] = mapped_column(String(250), nullable=True)
     start_date: Mapped[str] = mapped_column(Date, nullable=True)
     end_date: Mapped[str] = mapped_column(Date, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User")
-    parent_character: Mapped["Character"] = relationship("Character", foreign_keys="CharacterRelationship.parent_id", lazy="joined")
+    parent_character: Mapped["Character"] = relationship(
+        "Character", foreign_keys="CharacterRelationship.parent_id",
+        lazy="joined"
+    )
     related_character: Mapped["Character"] = relationship(
-        "Character", back_populates="character_relationships", lazy="joined",
-        foreign_keys="[CharacterRelationship.related_id]"
+        "Character", back_populates="character_relationships",
+        lazy="joined", foreign_keys="[CharacterRelationship.related_id]"
     )
 
     def __repr__(self):

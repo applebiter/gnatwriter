@@ -38,12 +38,20 @@ class EventLocation(Base):
 
     __tablename__ = 'events_locations'
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    event_id: Mapped[int] = mapped_column(Integer, ForeignKey('events.id'), primary_key=True)
-    location_id: Mapped[int] = mapped_column(Integer, ForeignKey('locations.id'), primary_key=True)
+    event_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('events.id'), primary_key=True
+    )
+    location_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('locations.id'), primary_key=True
+    )
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
-    event: Mapped["Event"] = relationship("Event", back_populates="locations")
-    location: Mapped["Location"] = relationship("Location", back_populates="events")
+    event: Mapped["Event"] = relationship(
+        "Event", back_populates="locations"
+    )
+    location: Mapped["Location"] = relationship(
+        "Location", back_populates="events"
+    )
 
     def __repr__(self):
         """Returns a string representation of the relationship.

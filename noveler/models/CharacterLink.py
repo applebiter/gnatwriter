@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import Integer, ForeignKey, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship, declarative_base
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from noveler.models import User, Character, Link, Base
 
 
@@ -38,12 +38,20 @@ class CharacterLink(Base):
 
     __tablename__ = 'characters_links'
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    character_id: Mapped[int] = mapped_column(Integer, ForeignKey('characters.id'), primary_key=True)
-    link_id: Mapped[int] = mapped_column(Integer, ForeignKey('links.id'), primary_key=True)
+    character_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('characters.id'), primary_key=True
+    )
+    link_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('links.id'), primary_key=True
+    )
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
-    character: Mapped["Character"] = relationship("Character", back_populates="links")
-    link: Mapped["Link"] = relationship("Link", back_populates="characters")
+    character: Mapped["Character"] = relationship(
+        "Character", back_populates="links"
+    )
+    link: Mapped["Link"] = relationship(
+        "Link", back_populates="characters"
+    )
 
     def __repr__(self):
         """Returns a string representation of the relationship.

@@ -5,9 +5,7 @@ from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Character, CharacterStory, Activity, CharacterRelationship, CharacterTrait, Event, \
     CharacterEvent, Link, CharacterLink, Note, CharacterNote, Image, CharacterImage
-
-datetime_format = "%Y-%m-%d %H:%M:%S.%f"
-date_format = "%Y-%m-%d"
+from configparser import ConfigParser
 
 
 class CharacterController(BaseController):
@@ -965,6 +963,10 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
+
+                config = ConfigParser()
+                config.read("config.cfg")
+                datetime_format = config.get("datetime", "datetime_format")
                 character_trait = session.query(CharacterTrait).filter(
                     CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
                 ).first()
@@ -1044,6 +1046,11 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
+
+                config = ConfigParser()
+                config.read("config.cfg")
+                datetime_format = config.get("datetime", "datetime_format")
+
                 character_trait = session.query(CharacterTrait).filter(
                     CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
                 ).first()
@@ -1517,6 +1524,11 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
+
+                config = ConfigParser()
+                config.read("config.cfg")
+                datetime_format = config.get("datetime", "datetime_format")
+
                 character_image = session.query(CharacterImage).filter(
                     CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id
                 ).first()
@@ -1655,6 +1667,11 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
+
+                config = ConfigParser()
+                config.read("config.cfg")
+                datetime_format = config.get("datetime", "datetime_format")
+
                 character_image = session.query(CharacterImage).filter(
                     CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id
                 ).first()

@@ -62,8 +62,12 @@ class Image(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     filename: Mapped[str] = mapped_column(String(150), nullable=False)
     dirname: Mapped[str] = mapped_column(String(150), nullable=False)
-    size_in_bytes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    mime_type: Mapped[ImageMimeTypes] = mapped_column(String(50), nullable=False)
+    size_in_bytes: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0
+    )
+    mime_type: Mapped[ImageMimeTypes] = mapped_column(
+        String(50), nullable=False
+    )
     caption: Mapped[str] = mapped_column(String(250), nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     modified: Mapped[str] = mapped_column(

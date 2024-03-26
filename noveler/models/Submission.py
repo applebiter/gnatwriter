@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from datetime import datetime
 from sqlalchemy import Integer, ForeignKey, Text, Date, String, Float, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
@@ -190,6 +191,10 @@ class Submission(Base):
             The validated date_sent
         """
 
+        config = ConfigParser()
+        config.read("config.cfg")
+        date_format = config.get("datetime", "date_format")
+
         if type(date_sent) is str and bool(datetime.strptime(date_sent, date_format)) is False:
             raise ValueError("The submission sent date must be in the format 'YYYY-MM-DD'.")
 
@@ -209,6 +214,10 @@ class Submission(Base):
         str
             The validated date_reply_received
         """
+
+        config = ConfigParser()
+        config.read("config.cfg")
+        date_format = config.get("datetime", "date_format")
 
         if date_reply_received is not None and bool(datetime.strptime(date_reply_received, date_format)) is False:
             raise ValueError("The submission reply received date must be in the format 'YYYY-MM-DD'.")
@@ -230,6 +239,10 @@ class Submission(Base):
             The validated date_published
         """
 
+        config = ConfigParser()
+        config.read("config.cfg")
+        date_format = config.get("datetime", "date_format")
+
         if date_published is not None and bool(datetime.strptime(date_published, date_format)) is False:
             raise ValueError("The submission published date must be in the format 'YYYY-MM-DD'.")
 
@@ -249,6 +262,10 @@ class Submission(Base):
         str
             The validated date_paid
         """
+
+        config = ConfigParser()
+        config.read("config.cfg")
+        date_format = config.get("datetime", "date_format")
 
         if date_paid is not None and bool(datetime.strptime(date_paid, date_format)) is False:
             raise ValueError("The submission paid date must be in the format 'YYYY-MM-DD'.")

@@ -38,12 +38,20 @@ class CharacterStory(Base):
 
     __tablename__ = 'characters_stories'
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    character_id: Mapped[int] = mapped_column(Integer, ForeignKey('characters.id'), primary_key=True)
-    story_id: Mapped[int] = mapped_column(Integer, ForeignKey('stories.id'), primary_key=True)
+    character_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('characters.id'), primary_key=True
+    )
+    story_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('stories.id'), primary_key=True
+    )
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
-    character: Mapped["Character"] = relationship("Character", back_populates="stories", lazy="joined")
-    story: Mapped["Story"] = relationship("Story", back_populates="characters", lazy="joined")
+    character: Mapped["Character"] = relationship(
+        "Character", back_populates="stories", lazy="joined"
+    )
+    story: Mapped["Story"] = relationship(
+        "Story", back_populates="characters", lazy="joined"
+    )
 
     def __repr__(self):
         """Returns a string representation of the relationship.

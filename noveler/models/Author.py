@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 from sqlalchemy import Integer, ForeignKey, Boolean, String, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates, declarative_base
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from noveler.models import User, AuthorStory, Base
 
 

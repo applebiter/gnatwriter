@@ -1,4 +1,5 @@
 from noveler.application import Noveler
+from configparser import ConfigParser
 
 """Example database connection strings
 
@@ -13,7 +14,11 @@ here using the sqlite3 driver, which is included in the Python standard library.
 defaults to False. If set to True, it will print all SQL commands to the console. This is useful for debugging.
 """
 
-noveler = Noveler("sqlite:///noveler/noveler.db")
+config = ConfigParser()
+config.read("config.cfg")
+noveler_db = config.get("sqlite-connection-data", "database")
+print(f"Connecting to database: {noveler_db}...")
+noveler = Noveler(f"sqlite:///noveler/{noveler_db}", echo=False)
 
 if noveler("story").has_stories():
     print("Stories found:")

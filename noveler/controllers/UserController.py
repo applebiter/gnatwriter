@@ -1,12 +1,37 @@
 import uuid
 from datetime import datetime
 from typing import Type
+import bcrypt
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-
 import noveler
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Activity
+
+
+def hash_password(password: str) -> str:
+    """Hash a password, return hashed password"""
+
+    if password == '':
+        raise ValueError('The password cannot be empty.')
+
+    if len(password) < 8:
+        raise ValueError('The password must be at least 8 characters.')
+
+    if len(password) > 24:
+        raise ValueError('The password cannot be more than 24 characters.')
+
+    return bcrypt.hashpw(
+        password.encode('utf8'), bcrypt.gensalt(rounds=12)
+    ).decode('utf8')
+
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    """Verify a password, return true if verified, false if not"""
+
+    return bcrypt.checkpw(
+        password.encode('utf8'), hashed_password.encode('utf8')
+    )
 
 
 class UserController(BaseController):
@@ -86,22 +111,32 @@ class UserController(BaseController):
         with self._session as session:
 
             try:
-                username_exists = session.query(User).filter(User.username == username).first()
+
+                username_exists = session.query(User).filter(
+                    User.username == username
+                ).first()
 
                 if username_exists:
                     raise Exception('That username already exists.')
 
-                email_exists = session.query(User).filter(User.email == email).first()
+                email_exists = session.query(User).filter(
+                    User.email == email
+                ).first()
 
                 if email_exists:
                     raise Exception('That email already exists.')
 
                 uuid4 = str(uuid.uuid4())
-                uuid_exists = session.query(User).filter(User.uuid == uuid4).first()
+                uuid_exists = session.query(User).filter(
+                    User.uuid == uuid4
+                ).first()
 
                 while uuid_exists:
+
                     uuid4 = str(uuid.uuid4())
-                    uuid_exists = session.query(User).filter(User.uuid == uuid4).first()
+                    uuid_exists = session.query(User).filter(
+                        User.uuid == uuid4
+                    ).first()
 
                 password = noveler.controllers.hash_password(password)
                 created = datetime.now()

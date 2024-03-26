@@ -1,16 +1,11 @@
 import uuid
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, Optional, Union, List
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Assistance, Activity
 from noveler.ollamasubsystem import OllamaClient
-
-noveler_chat_model = "gemma:2b"
-noveler_image_model = "llava:7b"
-noveler_generate_model = "llama2:7b"
-ollama_model_memory_duration = "0"  # How long to keep the model in memory
-ollama_context_window = 4096  # The number of tokens to use as context for the model
 
 
 class GenerativeController(BaseController):
@@ -30,7 +25,7 @@ class GenerativeController(BaseController):
         The Ollama client to be used when making requests.
     _chat_model : str
         The model to be used when generating chat messages.
-    _image_model : str
+    _multimodal_model : str
         The model to be used when describing images.
     _generative_model : str
         The model to be used when generating text.
@@ -84,13 +79,21 @@ class GenerativeController(BaseController):
                 Assistance.session_uuid == uuid4
             ).first()
 
+        config = ConfigParser()
+        config.read("config.cfg")
+        chat_model = config.get("ollama", "chat_model")
+        generative_model = config.get("ollama", "generative_model")
+        multimodal_model = config.get("ollama", "multimodal_model")
+        context_window = config.getint("ollama", "context_window")
+        model_memory_duration = config.get("ollama", "model_memory_duration")
+
         self._session_uuid = uuid4
         self._client = OllamaClient()
-        self._chat_model = noveler_chat_model
-        self._image_model = noveler_image_model
-        self._generative_model = noveler_generate_model
-        self._num_ctx = ollama_context_window
-        self._keep_alive = ollama_model_memory_duration
+        self._chat_model = chat_model
+        self._multimodal_model = multimodal_model
+        self._generative_model = generative_model
+        self._num_ctx = context_window
+        self._keep_alive = model_memory_duration
         self._templates = {
             "codellama:13b": """[INST] <<SYS>>{{ .System }}<</SYS>>
 
@@ -235,10 +238,10 @@ ASSISTANT:
             try:
 
                 response = self._client.generate(
-                    model=self._image_model,
+                    model=self._multimodal_model,
                     prompt=prompt,
                     system=priming,
-                    template=self._templates[self._image_model],
+                    template=self._templates[self._multimodal_model],
                     images=encoded,
                     options=options,
                     keep_alive=keep_alive
@@ -248,7 +251,7 @@ ASSISTANT:
                     user_id=self._owner.id,
                     session_uuid=session_uuid,
                     assistant=self._name,
-                    model=self._image_model,
+                    model=self._multimodal_model,
                     priming=priming,
                     prompt=prompt,
                     temperature=temperature,
@@ -339,7 +342,7 @@ ASSISTANT:
                     model=self._generative_model,
                     prompt=prompt,
                     system=priming,
-                    template=self._templates[self._image_model],
+                    template=self._templates[self._generative_model],
                     options=options,
                     keep_alive=keep_alive
                 )
@@ -348,7 +351,7 @@ ASSISTANT:
                     user_id=self._owner.id,
                     session_uuid=session_uuid,
                     assistant=self._name,
-                    model=self._image_model,
+                    model=self._generative_model,
                     priming=priming,
                     prompt=prompt,
                     temperature=temperature,

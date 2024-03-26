@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import Integer, ForeignKey, String, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates, declarative_base
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from noveler.models import User, Character, Base
 
 
@@ -45,14 +45,20 @@ class CharacterTrait(Base):
     __tablename__ = 'characters_traits'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    character_id: Mapped[int] = mapped_column(Integer, ForeignKey('characters.id'))
+    character_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('characters.id')
+    )
     position: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     magnitude: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    modified: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()), onupdate=str(datetime.now()))
+    modified: Mapped[str] = mapped_column(
+        DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
+    )
     user: Mapped["User"] = relationship("User")
-    character: Mapped["Character"] = relationship("Character", back_populates="traits", lazy="joined")
+    character: Mapped["Character"] = relationship(
+        "Character", back_populates="traits", lazy="joined"
+    )
 
     def __repr__(self):
         """Returns a string representation of the trait.

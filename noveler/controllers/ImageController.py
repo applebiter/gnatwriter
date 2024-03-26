@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import Type
-
 from sqlalchemy.orm import Session
-
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Image, Activity, ImageLocation
 

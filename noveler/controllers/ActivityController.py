@@ -1,4 +1,4 @@
-from typing import Type, Any
+from typing import Type
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from noveler.controllers import BaseController

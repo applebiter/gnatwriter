@@ -1,9 +1,7 @@
 from datetime import datetime
 from typing import Type
-
-from sqlalchemy import or_, func
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
-
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Story, Author, AuthorStory, Chapter, Activity, Character, CharacterStory, Link, \
     LinkStory, Note, NoteStory

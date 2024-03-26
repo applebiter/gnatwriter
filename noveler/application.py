@@ -9,11 +9,8 @@ from noveler.controllers import ActivityController, AuthorController, Bibliograp
     GenerativeController
 from noveler.models import User, Base
 
-datetime_format = "%Y-%m-%d %H:%M:%S.%f"
-date_format = "%Y-%m-%d"
 
-
-def hash_password(password):
+def hash_password(password: str) -> str:
     """Hash a password, return hashed password"""
 
     if password == '':
@@ -25,13 +22,17 @@ def hash_password(password):
     if len(password) > 24:
         raise ValueError('The password cannot be more than 24 characters.')
 
-    return bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt(rounds=12)).decode('utf8')
+    return bcrypt.hashpw(
+        password.encode('utf8'), bcrypt.gensalt(rounds=12)
+    ).decode('utf8')
 
 
-def verify_password(password, hashed_password):
+def verify_password(password: str, hashed_password: str) -> bool:
     """Verify a password, return true if verified, false if not"""
 
-    return bcrypt.checkpw(password.encode('utf8'), hashed_password.encode('utf8'))
+    return bcrypt.checkpw(
+        password.encode('utf8'), hashed_password.encode('utf8')
+    )
 
 
 class Noveler:

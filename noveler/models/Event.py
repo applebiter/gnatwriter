@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 from sqlalchemy import Integer, ForeignKey, String, DateTime, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates, declarative_base
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from noveler.models import User, EventLink, CharacterEvent, EventNote, EventLocation, Base
 
 
@@ -66,7 +66,9 @@ class Event(Base):
     modified: Mapped[str] = mapped_column(
         DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
     )
-    user: Mapped["User"] = relationship("User", back_populates="events")
+    user: Mapped["User"] = relationship(
+        "User", back_populates="events"
+    )
     links: Mapped[Optional[List["EventLink"]]] = relationship(
         "EventLink", back_populates="event", lazy="joined",
         cascade="all, delete, delete-orphan")

@@ -1,4 +1,5 @@
 import uuid
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, Optional, Union
 from ollama import Message
@@ -6,12 +7,6 @@ from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Assistance, Activity
 from noveler.ollamasubsystem import OllamaClient
-
-noveler_chat_model = "gemma:2b"
-noveler_image_model = "llava:7b"
-noveler_generate_model = "llama2:7b"
-ollama_model_memory_duration = "1h"  # How long to keep the model in memory
-ollama_context_window = 4096  # The number of tokens to use as context for the model
 
 
 class ChatController(BaseController):
@@ -65,13 +60,21 @@ class ChatController(BaseController):
                 Assistance.session_uuid == uuid4
             ).first()
 
+        config = ConfigParser()
+        config.read("config.cfg")
+        chat_model = config.get("ollama", "chat_model")
+        generative_model = config.get("ollama", "generative_model")
+        multimodal_model = config.get("ollama", "multimodal_model")
+        context_window = config.getint("ollama", "context_window")
+        model_memory_duration = config.get("ollama", "model_memory_duration")
+
         self._session_uuid = uuid4
         self._client = OllamaClient()
-        self._chat_model = noveler_chat_model
-        self._image_model = noveler_image_model
-        self._generative_model = noveler_generate_model
-        self._num_ctx = ollama_context_window
-        self._keep_alive = ollama_model_memory_duration
+        self._chat_model = chat_model
+        self._multimodal_model = multimodal_model
+        self._generative_model = generative_model
+        self._num_ctx = context_window
+        self._keep_alive = model_memory_duration
         self._templates = {
             "codellama:13b": """[INST] <<SYS>>{{ .System }}<</SYS>>
 

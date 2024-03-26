@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 from sqlalchemy import Integer, String, Boolean, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates, declarative_base
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from noveler.models import Activity, Assistance, Author, Character, Event, Image, Link, Location, Note, Story, \
     Submission, Base
 from validators import email as email_validator

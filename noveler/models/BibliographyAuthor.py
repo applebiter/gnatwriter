@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import Integer, ForeignKey, String, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates, declarative_base
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from noveler.models import Bibliography, User, Base
 
 

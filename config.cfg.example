@@ -1,0 +1,27 @@
+[mysql-connection-data]
+host = localhost
+port = 3306
+user = root
+password = password
+database = noveler
+
+[postgresql-connection-data]
+host = localhost
+port = 5432
+user = postgres
+password = password
+database = noveler
+
+[sqlite-connection-data]
+database = noveler.db
+
+[datetime]
+datetime_format = "%Y-%m-%d %H:%M:%S.%f"
+date_format = "%Y-%m-%d"
+
+[ollama]
+chat_model = "phi:2.7b"
+generative_model = "llama2:7b"
+multimodal_model = "llava:7b"
+model_memory_duration = 10m
+context_window = 4096
