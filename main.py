@@ -28,4 +28,6 @@ noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{data
 print("Connecting to the ollama server on a remote host on the home network...")
 client = Client()
 response = client.list()
-print(response)
+if response.get("models"):
+    for model in response.get("models"):
+        print(model.get("name"))
