@@ -1,6 +1,17 @@
+import time
 from noveler.application import Noveler
-from noveler.ollama import Client
 from configparser import ConfigParser
+from ollama import Client
+import threading
+
+
+def print_cube(num):
+    print("Cube: {}".format(num * num * num))
+
+
+def print_square(num):
+    print("Square: {}".format(num * num))
+
 
 """Example database connection strings
 
@@ -15,19 +26,38 @@ here using the sqlite3 driver, which is included in the Python standard library.
 defaults to False. If set to True, it will print all SQL commands to the console. This is useful for debugging.
 """
 
-config = ConfigParser()
-config.read("config.cfg")
-user = config.get("mysql", "user")
-password = config.get("mysql", "password")
-host = config.get("mysql", "host")
-port = config.get("mysql", "port")
-database = config.get("mysql", "database")
-print(f"Connecting to database: {database}...")
-noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")
+# config = ConfigParser()
+# config.read("config.cfg")
+# user = config.get("mysql", "user")
+# password = config.get("mysql", "password")
+# host = config.get("mysql", "host")
+# port = config.get("mysql", "port")
+# database = config.get("mysql", "database")
+# print(f"Connecting to database: {database}...")
+# noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")
 
-print("Connecting to the ollama server on a remote host on the home network...")
-client = Client()
-response = client.list()
-if response.get("models"):
-    for model in response.get("models"):
-        print(model.get("name"))
+
+def chat():
+    message = {'role': 'user', 'content': 'Why is the sky blue?'}
+    client = Client(host="http://violet:11434")
+    resp = client.chat(model='llama2:7b', messages=[message])
+    print(resp)
+    
+
+t_chat = threading.Thread(target=chat)
+t_cube = threading.Thread(target=print_cube, args=(10,))
+t_square = threading.Thread(target=print_square, args=(10,))
+
+t_chat.start()
+print("Made remote call to ollama...")
+t_cube.start()
+print("Ran the cube function...")
+t_square.start()
+print("Ran the square function...")
+print("Probably still waiting on that chat response...")
+
+t_chat.join()
+t_cube.join()
+t_square.join()
+
+print("Now all threads are done.")

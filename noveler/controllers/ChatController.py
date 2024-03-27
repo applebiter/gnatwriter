@@ -5,7 +5,6 @@ from typing import Type, Optional, Union
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Assistance, Activity, OllamaTemplate
-from noveler.ollama import Client, OllamaMessage
 
 
 class ChatController(BaseController):
@@ -66,7 +65,7 @@ class ChatController(BaseController):
         config.read("config.cfg")
 
         self._session_uuid = uuid4
-        self._client = Client()
+        # self._client = Client()
         self._chat_model = config.get("ollama", "chat_model")
         self._multimodal_model = config.get("ollama", "multimodal_model")
         self._generative_model = config.get("ollama", "generative_model")
