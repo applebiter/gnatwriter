@@ -44,7 +44,7 @@ messages = [{'role': 'user', 'content': 'Why is the sky blue?'}]
 def chat():
     """Example of how to use the chat method of the ChatController class.
 
-    response = noveler("chat-assistant").chat('model name', [
+    response = noveler("chat-assistant").chat('llama2', [
         {'role': 'user', 'content': 'Why is the sky blue?'},
         {'role': 'assistant', 'content': 'Because the atmosphere scatters sunlight.'},
     ])
