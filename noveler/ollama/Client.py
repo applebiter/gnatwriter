@@ -2,8 +2,6 @@ from configparser import ConfigParser
 from typing import Optional, List, Union
 import requests
 
-from noveler.models import OllamaMessage
-
 
 class Client:
     """Client is a wrapper for the Ollama REST API.
@@ -124,7 +122,7 @@ class Client:
             return e.response.json()
 
     def chat(
-        self, model: str, messages: List[OllamaMessage],
+        self, model: str, messages: List[dict],
         options: Optional[dict] = None, template: str = None,
         keep_alive: Optional[Union[float, str]] = "5m"
     ) -> dict:

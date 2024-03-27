@@ -119,7 +119,7 @@ class ChatController(BaseController):
             priming = [template for template in self._templates if template.model == self._chat_model][0].priming
 
         session_uuid = self._session_uuid if not session_uuid else session_uuid
-        messages = [OllamaMessage(role="system", content=priming)]
+        messages = [OllamaMessage(role="system", content=priming).serialize()]
 
         with self._session as session:
 
@@ -129,10 +129,10 @@ class ChatController(BaseController):
 
             if assistances:
                 for assistance in assistances:
-                    messages.append(OllamaMessage(role="user", content=assistance.prompt))
-                    messages.append(OllamaMessage(role="assistant", content=assistance.content))
+                    messages.append(OllamaMessage(role="user", content=assistance.prompt).serialize())
+                    messages.append(OllamaMessage(role="assistant", content=assistance.content).serialize())
 
-        messages.append(OllamaMessage(role="user", content=prompt))
+        messages.append(OllamaMessage(role="user", content=prompt).serialize())
 
         if not options:
             options = {

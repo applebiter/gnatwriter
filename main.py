@@ -1,4 +1,5 @@
 from noveler.application import Noveler
+from noveler.ollama import Client
 from configparser import ConfigParser
 
 """Example database connection strings
@@ -23,3 +24,8 @@ port = config.get("mysql", "port")
 database = config.get("mysql", "database")
 print(f"Connecting to database: {database}...")
 noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")
+
+print("Connecting to the ollama server on a remote host on the home network...")
+client = Client()
+response = client.list()
+print(response)
