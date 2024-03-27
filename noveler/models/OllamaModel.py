@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, validates
 from noveler.models import Base
 
 
-class OllamaTemplate(Base):
+class OllamaModel(Base):
     """OllamaTemplate stores the name of the model, a description of the model, the template, and an example of the
     model's use.
     """
@@ -41,7 +41,7 @@ class OllamaTemplate(Base):
             "modified": str(self.modified),
         }
 
-    def unserialize(self, data: dict) -> "OllamaTemplate":
+    def unserialize(self, data: dict) -> "OllamaModel":
         self.title = data.get("title", self.title)
         self.model = data.get("model", self.model)
         self.description = data.get("description", self.description)

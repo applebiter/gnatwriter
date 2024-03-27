@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Type, Optional, Union, List
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
-from noveler.models import User, Assistance, Activity, OllamaTemplate
+from noveler.models import User, Assistance, Activity, OllamaModel
 
 
 class GenerativeController(BaseController):
@@ -94,7 +94,7 @@ class GenerativeController(BaseController):
         self._keep_alive = config.get("ollama", "model_memory_duration")
 
         with self._session as session:
-            if session.query(OllamaTemplate).all():
+            if session.query(OllamaModel).all():
                 for template in self._templates:
                     self._templates[template.model] = template
 

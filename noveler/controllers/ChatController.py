@@ -2,14 +2,16 @@ import uuid
 from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, Optional, Union
+
+from ollama import Message, Client
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
-from noveler.models import User, Assistance, Activity, OllamaTemplate
+from noveler.models import User, Assistance, Activity, OllamaModel
 
 
 class ChatController(BaseController):
 
-    _templates = []
+    _templates = None
 
     """Chat Controller
 
@@ -64,8 +66,10 @@ class ChatController(BaseController):
         config = ConfigParser()
         config.read("config.cfg")
 
+        ollama_host = config.read("ollama", "host")
+        ollama_port = config.read("ollama", "port")
+        self._client = Client(host=f"http://{ollama_host}:{ollama_port}")
         self._session_uuid = uuid4
-        # self._client = Client()
         self._chat_model = config.get("ollama", "chat_model")
         self._multimodal_model = config.get("ollama", "multimodal_model")
         self._generative_model = config.get("ollama", "generative_model")
@@ -73,7 +77,7 @@ class ChatController(BaseController):
         self._keep_alive = config.get("ollama", "model_memory_duration")
 
         with self._session as session:
-            self._templates = session.query(OllamaTemplate).all()
+            self._templates = session.query(OllamaModel).all()
 
     def chat(
             self,
@@ -117,8 +121,8 @@ class ChatController(BaseController):
         if not priming:
             priming = [template for template in self._templates if template.model == self._chat_model][0].priming
 
+        messages = [Message(role="system", content=priming)]
         session_uuid = self._session_uuid if not session_uuid else session_uuid
-        messages = [OllamaMessage(role="system", content=priming).serialize()]
 
         with self._session as session:
 
@@ -128,10 +132,10 @@ class ChatController(BaseController):
 
             if assistances:
                 for assistance in assistances:
-                    messages.append(OllamaMessage(role="user", content=assistance.prompt).serialize())
-                    messages.append(OllamaMessage(role="assistant", content=assistance.content).serialize())
+                    messages.append(Message(role="user", content=assistance.prompt))
+                    messages.append(Message(role="assistant", content=assistance.content))
 
-        messages.append(OllamaMessage(role="user", content=prompt).serialize())
+        messages.append(Message(role="user", content=prompt))
 
         if not options:
             options = {
@@ -145,7 +149,6 @@ class ChatController(BaseController):
         if not options.get("num_ctx"):
             options["num_ctx"] = self._num_ctx
 
-        template = [template for template in self._templates if template.model == self._chat_model][0].template
         keep_alive = self._keep_alive if not keep_alive else keep_alive
 
         with self._session as session:
@@ -155,8 +158,9 @@ class ChatController(BaseController):
                 response = self._client.chat(
                     model=self._chat_model,
                     messages=messages,
+                    stream=False,
+                    format="",
                     options=options,
-                    template=template,
                     keep_alive=keep_alive
                 )
 
