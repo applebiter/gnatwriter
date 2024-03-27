@@ -1,11 +1,12 @@
+import base64
 import uuid
 from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, Optional, Union, List
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
-from noveler.models import User, Assistance, Activity
-from noveler.ollamasubsystem import OllamaClient
+from noveler.models import User, Assistance, Activity, OllamaTemplate
+from noveler.ollama import Client
 
 
 class GenerativeController(BaseController):
@@ -62,6 +63,9 @@ class GenerativeController(BaseController):
     get_by_session_uuid(session_uuid: str)
         Get all Assistance messages by session UUID.
     """
+
+    _templates = {}
+
     def __init__(self, session: Session, owner: Type[User]):
 
         super().__init__(session, owner)
@@ -81,98 +85,19 @@ class GenerativeController(BaseController):
 
         config = ConfigParser()
         config.read("config.cfg")
-        chat_model = config.get("ollama", "chat_model")
-        generative_model = config.get("ollama", "generative_model")
-        multimodal_model = config.get("ollama", "multimodal_model")
-        context_window = config.getint("ollama", "context_window")
-        model_memory_duration = config.get("ollama", "model_memory_duration")
 
         self._session_uuid = uuid4
-        self._client = OllamaClient()
-        self._chat_model = chat_model
-        self._multimodal_model = multimodal_model
-        self._generative_model = generative_model
-        self._num_ctx = context_window
-        self._keep_alive = model_memory_duration
-        self._templates = {
-            "codellama:13b": """[INST] <<SYS>>{{ .System }}<</SYS>>
+        self._client = Client()
+        self._chat_model = config.get("ollama", "chat_model")
+        self._multimodal_model = config.get("ollama", "multimodal_model")
+        self._generative_model = config.get("ollama", "generative_model")
+        self._num_ctx = config.getint("ollama", "context_window")
+        self._keep_alive = config.get("ollama", "model_memory_duration")
 
-{{ .Prompt }} [/INST]
-            """,
-            "codellama:7b": """[INST] <<SYS>>{{ .System }}<</SYS>>
-
-{{ .Prompt }} [/INST]
-            """,
-            "dolphin-phi:2.7b": """<|im_start|>system
-{{ .System }}<|im_end|>
-<|im_start|>user
-{{ .Prompt }}<|im_end|>
-<|im_start|>assistant
-            """,
-            "gemma:2b": """<start_of_turn>user
-{{ if .System }}{{ .System }} {{ end }}{{ .Prompt }}<end_of_turn>
-<start_of_turn>model
-{{ .Response }}<end_of_turn>
-            """,
-            "llama2:13b": """[INST] <<SYS>>{{ .System }}<</SYS>>
-
-{{ .Prompt }} [/INST]
-            """,
-            "llama2:7b": """[INST] <<SYS>>{{ .System }}<</SYS>>
-
-{{ .Prompt }} [/INST]
-            """,
-            "llama2-uncensored:7b": """[INST] <<SYS>>{{ .System }}<</SYS>>
-
-{{ .Prompt }} [/INST]
-            """,
-            "llava:13b": """[INST] {{ if .System }}{{ .System }} {{ end }}{{ .Prompt }} [/INST]
-            """,
-            "llava:7b": """[INST] {{ if .System }}{{ .System }} {{ end }}{{ .Prompt }} [/INST]
-            """,
-            "mistral:7b": """[INST] {{ .System }} {{ .Prompt }} [/INST]
-            """,
-            "orca2:13b": """<|im_start|>system
-{{ .System }}<|im_end|>
-<|im_start|>user
-{{ .Prompt }}<|im_end|>
-<|im_start|>assistant
-            """,
-            "orca2:7b": """<|im_start|>system
-{{ .System }}<|im_end|>
-<|im_start|>user
-{{ .Prompt }}<|im_end|>
-<|im_start|>assistant
-            """,
-            "phi:2.7b": """{{ if .System }}System: {{ .System }}{{ end }}
-User: {{ .Prompt }}
-Assistant:
-            """,
-            "wizard-vicuna-uncensored:13b": """{{ .System }}
-USER: {{ .Prompt }}
-ASSISTANT:
-            """,
-            "wizardcoder:13b-python": """{{ .System }}
-
-### Instruction:
-{{ .Prompt }}
-
-### Response:
-            """,
-            "wizardcoder:7b-python": """{{ .System }}
-
-### Instruction:
-{{ .Prompt }}
-
-### Response:
-            """,
-            "writer:7b": """<|im_start|>system
-{system_message}<|im_end|>
-<|im_start|>user
-{prompt}<|im_end|>
-<|im_start|>assistant
-            """
-        }
+        with self._session as session:
+            if session.query(OllamaTemplate).all():
+                for template in self._templates:
+                    self._templates[template.model] = template
 
     def describe_image(
             self,
@@ -212,10 +137,10 @@ ASSISTANT:
 
         for image in images:
             with open(image, "rb") as file:
-                encoded.append(file.read())
+                encoded.append(base64.b64encode(file.read()).decode())
 
         if not priming:
-            priming = """Image Assistant is ready to describe the image."""
+            priming = [template for template in self._templates if template.model == self._chat_model][0].priming
 
         session_uuid = self._session_uuid if not session_uuid else session_uuid
 
@@ -237,15 +162,16 @@ ASSISTANT:
 
             try:
 
+                template = self._templates.get(self._multimodal_model).template
+
                 response = self._client.generate(
-                    model=self._multimodal_model,
-                    prompt=prompt,
-                    system=priming,
-                    template=self._templates[self._multimodal_model],
-                    images=encoded,
-                    options=options,
+                    model=self._multimodal_model, prompt=prompt, images=encoded,
+                    options=options, system=priming,
+                    template=template,
                     keep_alive=keep_alive
                 )
+
+                content = response["response"] if response.get("response") else None
 
                 assistance = Assistance(
                     user_id=self._owner.id,
@@ -256,13 +182,12 @@ ASSISTANT:
                     prompt=prompt,
                     temperature=temperature,
                     seed=seed,
-                    content=response["response"] if response.get("response") else None,
+                    content=content,
                     done=response["done"],
                     total_duration=response["total_duration"] if response.get("total_duration") else None,
                     load_duration=response["load_duration"] if response.get("load_duration") else None,
                     prompt_eval_count=response["prompt_eval_count"] if response.get("prompt_eval_count") else None,
-                    prompt_eval_duration=response["prompt_eval_duration"] if response.get(
-                        "prompt_eval_duration") else None,
+                    prompt_eval_duration=response["prompt_eval_duration"] if response.get("prompt_eval_duration") else None,
                     eval_count=response["eval_count"] if response.get("eval_count") else None,
                     eval_duration=response["eval_duration"] if response.get("eval_duration") else None,
                     created=datetime.now()

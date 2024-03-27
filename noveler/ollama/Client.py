@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from typing import Optional, List, Union
 import requests
 
@@ -47,14 +48,21 @@ class Client:
     _host: str
     _port: int
 
-    def __init__(self, host: str = "localhost", port: int = 11434):
+    def __init__(self):
         """Initialize the Client with the provided URL."""
+
+        config = ConfigParser()
+        config.read("config.cfg")
+
+        host = config.get("ollama", "host")
+        port = config.getint("ollama", "port")
+
         self._host = host
         self._port = port
 
     def generate(
         self, model: str, prompt: str,
-        images: Optional[List[OllamaMessage]] = None,
+        images: Optional[List[str]] = None,
         options: Optional[dict] = None, system: Optional[str] = None,
         template: Optional[str] = None, context: Optional[str] = None,
         raw: Optional[bool] = False,
@@ -92,23 +100,28 @@ class Client:
             A dictionary containing the completion.
         """
 
-        data = {
-            "model": model,
-            "prompt": prompt,
-            "images": images,
-            "format": "json",
-            "options": options,
-            "system": system,
-            "template": template,
-            "context": context,
-            "stream": False,
-            "raw": raw,
-            "keep_alive": keep_alive
-        }
-        api_url = f"http://{self._host}:{self._port}/api/generate"
-        response = requests.post(api_url, data=data)
+        try:
 
-        return response.json()
+            data = {
+                "model": model,
+                "prompt": prompt,
+                "images": images,
+                "format": "json",
+                "options": options,
+                "system": system,
+                "template": template,
+                "context": context,
+                "stream": False,
+                "raw": raw,
+                "keep_alive": keep_alive
+            }
+            api_url = f"http://{self._host}:{self._port}/api/generate"
+            response = requests.post(api_url, data=data)
+
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()
 
     def chat(
         self, model: str, messages: List[OllamaMessage],
@@ -136,22 +149,24 @@ class Client:
             A dictionary containing the chat completion.
         """
 
-        if options is None:
-            options = {}
+        try:
 
-        data = {
-            "model": model,
-            "messages": messages,
-            "format": "json",
-            "options": options if options is not None else {},
-            "template": template,
-            "stream": False,
-            "keep_alive": keep_alive
-        }
-        api_url = f"http://{self._host}:{self._port}/api/chat"
-        response = requests.post(api_url, data=data)
+            data = {
+                "model": model,
+                "messages": messages,
+                "format": "json",
+                "options": options if options is not None else {},
+                "template": template,
+                "stream": False,
+                "keep_alive": keep_alive
+            }
+            api_url = f"http://{self._host}:{self._port}/api/chat"
+            response = requests.post(api_url, data=data)
 
-        return response.json()
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()
 
     def create(
         self, name: str, modelfile: Optional[str] = None,
@@ -174,16 +189,21 @@ class Client:
             A dictionary containing the model's information.
         """
 
-        data = {
-            "name": name,
-            "modelfile": modelfile,
-            "stream": False,
-            "path": path
-        }
-        api_url = f"http://{self._host}:{self._port}/api/create"
-        response = requests.post(api_url, data=data)
+        try:
 
-        return response.json()
+            data = {
+                "name": name,
+                "modelfile": modelfile,
+                "stream": False,
+                "path": path
+            }
+            api_url = f"http://{self._host}:{self._port}/api/create"
+            response = requests.post(api_url, data=data)
+
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()
 
     def list(self) -> dict:
         """List local models.
@@ -194,10 +214,15 @@ class Client:
             A dictionary containing the local models.
         """
 
-        api_url = f"http://{self._host}:{self._port}/api/tags"
-        response = requests.get(api_url)
+        try:
 
-        return response.json()
+            api_url = f"http://{self._host}:{self._port}/api/tags"
+            response = requests.get(api_url)
+
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()
 
     def show(self, name: str) -> dict:
         """Show a model's information.
@@ -213,10 +238,14 @@ class Client:
             A dictionary containing the model's information.
         """
 
-        api_url = f"http://{self._host}:{self._port}/api/show"
-        response = requests.post(api_url, data={"name": name})
+        try:
+            api_url = f"http://{self._host}:{self._port}/api/show"
+            response = requests.post(api_url, data={"name": name})
 
-        return response.json()
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()
 
     def copy(self, source: str, destination: str) -> dict:
         """Copy a model.
@@ -234,14 +263,18 @@ class Client:
             A dictionary containing the new model's information.
         """
 
-        data = {
-            "source": source,
-            "destination": destination
-        }
-        api_url = f"http://{self._host}:{self._port}/api/copy"
-        response = requests.post(api_url, data=data)
+        try:
+            data = {
+                "source": source,
+                "destination": destination
+            }
+            api_url = f"http://{self._host}:{self._port}/api/copy"
+            response = requests.post(api_url, data=data)
 
-        return response.json()
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()
 
     def delete(self, name: str) -> dict:
         """Delete a model.
@@ -257,13 +290,17 @@ class Client:
             A dictionary containing the model's information.
         """
 
-        params = {
-            "name": name
-        }
-        api_url = f"http://{self._host}:{self._port}/api/delete"
-        response = requests.delete(api_url, params=params)
+        try:
+            params = {
+                "name": name
+            }
+            api_url = f"http://{self._host}:{self._port}/api/delete"
+            response = requests.delete(api_url, params=params)
 
-        return response.json()
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()
 
     def pull(self, name: str, insecure: Optional[bool] = False) -> dict:
         """Pull a model.
@@ -281,15 +318,19 @@ class Client:
             A dictionary containing the model's information.
         """
 
-        data = {
-            "name": name,
-            "insecure": insecure,
-            "stream": False
-        }
-        api_url = f"http://{self._host}:{self._port}/api/pull"
-        response = requests.post(api_url, data=data)
+        try:
+            data = {
+                "name": name,
+                "insecure": insecure,
+                "stream": False
+            }
+            api_url = f"http://{self._host}:{self._port}/api/pull"
+            response = requests.post(api_url, data=data)
 
-        return response.json()
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()
 
     def push(self, name: str, insecure: Optional[str] = False) -> dict:
         """Push a model
@@ -307,15 +348,19 @@ class Client:
             A dictionary containing the model's information.
         """
 
-        data = {
-            "name": name,
-            "insecure": insecure,
-            "stream": False
-        }
-        api_url = f"http://{self._host}:{self._port}/api/push"
-        response = requests.post(api_url, data=data)
+        try:
+            data = {
+                "name": name,
+                "insecure": insecure,
+                "stream": False
+            }
+            api_url = f"http://{self._host}:{self._port}/api/push"
+            response = requests.post(api_url, data=data)
 
-        return response.json()
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()
 
     def embeddings(
         self, model: str, prompt: str, options: dict,
@@ -340,16 +385,20 @@ class Client:
             A dictionary containing the embeddings.
         """
 
-        if options is None:
-            options = {}
+        try:
+            if options is None:
+                options = {}
 
-        data = {
-            "model": model,
-            "prompt": prompt,
-            "options": options if options is not None else {},
-            "keep_alive": keep_alive
-        }
-        api_url = f"http://{self._host}:{self._port}/api/embeddings"
-        response = requests.post(api_url, data=data)
+            data = {
+                "model": model,
+                "prompt": prompt,
+                "options": options if options is not None else {},
+                "keep_alive": keep_alive
+            }
+            api_url = f"http://{self._host}:{self._port}/api/embeddings"
+            response = requests.post(api_url, data=data)
 
-        return response.json()
+            return response.json()
+
+        except requests.exceptions.HTTPError as e:
+            return e.response.json()

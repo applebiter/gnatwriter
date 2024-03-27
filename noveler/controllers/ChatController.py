@@ -6,10 +6,12 @@ from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Assistance, Activity, OllamaTemplate, OllamaMessage
 from noveler.ollama import Client
-from noveler.ollamasubsystem import OllamaClient
 
 
 class ChatController(BaseController):
+
+    _templates = []
+
     """Chat Controller
 
     The Chat Controller is a specialized controller that uses the Ollama API to
