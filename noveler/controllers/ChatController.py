@@ -4,8 +4,8 @@ from datetime import datetime
 from typing import Type, Optional, Union
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
-from noveler.models import User, Assistance, Activity, OllamaTemplate, OllamaMessage
-from noveler.ollama import Client
+from noveler.models import User, Assistance, Activity, OllamaTemplate
+from noveler.ollama import Client, OllamaMessage
 
 
 class ChatController(BaseController):
