@@ -33,6 +33,7 @@ from noveler.models.LocationNote import LocationNote
 from noveler.models.Note import Note
 from noveler.models.NoteScene import NoteScene
 from noveler.models.NoteStory import NoteStory
+from noveler.models.OllamaMessage import OllamaMessage
 from noveler.models.OllamaTemplate import OllamaTemplate
 from noveler.models.Scene import Scene
 from noveler.models.Story import Story

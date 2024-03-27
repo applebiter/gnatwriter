@@ -2,10 +2,10 @@ import uuid
 from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, Optional, Union
-from ollama import Message
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
-from noveler.models import User, Assistance, Activity
+from noveler.models import User, Assistance, Activity, OllamaTemplate, OllamaMessage
+from noveler.ollama import Client
 from noveler.ollamasubsystem import OllamaClient
 
 
@@ -25,7 +25,7 @@ class ChatController(BaseController):
         The Ollama client to be used when making the request.
     _chat_model : str
         The model to be used when making the request.
-    _image_model : str
+    _multimodal_model : str
         The image model to be used when making the request.
     _generative_model : str
         The generative model to be used when making the request.
@@ -62,98 +62,17 @@ class ChatController(BaseController):
 
         config = ConfigParser()
         config.read("config.cfg")
-        chat_model = config.get("ollama", "chat_model")
-        generative_model = config.get("ollama", "generative_model")
-        multimodal_model = config.get("ollama", "multimodal_model")
-        context_window = config.getint("ollama", "context_window")
-        model_memory_duration = config.get("ollama", "model_memory_duration")
 
         self._session_uuid = uuid4
-        self._client = OllamaClient()
-        self._chat_model = chat_model
-        self._multimodal_model = multimodal_model
-        self._generative_model = generative_model
-        self._num_ctx = context_window
-        self._keep_alive = model_memory_duration
-        self._templates = {
-            "codellama:13b": """[INST] <<SYS>>{{ .System }}<</SYS>>
+        self._client = Client()
+        self._chat_model = config.get("ollama", "chat_model")
+        self._multimodal_model = config.get("ollama", "multimodal_model")
+        self._generative_model = config.get("ollama", "generative_model")
+        self._num_ctx = config.getint("ollama", "context_window")
+        self._keep_alive = config.get("ollama", "model_memory_duration")
 
-{{ .Prompt }} [/INST]
-            """,
-            "codellama:7b": """[INST] <<SYS>>{{ .System }}<</SYS>>
-
-{{ .Prompt }} [/INST]
-            """,
-            "dolphin-phi:2.7b": """<|im_start|>system
-{{ .System }}<|im_end|>
-<|im_start|>user
-{{ .Prompt }}<|im_end|>
-<|im_start|>assistant
-            """,
-            "gemma:2b": """<start_of_turn>user
-{{ if .System }}{{ .System }} {{ end }}{{ .Prompt }}<end_of_turn>
-<start_of_turn>model
-{{ .Response }}<end_of_turn>
-            """,
-            "llama2:13b": """[INST] <<SYS>>{{ .System }}<</SYS>>
-
-{{ .Prompt }} [/INST]
-            """,
-            "llama2:7b": """[INST] <<SYS>>{{ .System }}<</SYS>>
-
-{{ .Prompt }} [/INST]
-            """,
-            "llama2-uncensored:7b": """[INST] <<SYS>>{{ .System }}<</SYS>>
-
-{{ .Prompt }} [/INST]
-            """,
-            "llava:13b": """[INST] {{ if .System }}{{ .System }} {{ end }}{{ .Prompt }} [/INST]
-            """,
-            "llava:7b": """[INST] {{ if .System }}{{ .System }} {{ end }}{{ .Prompt }} [/INST]
-            """,
-            "mistral:7b": """[INST] {{ .System }} {{ .Prompt }} [/INST]
-            """,
-            "orca2:13b": """<|im_start|>system
-{{ .System }}<|im_end|>
-<|im_start|>user
-{{ .Prompt }}<|im_end|>
-<|im_start|>assistant
-            """,
-            "orca2:7b": """<|im_start|>system
-{{ .System }}<|im_end|>
-<|im_start|>user
-{{ .Prompt }}<|im_end|>
-<|im_start|>assistant
-            """,
-            "phi:2.7b": """{{ if .System }}System: {{ .System }}{{ end }}
-User: {{ .Prompt }}
-Assistant:
-            """,
-            "wizard-vicuna-uncensored:13b": """{{ .System }}
-USER: {{ .Prompt }}
-ASSISTANT:
-            """,
-            "wizardcoder:13b-python": """{{ .System }}
-
-### Instruction:
-{{ .Prompt }}
-
-### Response:
-            """,
-            "wizardcoder:7b-python": """{{ .System }}
-
-### Instruction:
-{{ .Prompt }}
-
-### Response:
-            """,
-            "writer:7b": """<|im_start|>system
-{system_message}<|im_end|>
-<|im_start|>user
-{prompt}<|im_end|>
-<|im_start|>assistant
-            """
-        }
+        with self._session as session:
+            self._templates = session.query(OllamaTemplate).all()
 
     def chat(
             self,
@@ -195,16 +114,23 @@ ASSISTANT:
         """
 
         if not priming:
-            priming = """Chat Assistant is an expert in creative writing, style, 
-                and literary theory who can explain the fine points of plot and 
-                the sophisticated nuance of tone, and who also knows the human 
-                subject very well."""
+            priming = [template for template in self._templates if template.model == self._chat_model][0].priming
 
         session_uuid = self._session_uuid if not session_uuid else session_uuid
-        messages = [
-            Message(role="system", content=priming),
-            Message(role="user", content=prompt)
-        ]
+        messages = [OllamaMessage(role="system", content=priming)]
+
+        with self._session as session:
+
+            assistances = session.query(Assistance).filter_by(
+                session_uuid=session_uuid
+            ).order_by(Assistance.created).all()
+
+            if assistances:
+                for assistance in assistances:
+                    messages.append(OllamaMessage(role="user", content=assistance.prompt))
+                    messages.append(OllamaMessage(role="assistant", content=assistance.content))
+
+        messages.append(OllamaMessage(role="user", content=prompt))
 
         if not options:
             options = {
@@ -218,6 +144,7 @@ ASSISTANT:
         if not options.get("num_ctx"):
             options["num_ctx"] = self._num_ctx
 
+        template = [template for template in self._templates if template.model == self._chat_model][0].template
         keep_alive = self._keep_alive if not keep_alive else keep_alive
 
         with self._session as session:
@@ -228,6 +155,7 @@ ASSISTANT:
                     model=self._chat_model,
                     messages=messages,
                     options=options,
+                    template=template,
                     keep_alive=keep_alive
                 )
 

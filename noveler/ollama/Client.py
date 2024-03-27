@@ -1,6 +1,8 @@
 from typing import Optional, List, Union
 import requests
 
+from noveler.models import OllamaMessage
+
 
 class Client:
     """Client is a wrapper for the Ollama REST API.
@@ -51,7 +53,8 @@ class Client:
         self._port = port
 
     def generate(
-        self, model: str, prompt: str, images: Optional[List[str]] = None,
+        self, model: str, prompt: str,
+        images: Optional[List[OllamaMessage]] = None,
         options: Optional[dict] = None, system: Optional[str] = None,
         template: Optional[str] = None, context: Optional[str] = None,
         raw: Optional[bool] = False,
@@ -108,8 +111,9 @@ class Client:
         return response.json()
 
     def chat(
-        self, model: str, messages: List[dict], options: Optional[dict] = None,
-        template: str = None, keep_alive: Optional[Union[float, str]] = "5m"
+        self, model: str, messages: List[OllamaMessage],
+        options: Optional[dict] = None, template: str = None,
+        keep_alive: Optional[Union[float, str]] = "5m"
     ) -> dict:
         """Generate a chat completion.
 
