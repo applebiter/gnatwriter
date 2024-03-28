@@ -9,7 +9,7 @@ class OllamaModel(Base):
     model's use.
     """
 
-    __tablename__ = "ollama_templates"
+    __tablename__ = "ollama_models"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String(150), nullable=False)
     model: Mapped[str] = mapped_column(String(75), nullable=False)
