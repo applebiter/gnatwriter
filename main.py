@@ -1,8 +1,5 @@
 import threading
-import time
 from configparser import ConfigParser
-
-from ollama import Client
 from noveler.application import Noveler
 
 
@@ -36,18 +33,14 @@ password = config.get("mysql", "password")
 host = config.get("mysql", "host")
 port = config.get("mysql", "port")
 database = config.get("mysql", "database")
-noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")
-# ollama stuff
-messages = [{'role': 'user', 'content': 'Why is the sky blue?'}]
+# noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")
+noveler = Noveler(f"sqlite:///{database}.db")
 
 
-def chat():
+def chat(prompt):
     """Example of how to use the chat method of the ChatController class.
 
-    response = noveler("chat-assistant").chat('llama2', [
-        {'role': 'user', 'content': 'Why is the sky blue?'},
-        {'role': 'assistant', 'content': 'Because the atmosphere scatters sunlight.'},
-    ])
+    response = noveler("assistant").chat('Why is the sky blue?')
 
     The method is a wrapper around the chat method of the Ollama Client class. It takes a list of messages as input and
     returns a list of responses. The messages are dictionaries with two keys: role and content. The role key is a string
@@ -62,28 +55,25 @@ def chat():
     from the ollama models, as that would only magnify the latency inherent in running models on end-user hardware.
     """
 
-    assistant = noveler("chat-assistant")
-    response = assistant.chat(
-        model='dolphin-phi:2.7b', messages=messages, stream=False, format='',
-        options={'temperature': 1.0}, keep_alive=0)
+    response = noveler("assistant").chat(prompt=prompt, temperature=1.0)
 
     print(response)
 
 
-t_chat = threading.Thread(target=chat)
-t_cube = threading.Thread(target=print_cube, args=(10,))
-t_square = threading.Thread(target=print_square, args=(10,))
-
-t_chat.start()
-print("Made remote call to ollama...")
-t_cube.start()
-print("Ran the cube function...")
-t_square.start()
-print("\nRan the square function...")
-print("Probably still waiting on that chat response...")
-
-t_chat.join()
-t_cube.join()
-t_square.join()
-
-print("Now all threads are done.")
+# t_chat = threading.Thread(target=chat, args=("Why is the sky blue?",))
+# t_cube = threading.Thread(target=print_cube, args=(10,))
+# t_square = threading.Thread(target=print_square, args=(10,))
+#
+# t_chat.start()
+# print("Made remote call to ollama...")
+# t_cube.start()
+# print("Ran the cube function...")
+# t_square.start()
+# print("\nRan the square function...")
+# print("Probably still waiting on that chat response...")
+#
+# t_chat.join()
+# t_cube.join()
+# t_square.join()
+#
+# print("Now all threads are done.")

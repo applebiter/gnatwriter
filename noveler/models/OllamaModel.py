@@ -17,13 +17,14 @@ class OllamaModel(Base):
     template: Mapped[str] = mapped_column(Text, nullable=False)
     example: Mapped[str] = mapped_column(Text, nullable=True)
     priming: Mapped[str] = mapped_column(Text, nullable=True)
+    params: Mapped[str] = mapped_column(Text, nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     modified: Mapped[str] = mapped_column(
         DateTime, default=str(datetime.now()), onupdate=str(datetime.now())
     )
 
     def __repr__(self) -> str:
-        return f"<OllamaTemplate(title={self.title}, model={self.model})>"
+        return f"<OllamaModel(title={self.title}, model={self.model})>"
 
     def __str__(self) -> str:
         return f"{self.title} ({self.model})"
@@ -37,6 +38,7 @@ class OllamaModel(Base):
             "template": self.template,
             "example": self.example,
             "priming": self.priming,
+            "params": self.params,
             "created": str(self.created),
             "modified": str(self.modified),
         }
@@ -48,6 +50,7 @@ class OllamaModel(Base):
         self.template = data.get("template", self.template)
         self.example = data.get("example", self.example)
         self.priming = data.get("priming", self.priming)
+        self.params = data.get("params", self.params)
         self.created = data.get("created", self.created)
         self.modified = data.get("modified", self.modified)
 
@@ -172,3 +175,23 @@ class OllamaModel(Base):
             raise ValueError("The model's priming must have no more than 65,535 characters.")
 
         return priming
+
+    @validates("params")
+    def validate_params(self, key, params: str) -> str:
+        """Validates the params' length.
+
+        Parameters
+        ----------
+        params: str
+            The character's params
+
+        Returns
+        -------
+        str
+            The validated params
+        """
+
+        if params and len(params) > 65535:
+            raise ValueError("The model's params must have no more than 65,535 characters.")
+
+        return params

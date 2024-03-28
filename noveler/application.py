@@ -4,7 +4,7 @@ import bcrypt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from noveler.controllers import ActivityController, AuthorController, BibliographyController,  ChapterController, \
-    CharacterController, ChatController, EventController, GenerativeController, ImageController, LinkController, \
+    CharacterController, EventController, ImageController, LinkController, AssistantController, \
     LocationController, NoteController, SceneController, StoryController, SubmissionController, UserController
 from noveler.models import Base, User
 
@@ -67,13 +67,12 @@ class Noveler:
 
         self._controllers = {
             "activity": ActivityController(self._session, self._owner),
+            "assistant": AssistantController(self._session, self._owner),
             "author": AuthorController(self._session, self._owner),
             "bibliography": BibliographyController(self._session, self._owner),
             "chapter": ChapterController(self._session, self._owner),
             "character": CharacterController(self._session, self._owner),
-            "chat-assistant": ChatController(self._session, self._owner),
             "event": EventController(self._session, self._owner),
-            "generative-assistant": GenerativeController(self._session, self._owner),
             "image": ImageController(self._session, self._owner),
             "link": LinkController(self._session, self._owner),
             "location": LocationController(self._session, self._owner),
