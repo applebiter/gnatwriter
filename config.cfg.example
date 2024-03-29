@@ -20,8 +20,12 @@ datetime = "%Y-%m-%d %H:%M:%S.%f"
 date = "%Y-%m-%d"
 
 [ollama]
-chat_model = "phi:2.7b"
-generative_model = "llama2:7b"
-multimodal_model = "llava:7b"
-model_memory_duration = 10m
+url = http://localhost:11434
+chat_model = dolphin-phi:2.7b
+generative_model = mistral-openorca:7b
+multimodal_model = llava:7b
+model_memory_duration = 0
 context_window = 4096
+
+[export]
+root = /home/<username>/Programs/noveler/noveler/export
