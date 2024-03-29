@@ -56,15 +56,21 @@ class NoteController(BaseController):
         """
 
         with self._session as session:
+
             try:
+
                 created = datetime.now()
                 modified = created
 
-                note = Note(user_id=self._owner.id, title=title, content=content, created=created, modified=modified)
+                note = Note(
+                    user_id=self._owner.id, title=title, content=content,
+                    created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Note {note.title[:50]} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Note {note.title[:50]} \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(note)
                 session.add(activity)

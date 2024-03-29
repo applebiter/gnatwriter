@@ -33,8 +33,10 @@ password = config.get("mysql", "password")
 host = config.get("mysql", "host")
 port = config.get("mysql", "port")
 database = config.get("mysql", "database")
-# noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")
-noveler = Noveler(f"sqlite:///{database}.db")
+noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")
+# noveler = Noveler(f"sqlite:///{database}.db")
+# reach out to the ollama server for updates
+# noveler("assistant").update_models()
 
 
 def chat(prompt):
@@ -60,20 +62,20 @@ def chat(prompt):
     print(response)
 
 
-# t_chat = threading.Thread(target=chat, args=("Why is the sky blue?",))
-# t_cube = threading.Thread(target=print_cube, args=(10,))
-# t_square = threading.Thread(target=print_square, args=(10,))
-#
-# t_chat.start()
-# print("Made remote call to ollama...")
-# t_cube.start()
-# print("Ran the cube function...")
-# t_square.start()
-# print("\nRan the square function...")
-# print("Probably still waiting on that chat response...")
-#
-# t_chat.join()
-# t_cube.join()
-# t_square.join()
-#
-# print("Now all threads are done.")
+t_chat = threading.Thread(target=chat, args=("Give me five good reasons to legalize marijuana. Supply supporting evidence.",))
+t_cube = threading.Thread(target=print_cube, args=(10,))
+t_square = threading.Thread(target=print_square, args=(10,))
+
+t_chat.start()
+print("Made remote call to ollama...")
+t_cube.start()
+print("Ran the cube function...")
+t_square.start()
+print("\nRan the square function...")
+print("Probably still waiting on that chat response...")
+
+t_chat.join()
+t_cube.join()
+t_square.join()
+
+print("Now all threads are done.")

@@ -4,7 +4,6 @@ import uuid
 from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, Optional, Union, List, Literal
-
 from ollama import Client, Message
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
@@ -92,12 +91,9 @@ class AssistantController(BaseController):
 
         config = ConfigParser()
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        print(f"{project_root}/config.cfg")
         config.read(f"{project_root}/config.cfg")
-        ollama_host = config.read("ollama", "host")
-        ollama_port = str(config.read("ollama", "port"))
-
-        self._client = Client(host="http://violet:11434")
+        ollama_url = config.read("ollama", "url")
+        self._client = Client(host=ollama_url)  # If I make this a string instead of a bytearray, the ollama code breaks
         self._session_uuid = uuid4
         self._chat_model = config.get("ollama", "chat_model")
         self._generative_model = config.get("ollama", "generative_model")
@@ -105,8 +101,46 @@ class AssistantController(BaseController):
         self._num_ctx = config.getint("ollama", "context_window")
         self._keep_alive = config.get("ollama", "model_memory_duration")
 
-        with self._session as session:
-            self._templates = session.query(OllamaModel).all()
+    def update_models(self):
+        """Update the database with any new models in the list provided by the Ollama API.
+        """
+
+        try:
+
+            olist = self._client.list()
+
+            if olist:
+
+                for model in olist["models"]:
+                    model_exists = self._session.query(OllamaModel).filter(
+                        OllamaModel.model == model["model"]
+                    ).first()
+
+                    if not model_exists:
+
+                        details = self._client.show(model["model"])
+
+                        description = details["modelfile"] if details.get("modelfile") else None
+                        parameters = details["parameters"] if details.get("parameters") else None
+                        template = details["template"] if details.get("template") else None
+                        priming = details["system"] if details.get("system") else None
+
+                        created = datetime.now()
+                        modified = created
+
+                        ollama_model = OllamaModel(
+                            title=model["model"], model=model["model"],
+                            description=description, template=template,
+                            example=None, priming=priming, params=parameters,
+                            created=created, modified=modified
+                        )
+
+                        self._session.add(ollama_model)
+                        self._session.commit()
+
+        except Exception as e:
+            self._session.rollback()
+            raise e
 
     def chat(
             self,
@@ -148,9 +182,19 @@ class AssistantController(BaseController):
         """
 
         if not priming:
-            priming = [template for template in self._templates if template.model == self._chat_model][0].priming
 
-        messages = [Message(role="system", content=priming)]
+            with self._session as session:
+
+                model = session.query(OllamaModel).filter(
+                    OllamaModel.model == self._chat_model
+                ).first()
+
+        messages = []
+
+        if model:
+            if priming is not None:
+                messages.append(Message(role="system", content=priming))
+
         session_uuid = self._session_uuid if not session_uuid else session_uuid
 
         with self._session as session:
@@ -161,8 +205,12 @@ class AssistantController(BaseController):
 
             if assistances:
                 for assistance in assistances:
-                    messages.append(Message(role="user", content=assistance.prompt))
-                    messages.append(Message(role="assistant", content=assistance.content))
+                    messages.append(Message(
+                        role="user", content=assistance.prompt
+                    ))
+                    messages.append(Message(
+                        role="assistant", content=assistance.content
+                    ))
 
         messages.append(Message(role="user", content=prompt))
 
@@ -187,8 +235,7 @@ class AssistantController(BaseController):
                 response = self._client.chat(
                     model=self._chat_model,
                     messages=messages,
-                    stream=False,
-                    format="",
+                    format='',
                     options=options,
                     keep_alive=keep_alive
                 )
@@ -445,6 +492,14 @@ class AssistantController(BaseController):
             else:
                 session.commit()
                 return response
+
+    def list_models(self):
+        """List all available models."""
+        return self._client.list()
+
+    def show_model(self, model: str):
+        """Show the details of a specific model."""
+        return self._client.show(model)
 
     def __str__(self):
         """Return the class string representation."""

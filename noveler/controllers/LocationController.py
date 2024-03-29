@@ -456,11 +456,15 @@ class LocationController(BaseController):
         """
 
         with self._session as session:
+
             for image_location in session.query(ImageLocation).filter(
-                ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
+                ImageLocation.location_id == location_id,
+                    ImageLocation.user_id == self._owner.id
             ).order_by(ImageLocation.position).all():
+
                 yield session.query(Image).filter(
-                    Image.id == image_location.image_id, Image.user_id == self._owner.id
+                    Image.id == image_location.image_id,
+                    Image.user_id == self._owner.id
                 ).first()
 
     def get_images_page_by_location_id(self, location_id: int, page: int, per_page: int) -> list:

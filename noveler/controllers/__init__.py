@@ -10,6 +10,7 @@ from noveler.controllers.ImageController import ImageController
 from noveler.controllers.LinkController import LinkController
 from noveler.controllers.LocationController import LocationController
 from noveler.controllers.NoteController import NoteController
+from noveler.controllers.OllamaModelController import OllamaModelController
 from noveler.controllers.SceneController import SceneController
 from noveler.controllers.StoryController import StoryController
 from noveler.controllers.SubmissionController import SubmissionController

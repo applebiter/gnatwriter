@@ -3,9 +3,10 @@ from datetime import datetime
 import bcrypt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from noveler.controllers import ActivityController, AuthorController, BibliographyController,  ChapterController, \
+from noveler.controllers import ActivityController, AuthorController, BibliographyController, ChapterController, \
     CharacterController, EventController, ImageController, LinkController, AssistantController, \
-    LocationController, NoteController, SceneController, StoryController, SubmissionController, UserController
+    LocationController, NoteController, SceneController, StoryController, SubmissionController, UserController, \
+    OllamaModelController
 from noveler.models import Base, User
 
 
@@ -77,6 +78,7 @@ class Noveler:
             "link": LinkController(self._session, self._owner),
             "location": LocationController(self._session, self._owner),
             "note": NoteController(self._session, self._owner),
+            "ollama-model": OllamaModelController(self._session, self._owner),
             "scene": SceneController(self._session, self._owner),
             "story": StoryController(self._session, self._owner),
             "submission": SubmissionController(self._session, self._owner),

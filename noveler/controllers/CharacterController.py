@@ -120,10 +120,10 @@ class CharacterController(BaseController):
         super().__init__(session, owner)
 
     def create_character(
-        self, title: str = None, first_name: str = None,
-        middle_name: str = None, last_name: str = None, nickname: str = None,
-        gender: str = None, sex: str = None, date_of_birth: str = None,
-        date_of_death: str = None, description: str = None
+            self, title: str = None, first_name: str = None,
+            middle_name: str = None, last_name: str = None, nickname: str = None,
+            gender: str = None, sex: str = None, date_of_birth: str = None,
+            date_of_death: str = None, description: str = None
     ) -> Character:
         """Create a new character
 
@@ -195,11 +195,11 @@ class CharacterController(BaseController):
                 return character
 
     def update_character(
-        self, character_id: int = None, title: str = None,
-        first_name: str = None, middle_name: str = None, last_name: str = None,
-        nickname: str = None, gender: str = None, sex: str = None,
-        date_of_birth: str = None, date_of_death: str = None,
-        description: str = None
+            self, character_id: int = None, title: str = None,
+            first_name: str = None, middle_name: str = None, last_name: str = None,
+            nickname: str = None, gender: str = None, sex: str = None,
+            date_of_birth: str = None, date_of_death: str = None,
+            description: str = None
     ) -> Type[Character]:
         """Update a character
 
@@ -507,11 +507,20 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Character).join(CharacterStory, Character.id == CharacterStory.character_id).filter(
-                or_(Character.title.like(f'%{search}%'), Character.first_name.like(f'%{search}%'),
-                    Character.middle_name.like(f'%{search}%'), Character.last_name.like(f'%{search}%'),
-                    Character.nickname.like(f'%{search}%'), Character.description.like(f'%{search}%')),
-                CharacterStory.story_id == story_id, CharacterStory.user_id == self._owner.id
+            return session.query(Character).join(
+                CharacterStory,
+                Character.id == CharacterStory.character_id
+            ).filter(
+                or_(
+                    Character.title.like(f'%{search}%'),
+                    Character.first_name.like(f'%{search}%'),
+                    Character.middle_name.like(f'%{search}%'),
+                    Character.last_name.like(f'%{search}%'),
+                    Character.nickname.like(f'%{search}%'),
+                    Character.description.like(f'%{search}%')
+                ),
+                CharacterStory.story_id == story_id,
+                CharacterStory.user_id == self._owner.id
             ).all()
 
     def create_relationship(self, parent_id: int, related_id: int, relationship_type: str, description: str = None,
@@ -695,18 +704,18 @@ class CharacterController(BaseController):
 
                 if position < character_relationship.position:
                     for sibling in session.query(CharacterRelationship).filter(
-                        CharacterRelationship.parent_id == character_relationship.parent_id,
-                        CharacterRelationship.position >= position,
-                        CharacterRelationship.position < character_relationship.position,
-                        CharacterRelationship.user_id == self._owner.id
+                            CharacterRelationship.parent_id == character_relationship.parent_id,
+                            CharacterRelationship.position >= position,
+                            CharacterRelationship.position < character_relationship.position,
+                            CharacterRelationship.user_id == self._owner.id
                     ).all():
                         sibling.position += 1
 
                 else:
                     for sibling in session.query(CharacterRelationship).filter(
-                        CharacterRelationship.parent_id == character_relationship.parent_id,
-                        CharacterRelationship.position > character_relationship.position,
-                        CharacterRelationship.position <= position, CharacterRelationship.user_id == self._owner.id
+                            CharacterRelationship.parent_id == character_relationship.parent_id,
+                            CharacterRelationship.position > character_relationship.position,
+                            CharacterRelationship.position <= position, CharacterRelationship.user_id == self._owner.id
                     ).all():
                         sibling.position -= 1
 
@@ -753,9 +762,9 @@ class CharacterController(BaseController):
                     raise ValueError('Character relationship not found.')
 
                 for sibling in session.query(CharacterRelationship).filter(
-                    CharacterRelationship.parent_id == character_relationship.parent_id,
-                    CharacterRelationship.position > character_relationship.position,
-                    CharacterRelationship.user_id == self._owner.id
+                        CharacterRelationship.parent_id == character_relationship.parent_id,
+                        CharacterRelationship.position > character_relationship.position,
+                        CharacterRelationship.user_id == self._owner.id
                 ).all():
                     sibling.position -= 1
 
@@ -1059,8 +1068,8 @@ class CharacterController(BaseController):
                     raise ValueError('Character trait not found.')
 
                 for sibling in session.query(CharacterTrait).filter(
-                    CharacterTrait.character_id == character_trait.character_id,
-                    CharacterTrait.position > character_trait.position, CharacterTrait.user_id == self._owner.id
+                        CharacterTrait.character_id == character_trait.character_id,
+                        CharacterTrait.position > character_trait.position, CharacterTrait.user_id == self._owner.id
                 ).all():
                     sibling.position -= 1
                     sibling.created = datetime.strptime(str(sibling.created), datetime_format)
@@ -1213,7 +1222,7 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_event in session.query(CharacterEvent).filter(
-                CharacterEvent.character_id == character_id, CharacterEvent.user_id == self._owner.id
+                    CharacterEvent.character_id == character_id, CharacterEvent.user_id == self._owner.id
             ).all():
                 yield session.query(Event).filter(
                     Event.id == character_event.event_id, Event.user_id == self._owner.id
@@ -1309,7 +1318,7 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_link in session.query(CharacterLink).filter(
-                CharacterLink.character_id == character_id, CharacterLink.user_id == self._owner.id
+                    CharacterLink.character_id == character_id, CharacterLink.user_id == self._owner.id
             ).all():
                 yield session.query(Link).filter(
                     Link.id == character_link.link_id, Link.user_id == self._owner.id
@@ -1405,7 +1414,7 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_note in session.query(CharacterNote).filter(
-                CharacterNote.character_id == character_id, CharacterNote.user_id == self._owner.id
+                    CharacterNote.character_id == character_id, CharacterNote.user_id == self._owner.id
             ).all():
                 yield session.query(Note).filter(
                     Note.id == character_note.note_id, Note.user_id == self._owner.id
@@ -1625,8 +1634,8 @@ class CharacterController(BaseController):
 
                 if is_default:
                     for sibling in session.query(CharacterImage).filter(
-                        CharacterImage.character_id == character_image.character_id,
-                        CharacterImage.user_id == self._owner.id
+                            CharacterImage.character_id == character_image.character_id,
+                            CharacterImage.user_id == self._owner.id
                     ).all():
                         sibling.is_default = False
                         sibling.modified = datetime.now()
@@ -1683,8 +1692,8 @@ class CharacterController(BaseController):
                     raise ValueError('Character image not found.')
 
                 for sibling in session.query(CharacterImage).filter(
-                    CharacterImage.character_id == character_image.character_id,
-                    CharacterImage.position > character_image.position, CharacterImage.user_id == self._owner.id
+                        CharacterImage.character_id == character_image.character_id,
+                        CharacterImage.position > character_image.position, CharacterImage.user_id == self._owner.id
                 ).all():
                     sibling.position -= 1
                     sibling.created = datetime.strptime(str(sibling.created), datetime_format)
@@ -1742,7 +1751,7 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_image in session.query(CharacterImage).filter(
-                CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
+                    CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
             ).order_by(CharacterImage.position).all():
                 yield session.query(Image).filter(
                     Image.id == character_image.image_id, Image.user_id == self._owner.id
@@ -1771,7 +1780,7 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             for character_image in session.query(CharacterImage).filter(
-                CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
+                    CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
             ).order_by(CharacterImage.position).offset(offset).limit(per_page).all():
                 yield session.query(Image).filter(
                     Image.id == character_image.image_id, Image.user_id == self._owner.id
