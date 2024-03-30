@@ -164,11 +164,17 @@ class ExportController(BaseController):
                 for chapter in dict_story["chapters"]:
 
                     output.write(f"\n\n{chapter['title']}\n\n")
-                    output.write(f"\n\n{chapter['description']}\n\n")
+
+                    if chapter['description']:
+                        output.write(f"\n\n{chapter['description']}\n\n")
 
                     for scene in chapter["scenes"]:
-                        output.write(f"{scene['title']}\n")
-                        output.write(f"{scene['content']}\n")
+
+                        if chapter['title']:
+                            output.write(f"{scene['title']}\n")
+
+                        if scene['content']:
+                            output.write(f"{scene['content']}\n")
 
         with self._session as session:
 

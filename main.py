@@ -55,7 +55,7 @@ input_docs = loader.load()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 splits = text_splitter.split_documents(input_docs)
 # Create Ollama embeddings and vector store
-embeddings = OllamaEmbeddings(model="magicoder:7b")
+embeddings = OllamaEmbeddings(model="mistral:7b")
 vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
 # Create the retriever
 retriever = vectorstore.as_retriever()
@@ -69,7 +69,7 @@ def format_docs(docs):
 def ollama_llm(question, context):
     formatted_prompt = f"Question: {question}\n\nContext: {context}"
     response = ollama.chat(
-        model="magicoder:7b",
+        model="mistral:7b",
         messages=[{'role': 'user', 'content': formatted_prompt, 'options': {
             'temperature': 0.5, "keep_alive": 0
         }}]
@@ -85,12 +85,12 @@ def rag_chain(question):
 
 
 # Use the RAG chain
-result = rag_chain("Who is Flando?")
+result = rag_chain("Who is Flando?")  # medllama2:7b only model so far to correctly name him as the rat
 print(result)
 #
 # Export the existing story to JSON and text
 # noveler("export").export_story_to_json(story_id=1)
-# noveler("export").export_story_to_text(story_id=1)
+noveler("export").export_story_to_text(story_id=1)
 
 # def chat(prompt):
 #     """Example of how to use the chat method of the ChatController class.
