@@ -114,11 +114,14 @@ class Link(Base):
             A dictionary representation of the link
         """
 
+        escaped_title = self.title.replace('"', '\\"').replace('/', '\\/')
+        escaped_url = self.description.replace('"', '\\"').replace('/', '\\/')
+
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'title': self.title,
-            'url': self.url,
+            'title': escaped_title,
+            'url': escaped_url,
             'created': str(self.created),
             'modified': str(self.modified),
         }

@@ -136,7 +136,6 @@ class ExportController(BaseController):
 
             with open(story_file, "w") as output:
 
-                output.write(" ")
                 output.write(f"{dict_story['title']}\n")
                 output.write(f"{dict_story['description']}\n")
 

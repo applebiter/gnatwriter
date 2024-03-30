@@ -23,13 +23,21 @@ class AssistantController(BaseController):
         The Ollama client to be used when making requests.
     _chat_model : str
         The model to be used when chatting.
-    _multimodal_model : str
-        The model to be used when describing images.
+    _chat_num_ctx : int
+        The number of tokens to use as context for the model.
+    _chat_keep_alive : Union[float, str]
+        The duration to keep the model in memory.
     _generative_model : str
         The model to be used when generating text.
-    _num_ctx : int
+    _generative_num_ctx : int
         The number of tokens to use as context for the model.
-    _keep_alive : Union[float, str]
+    _generative_keep_alive : Union[float, str]
+        The duration to keep the model in memory.
+    _multimodal_model : str
+        The model to be used when describing images.
+    _multimodal_num_ctx : int
+        The number of tokens to use as context for the model.
+    _multimodal_keep_alive : Union[float, str]
         The duration to keep the model in memory.
     _templates : dict
         The templates to be used when generating text.
@@ -96,10 +104,14 @@ class AssistantController(BaseController):
         self._client = Client(host=ollama_url)  # If I make this a string instead of a bytearray, the ollama code breaks
         self._session_uuid = uuid4
         self._chat_model = config.get("ollama", "chat_model")
+        self._chat_num_ctx = config.getint("ollama", "chat_context_window")
+        self._chat_keep_alive = config.getint("ollama", "chat_memory_duration")
         self._generative_model = config.get("ollama", "generative_model")
+        self._generative_num_ctx = config.getint("ollama", "generative_context_window")
+        self._generative_keep_alive = config.getint("ollama", "generative_memory_duration")
         self._multimodal_model = config.get("ollama", "multimodal_model")
-        self._num_ctx = config.getint("ollama", "context_window")
-        self._keep_alive = config.get("ollama", "model_memory_duration")
+        self._multimodal_num_ctx = config.getint("ollama", "multimodal_context_window")
+        self._multimodal_keep_alive = config.getint("ollama", "multimodal_memory_duration")
 
     def update_models(self):
         """Update the database with any new models in the list provided by the Ollama API.
@@ -138,19 +150,46 @@ class AssistantController(BaseController):
                         self._session.add(ollama_model)
                         self._session.commit()
 
+                # delete models from db where existing model does not appear in
+                # the olist
+
+                with self._session as session:
+
+                    try:
+
+                        models = session.query(OllamaModel).all()
+
+                        for model in models:
+                            model_exists = False
+
+                            for omodel in olist["models"]:
+                                if model.model == omodel["model"]:
+                                    model_exists = True
+                                    break
+
+                            if not model_exists:
+                                session.delete(model)
+
+                    except Exception as e:
+                        session.rollback()
+                        raise e
+
+                    else:
+                        session.commit()
+
         except Exception as e:
             self._session.rollback()
             raise e
 
     def chat(
-            self,
-            prompt: str,
-            temperature: Optional[float] = 0.5,
-            seed: Optional[int] = None,
-            priming: str = None,
-            options: Optional[dict] = None,
-            session_uuid: str = None,
-            keep_alive: Optional[Union[float, str]] = None
+        self,
+        prompt: str,
+        temperature: Optional[float] = 0.5,
+        seed: Optional[int] = None,
+        priming: str = None,
+        options: Optional[dict] = None,
+        session_uuid: str = None,
+        keep_alive: Optional[Union[float, str]] = None
     ):
         """Chat with the Chat Assistant.
 
@@ -217,16 +256,16 @@ class AssistantController(BaseController):
         if not options:
             options = {
                 "temperature": temperature,
-                "num_ctx": self._num_ctx
+                "num_ctx": self._chat_num_ctx
             }
 
         if not options.get("temperature"):
             options["temperature"] = temperature
 
         if not options.get("num_ctx"):
-            options["num_ctx"] = self._num_ctx
+            options["num_ctx"] = self._chat_num_ctx
 
-        keep_alive = self._keep_alive if not keep_alive else keep_alive
+        keep_alive = self._chat_keep_alive if not keep_alive else keep_alive
 
         with self._session as session:
 
@@ -276,6 +315,18 @@ class AssistantController(BaseController):
             else:
                 session.commit()
                 return response
+
+    def rag_chat(
+        self,
+        prompt: str,
+        temperature: Optional[float] = 0.5,
+        seed: Optional[int] = None,
+        priming: str = None,
+        options: Optional[dict] = None,
+        session_uuid: str = None,
+        keep_alive: Optional[Union[float, str]] = None
+    ):
+        pass
 
     def describe_image(
             self,
@@ -330,16 +381,16 @@ class AssistantController(BaseController):
         if not options:
             options = {
                 "temperature": temperature,
-                "num_ctx": self._num_ctx
+                "num_ctx": self._multimodal_num_ctx
             }
 
         if not options.get("temperature"):
             options["temperature"] = temperature
 
         if not options.get("num_ctx"):
-            options["num_ctx"] = self._num_ctx
+            options["num_ctx"] = self._multimodal_num_ctx
 
-        keep_alive = self._keep_alive if not keep_alive else keep_alive
+        keep_alive = self._multimodal_keep_alive if not keep_alive else keep_alive
 
         with self._session as session:
 
@@ -434,16 +485,16 @@ class AssistantController(BaseController):
         if not options:
             options = {
                 "temperature": temperature,
-                "num_ctx": self._num_ctx
+                "num_ctx": self._generative_num_ctx
             }
 
         if not options.get("temperature"):
             options["temperature"] = temperature
 
         if not options.get("num_ctx"):
-            options["num_ctx"] = self._num_ctx
+            options["num_ctx"] = self._generative_num_ctx
 
-        keep_alive = self._keep_alive if not keep_alive else keep_alive
+        keep_alive = self._generative_keep_alive if not keep_alive else keep_alive
 
         with self._session as session:
 

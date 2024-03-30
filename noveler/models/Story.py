@@ -137,11 +137,17 @@ class Story(Base):
             for chapter in self.chapters:
                 chapters.append(chapter.serialize())
 
+        escaped_title = self.title.replace('"', "'").replace('/', '\\/')
+        escaped_description = None
+
+        if self.description:
+            escaped_description = self.description.replace('"', '\\"').replace('/', '\\/')
+
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'title': self.title,
-            'description': self.description,
+            'title': escaped_title,
+            'description': escaped_description,
             'created': str(self.created),
             'modified': str(self.modified),
             'authors': authors,

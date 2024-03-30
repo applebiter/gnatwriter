@@ -120,13 +120,19 @@ class Chapter(Base):
             for scene in self.scenes:
                 scenes.append(scene.serialize())
 
+        escaped_title = self.title.replace('"', "'").replace('/', '\\/')
+        escaped_description = None
+
+        if self.description:
+            escaped_description = self.description.replace('"', "'").replace('/', '\\/')
+
         return {
             'id': self.id,
             'user_id': self.user_id,
             'story_id': self.story_id,
             'position': self.position,
-            'title': self.title,
-            'description': self.description,
+            'title': escaped_title,
+            'description': escaped_description,
             'created': str(self.created),
             'modified': str(self.modified),
             'links': links,

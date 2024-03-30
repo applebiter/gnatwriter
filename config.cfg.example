@@ -22,10 +22,14 @@ date = "%Y-%m-%d"
 [ollama]
 url = http://localhost:11434
 chat_model = dolphin-phi:2.7b
-generative_model = mistral-openorca:7b
+chat_context_window = 4096
+chat_memory_duration = 0
+generative_model =yarn-mistral:7b
+generative_context_window = 4096
+generative_memory_duration = 0
 multimodal_model = llava:7b
-model_memory_duration = 0
-context_window = 4096
+multimodal_context_window = 4096
+multimodal_memory_duration = 0
 
 [export]
-root = /home/<username>/Programs/noveler/noveler/export
+root = /home/<username>/<some folder>/noveler/noveler/export

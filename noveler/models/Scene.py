@@ -118,15 +118,26 @@ class Scene(Base):
             for note_scene in self.notes:
                 notes.append(note_scene.note.serialize())
 
+        escaped_title = self.title.replace('"', '\\"').replace('/', '\\/')
+
+        escaped_description = None
+        escaped_content = None
+
+        if self.description:
+            escaped_description = self.description.replace('"', "'").replace('/', '\\/')
+
+        if self.content:
+            escaped_content = self.content.replace('"', "'").replace('/', '\\/')
+
         return {
             'id': self.id,
             'user_id': self.user_id,
             'story_id': self.story_id,
             'chapter_id': self.chapter_id,
             'position': self.position,
-            'title': self.title,
-            'description': self.description,
-            'content': self.content,
+            'title': escaped_title,
+            'description': escaped_description,
+            'content': escaped_content,
             'created': str(self.created),
             'modified': str(self.modified),
             'links': links,

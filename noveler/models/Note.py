@@ -113,11 +113,14 @@ class Note(Base):
             A dictionary representation of the note
         """
 
+        escaped_title = self.title.replace('"', '\\"').replace('/', '\\/')
+        escaped_content = self.content.replace('"', '\\"').replace('/', '\\/')
+
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'title': self.title,
-            'content': self.content,
+            'title': escaped_title,
+            'content': escaped_content,
             'created': str(self.created),
             'modified': str(self.modified),
         }
