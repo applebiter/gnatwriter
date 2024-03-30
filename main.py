@@ -55,7 +55,7 @@ input_docs = loader.load()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 splits = text_splitter.split_documents(input_docs)
 # Create Ollama embeddings and vector store
-embeddings = OllamaEmbeddings(model="mistral:7b")
+embeddings = OllamaEmbeddings(model="mistral-openorca:7b")
 vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
 # Create the retriever
 retriever = vectorstore.as_retriever()
@@ -69,7 +69,7 @@ def format_docs(docs):
 def ollama_llm(question, context):
     formatted_prompt = f"Question: {question}\n\nContext: {context}"
     response = ollama.chat(
-        model="mistral:7b",
+        model="mistral-openorca:7b",
         messages=[{'role': 'user', 'content': formatted_prompt, 'options': {
             'temperature': 0.5, "keep_alive": 0
         }}]
