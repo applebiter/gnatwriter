@@ -38,12 +38,20 @@ class LinkStory(Base):
 
     __tablename__ = 'links_stories'
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    link_id: Mapped[int] = mapped_column(Integer, ForeignKey('links.id'), primary_key=True)
-    story_id: Mapped[int] = mapped_column(Integer, ForeignKey('stories.id'), primary_key=True)
+    link_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('links.id'), primary_key=True
+    )
+    story_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('stories.id'), primary_key=True
+    )
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
-    link: Mapped["Link"] = relationship("Link", back_populates="stories")
-    story: Mapped["Story"] = relationship("Story", back_populates="links")
+    link: Mapped["Link"] = relationship(
+        "Link", back_populates="stories", lazy="joined"
+    )
+    story: Mapped["Story"] = relationship(
+        "Story", back_populates="links"
+    )
 
     def __repr__(self):
         """Returns a string representation of the relationship.

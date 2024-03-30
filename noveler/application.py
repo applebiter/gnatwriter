@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from noveler.controllers import ActivityController, AuthorController, BibliographyController, ChapterController, \
     CharacterController, EventController, ImageController, LinkController, AssistantController, \
     LocationController, NoteController, SceneController, StoryController, SubmissionController, UserController, \
-    OllamaModelController
+    OllamaModelController, ExportController
 from noveler.models import Base, User
 
 
@@ -74,6 +74,7 @@ class Noveler:
             "chapter": ChapterController(self._session, self._owner),
             "character": CharacterController(self._session, self._owner),
             "event": EventController(self._session, self._owner),
+            "export": ExportController(self._session, self._owner),
             "image": ImageController(self._session, self._owner),
             "link": LinkController(self._session, self._owner),
             "location": LocationController(self._session, self._owner),

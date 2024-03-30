@@ -108,6 +108,16 @@ class Scene(Base):
             A dictionary representation of the scene
         """
 
+        links = []
+        if self.links:
+            for link_scene in self.links:
+                links.append(link_scene.link.serialize())
+
+        notes = []
+        if self.notes:
+            for note_scene in self.notes:
+                notes.append(note_scene.note.serialize())
+
         return {
             'id': self.id,
             'user_id': self.user_id,
@@ -119,6 +129,8 @@ class Scene(Base):
             'content': self.content,
             'created': str(self.created),
             'modified': str(self.modified),
+            'links': links,
+            'notes': notes
         }
 
     def unserialize(self, data: dict) -> "Scene":

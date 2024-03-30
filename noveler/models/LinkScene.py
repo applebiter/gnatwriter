@@ -42,8 +42,12 @@ class LinkScene(Base):
     scene_id: Mapped[int] = mapped_column(Integer, ForeignKey('scenes.id'), primary_key=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
-    link: Mapped["Link"] = relationship("Link", back_populates="scenes")
-    scene: Mapped["Scene"] = relationship("Scene", back_populates="links")
+    link: Mapped["Link"] = relationship(
+        "Link", back_populates="scenes", lazy='joined'
+    )
+    scene: Mapped["Scene"] = relationship(
+        "Scene", back_populates="links"
+    )
 
     def __repr__(self):
         """Returns a string representation of the relationship.

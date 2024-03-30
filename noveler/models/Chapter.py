@@ -105,6 +105,21 @@ class Chapter(Base):
             A dictionary representation of the chapter
         """
 
+        links = []
+        if self.links:
+            for chapter_link in self.links:
+                links.append(chapter_link.link.serialize())
+
+        notes = []
+        if self.notes:
+            for chapter_note in self.notes:
+                notes.append(chapter_note.note.serialize())
+
+        scenes = []
+        if self.scenes:
+            for scene in self.scenes:
+                scenes.append(scene.serialize())
+
         return {
             'id': self.id,
             'user_id': self.user_id,
@@ -114,6 +129,9 @@ class Chapter(Base):
             'description': self.description,
             'created': str(self.created),
             'modified': str(self.modified),
+            'links': links,
+            'notes': notes,
+            'scenes': scenes
         }
 
     def unserialize(self, data: dict) -> "Chapter":

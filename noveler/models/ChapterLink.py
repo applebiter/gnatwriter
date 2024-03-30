@@ -43,13 +43,21 @@ class ChapterLink(Base):
     __tablename__ = 'chapters_links'
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     story_id: Mapped[int] = mapped_column(Integer, ForeignKey('stories.id'))
-    chapter_id: Mapped[int] = mapped_column(Integer, ForeignKey('chapters.id'), primary_key=True)
-    link_id: Mapped[int] = mapped_column(Integer, ForeignKey('links.id'), primary_key=True)
+    chapter_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('chapters.id'), primary_key=True
+    )
+    link_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('links.id'), primary_key=True
+    )
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
     story: Mapped["Story"] = relationship("Story")
-    chapter: Mapped["Chapter"] = relationship("Chapter", back_populates="links")
-    link: Mapped["Link"] = relationship("Link", back_populates="chapters")
+    chapter: Mapped["Chapter"] = relationship(
+        "Chapter", back_populates="links"
+    )
+    link: Mapped["Link"] = relationship(
+        "Link", back_populates="chapters", lazy="joined"
+    )
 
     def __repr__(self):
         """Returns a string representation of the relationship.

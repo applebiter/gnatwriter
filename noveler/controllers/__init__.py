@@ -6,6 +6,7 @@ from noveler.controllers.BibliographyController import BibliographyController
 from noveler.controllers.ChapterController import ChapterController
 from noveler.controllers.CharacterController import CharacterController
 from noveler.controllers.EventController import EventController
+from noveler.controllers.ExportController import ExportController
 from noveler.controllers.ImageController import ImageController
 from noveler.controllers.LinkController import LinkController
 from noveler.controllers.LocationController import LocationController

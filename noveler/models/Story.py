@@ -65,25 +65,25 @@ class Story(Base):
     )
     user: Mapped["User"] = relationship("User", back_populates="stories")
     chapters: Mapped[Optional[List["Chapter"]]] = relationship(
-        "Chapter", back_populates="story",
+        "Chapter", back_populates="story", lazy="joined",
         cascade="all, delete, delete-orphan")
     authors: Mapped[Optional[List["AuthorStory"]]] = relationship(
         "AuthorStory", back_populates="story", lazy="joined",
         cascade="all, delete, delete-orphan")
     references: Mapped[Optional[List["Bibliography"]]] = relationship(
-        "Bibliography", back_populates="story",
+        "Bibliography", back_populates="story", lazy="joined",
         cascade="all, delete, delete-orphan")
     submissions: Mapped[Optional[List["Submission"]]] = relationship(
-        "Submission", back_populates="story",
+        "Submission", back_populates="story", lazy="joined",
         cascade="all, delete, delete-orphan")
     links: Mapped[Optional[List["LinkStory"]]] = relationship(
-        "LinkStory", back_populates="story",
+        "LinkStory", back_populates="story", lazy="joined",
         cascade="all, delete, delete-orphan")
     notes: Mapped[Optional[List["NoteStory"]]] = relationship(
-        "NoteStory", back_populates="story",
+        "NoteStory", back_populates="story", lazy="joined",
         cascade="all, delete, delete-orphan")
     characters: Mapped[Optional[List["CharacterStory"]]] = relationship(
-        "CharacterStory", back_populates="story", lazy="joined",
+        "CharacterStory", back_populates="story",
         cascade="all, delete, delete-orphan")
 
     def __repr__(self):
@@ -117,6 +117,26 @@ class Story(Base):
             A dictionary representation of the story
         """
 
+        authors = []
+        if self.authors:
+            for author_story in self.authors:
+                authors.append(author_story.author.serialize())
+
+        links = []
+        if self.links:
+            for link_story in self.links:
+                links.append(link_story.link.serialize())
+
+        notes = []
+        if self.notes:
+            for note_story in self.notes:
+                notes.append(note_story.note.serialize())
+
+        chapters = []
+        if self.chapters:
+            for chapter in self.chapters:
+                chapters.append(chapter.serialize())
+
         return {
             'id': self.id,
             'user_id': self.user_id,
@@ -124,6 +144,10 @@ class Story(Base):
             'description': self.description,
             'created': str(self.created),
             'modified': str(self.modified),
+            'authors': authors,
+            'links': links,
+            'notes': notes,
+            'chapters': chapters
         }
 
     def unserialize(self, data: dict) -> "Story":

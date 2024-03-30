@@ -53,3 +53,4 @@ wheels/
 images/
 *.cfg
 noveler.db
+noveler/export/
