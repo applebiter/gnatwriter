@@ -42,11 +42,6 @@ class ExportController(BaseController):
         folder named with the story id. So, for example, if the story id is 1,
         the file would be stored in the folder export/<user UUID>/1/story.json.
 
-        Story size can potentially be huge, so this method uses strategies for
-        limiting memory usage. It reads the story in chunks and writes it to
-        the file in chunks. The method will return False if the story id is not
-        found. If a file already exists, it will be overwritten.
-
         Parameters
         ----------
         story_id : int
@@ -108,11 +103,6 @@ class ExportController(BaseController):
         This method exports a story to a text file and stores that file in a
         folder named with the story id. So, for example, if the story id is 1,
         the file would be stored in the folder export/<user UUID>/1/story.txt.
-
-        Story size can potentially be huge, so this method uses strategies for
-        limiting memory usage. It reads the story in chunks and writes it to
-        the file in chunks. The method will return False if the story id is not
-        found. If a file already exists, it will be overwritten.
 
         Parameters
         ----------
