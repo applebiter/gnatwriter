@@ -141,12 +141,45 @@ class ExportController(BaseController):
             if not os.path.exists(story_folder):
                 os.makedirs(story_folder)
 
-            story_file = f"{story_folder}/story.json"
+            story_file = f"{story_folder}/story.txt"
             dict_story = story.serialize()
 
-            # with open(story_file, "w") as output:
+            with open(story_file, "w") as output:
 
-                # to be did
+                output.write(" ")
+                output.write(f"{dict_story['title']}\n")
+                output.write(f"{dict_story['description']}\n")
+
+                author_count = len(dict_story["authors"])
+
+                counter = 0
+                is_first = True
+                author_string = ""
+
+                for author in dict_story["authors"]:
+
+                    counter += 1
+
+                    if is_first:
+                        author_string += f"By {author['name']}"
+                        is_first = False
+
+                    elif counter == (author_count - 2):
+                        author_string += f", {author.name}"
+
+                    elif counter == (author_count - 1):
+                        author_string += f" and {author.name}"
+
+                output.write(f"{author_string}\n")
+
+                for chapter in dict_story["chapters"]:
+
+                    output.write(f"\n\n{chapter['title']}\n\n")
+                    output.write(f"\n\n{chapter['description']}\n\n")
+
+                    for scene in chapter["scenes"]:
+                        output.write(f"{scene['title']}\n")
+                        output.write(f"{scene['content']}\n")
 
         with self._session as session:
 

@@ -36,8 +36,8 @@ database = config.get("mysql", "database")
 # noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")
 noveler = Noveler(f"sqlite:///{database}.db")
 # Export the existing story to JSON
-if noveler("export").export_story_to_json(story_id=1):
-    print("Exported story to JSON.")
+if noveler("export").export_story_to_text(story_id=1):
+    print("Exported story to file.")
 else:
     print("Abject failure.")
 
