@@ -1,12 +1,11 @@
+import os
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type
 from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Scene, Link, LinkScene, Note, NoteScene, Activity
-
-datetime_format = "%Y-%m-%d %H:%M:%S.%f"
-date_format = "%Y-%m-%d"
 
 
 class SceneController(BaseController):
@@ -191,10 +190,15 @@ class SceneController(BaseController):
             The new position value
         """
 
+        config = ConfigParser()
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        config.read(f"{project_root}/config.cfg")
+
         with self._session as session:
             try:
                 scene = session.query(Scene).filter(
-                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                    Scene.id == scene_id,
+                    Scene.user_id == self._owner.id
                 ).first()
 
                 if not scene:
@@ -205,21 +209,31 @@ class SceneController(BaseController):
 
                 if scene.position > position:
                     scenes = session.query(Scene).filter(
-                        Scene.chapter_id == scene.chapter_id, Scene.position >= position,
-                        Scene.position < scene.position, Scene.user_id == self._owner.id
+                        Scene.chapter_id == scene.chapter_id,
+                        Scene.position >= position,
+                        Scene.position < scene.position,
+                        Scene.user_id == self._owner.id
                     ).all()
                     for sibling in scenes:
                         sibling.position += 1
-                        sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                        sibling.created = datetime.strptime(
+                            str(sibling.created),
+                            config.get("formats", "datetime")
+                        )
                         sibling.modified = datetime.now()
                 else:
                     scenes = session.query(Scene).filter(
-                        Scene.chapter_id == scene.chapter_id, Scene.position > scene.position,
-                        Scene.position <= position, Scene.user_id == self._owner.id
+                        Scene.chapter_id == scene.chapter_id,
+                        Scene.position > scene.position,
+                        Scene.position <= position,
+                        Scene.user_id == self._owner.id
                     ).all()
                     for sibling in scenes:
                         sibling.position -= 1
-                        sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                        sibling.created = datetime.strptime(
+                            str(sibling.created),
+                            config.get("formats", "datetime")
+                        )
                         sibling.modified = datetime.now()
 
                 scene.position = position
@@ -253,6 +267,10 @@ class SceneController(BaseController):
             True on success
         """
 
+        config = ConfigParser()
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        config.read(f"{project_root}/config.cfg")
+
         with self._session as session:
             try:
                 scene = session.query(Scene).filter(
@@ -271,7 +289,10 @@ class SceneController(BaseController):
 
                 for sibling in siblings:
                     sibling.position -= 1
-                    sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                    sibling.created = datetime.strptime(
+                        str(sibling.created),
+                        config.get("formats", "datetime")
+                    )
                     sibling.modified = datetime.now()
 
                 activity = Activity(user_id=self._owner.id,

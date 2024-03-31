@@ -3,7 +3,7 @@ import os
 import uuid
 from configparser import ConfigParser
 from datetime import datetime
-from typing import Type, Optional, Union, List, Literal
+from typing import Type, Optional, Union, List, Literal, Mapping, Any
 from langchain_community.document_loaders.text import TextLoader
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.vectorstores.chroma import Chroma
@@ -117,7 +117,7 @@ class AssistantController(BaseController):
         self._multimodal_num_ctx = config.getint("ollama", "multimodal_context_window")
         self._multimodal_keep_alive = config.getint("ollama", "multimodal_memory_duration")
 
-    def update_models(self):
+    def update_models(self) -> bool:
         """Update the database with any new models in the list provided by the Ollama API.
         """
 
@@ -176,14 +176,16 @@ class AssistantController(BaseController):
 
                     except Exception as e:
                         session.rollback()
-                        raise e
+                        return False
 
                     else:
                         session.commit()
 
         except Exception as e:
             self._session.rollback()
-            raise e
+            return False
+
+        return True
 
     def chat(
         self,
@@ -652,11 +654,11 @@ class AssistantController(BaseController):
                 session.commit()
                 return response
 
-    def list_models(self):
+    def list_models(self) -> Mapping[str, Any]:
         """List all available models."""
         return self._client.list()
 
-    def show_model(self, model: str):
+    def show_model(self, model: str) -> Mapping[str, Any]:
         """Show the details of a specific model."""
         return self._client.show(model)
 
@@ -667,14 +669,3 @@ class AssistantController(BaseController):
     def __repr__(self):
         """Return the class representation."""
         return f"{self.__class__.__name__}()"
-
-    def get_by_session_uuid(self, session_uuid: str):
-        """Get all messages by session UUID."""
-
-        with self._session as session:
-
-            messages = session.query(Assistance).filter_by(
-                session_uuid=session_uuid
-            ).order_by(Assistance.created).all()
-
-            return messages

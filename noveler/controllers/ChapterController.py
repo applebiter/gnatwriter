@@ -1,12 +1,11 @@
+import os
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from noveler.controllers import BaseController
 from noveler.models import User, Chapter, Activity, Scene, Link, ChapterLink, Note, ChapterNote
-
-datetime_format = "%Y-%m-%d %H:%M:%S.%f"
-date_format = "%Y-%m-%d"
 
 
 class ChapterController(BaseController):
@@ -210,6 +209,10 @@ class ChapterController(BaseController):
             True if the chapter was deleted, False if not
         """
 
+        config = ConfigParser()
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        config.read(f"{project_root}/config.cfg")
+
         with self._session as session:
 
             try:
@@ -231,7 +234,8 @@ class ChapterController(BaseController):
                 for sibling in siblings:
                     sibling.position -= 1
                     sibling.created = datetime.strptime(
-                        str(sibling.created), datetime_format
+                        str(sibling.created),
+                        config.get("formats", "datetime")
                     )
                     sibling.modified = datetime.now()
 
@@ -276,6 +280,10 @@ class ChapterController(BaseController):
             The updated chapter object
         """
 
+        config = ConfigParser()
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        config.read(f"{project_root}/config.cfg")
+
         with self._session as session:
 
             try:
@@ -291,7 +299,9 @@ class ChapterController(BaseController):
                 if position < 1:
                     raise ValueError('Position must be greater than 0.')
 
-                highest_position = session.query(func.max(Chapter.position)).filter(
+                highest_position = session.query(
+                    func.max(Chapter.position)
+                ).filter(
                     Chapter.story_id == chapter.story_id,
                     Chapter.user_id == self._owner.id
                 ).scalar()
@@ -314,7 +324,9 @@ class ChapterController(BaseController):
                     for sibling in siblings:
                         sibling.position += 1
                         sibling.created = datetime.strptime(
-                            str(sibling.created), datetime_format)
+                            str(sibling.created),
+                            config.get("formats", "datetime")
+                        )
                         sibling.modified = datetime.now()
 
                 else:
@@ -328,7 +340,9 @@ class ChapterController(BaseController):
                     for sibling in siblings:
                         sibling.position -= 1
                         sibling.created = datetime.strptime(
-                            str(sibling.created), datetime_format)
+                            str(sibling.created),
+                            config.get("formats", "datetime")
+                        )
                         sibling.modified = datetime.now()
 
                 chapter.position = position

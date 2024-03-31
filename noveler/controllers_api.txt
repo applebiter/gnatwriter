@@ -9,6 +9,51 @@ class ActivityController
     get_activity_count ( ) : int
     search_activities ( search: str ) : list
 
+class AssistantController
+    update_models ( ) : bool
+    chat (
+        prompt: str,
+        temperature: Optional[float] = 0.5,
+        seed: Optional[int] = None,
+        priming: str = None,
+        options: Optional[dict] = None,
+        session_uuid: str = None,
+        keep_alive: Optional[Union[float, str]] = None
+    ) : Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]
+    rag_chat (
+        prompt: str,
+        document: str,
+        temperature: Optional[float] = 0.5,
+        seed: Optional[int] = None,
+        priming: str = None,
+        options: Optional[dict] = None,
+        session_uuid: str = None,
+        keep_alive: Optional[Union[float, str]] = None
+    ) : Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]
+    describe_image (
+        images: List[str],
+        prompt: Optional[str] = "Describe the image",
+        temperature: Optional[float] = 0.5,
+        seed: Optional[int] = None,
+        priming: Optional[str] = None,
+        return_format: Literal['', 'json'] = '',
+        options: Optional[dict] = None,
+        session_uuid: str = None,
+        keep_alive: Optional[Union[float, str]] = None
+    ) : Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]
+    generate (
+        prompt: str = None,
+        temperature: Optional[float] = 0.5,
+        seed: Optional[int] = None,
+        priming: Optional[str] = None,
+        return_format: Literal['', 'json'] = '',
+        options: Optional[dict] = None,
+        session_uuid: str = None,
+        keep_alive: Optional[Union[float, str]] = None
+    ) : Union[Mapping[str, Any], Iterator[Mapping[str, Any]]]
+    list_models ( ): Mapping[str, Any]
+    show_model ( model: str ): Mapping[str, Any]
+
 class AuthorController
     create_author ( name: str, initials: str = None, is_pseudonym: bool = False ) : Author
     update_author ( author_id: int, name: str, initials: str = None ) : Type[Author]
