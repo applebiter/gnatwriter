@@ -19,8 +19,6 @@ class AssistantController(BaseController):
 
     Attributes
     ----------
-    _name : str
-        The name of the assistant.
     _session_uuid : str
         The UUID of the session.
     _client : OllamaClient
@@ -87,8 +85,6 @@ class AssistantController(BaseController):
     def __init__(self, session: Session, owner: Type[User]):
 
         super().__init__(session, owner)
-
-        self._name = "Generative Assistant"
 
         uuid4 = str(uuid.uuid4())
         uuid_exists = session.query(Assistance).filter(
@@ -286,7 +282,7 @@ class AssistantController(BaseController):
                 assistance = Assistance(
                     user_id=self._owner.id,
                     session_uuid=session_uuid,
-                    assistant=self._name,
+                    assistant="Chat Assistant",
                     model=self._chat_model,
                     priming=priming,
                     prompt=prompt,
@@ -404,7 +400,7 @@ class AssistantController(BaseController):
                 assistance = Assistance(
                     user_id=self._owner.id,
                     session_uuid=session_uuid,
-                    assistant=self._name,
+                    assistant="RAG Chat Assistant",
                     model=self._chat_model,
                     priming=priming,
                     prompt=prompt,
@@ -518,7 +514,7 @@ class AssistantController(BaseController):
                 assistance = Assistance(
                     user_id=self._owner.id,
                     session_uuid=session_uuid,
-                    assistant=self._name,
+                    assistant="Multimodal Assistant",
                     model=self._multimodal_model,
                     priming=priming,
                     prompt=prompt,
@@ -620,7 +616,7 @@ class AssistantController(BaseController):
                 assistance = Assistance(
                     user_id=self._owner.id,
                     session_uuid=session_uuid,
-                    assistant=self._name,
+                    assistant="Generative Assistant",
                     model=self._generative_model,
                     priming=priming,
                     prompt=prompt,
@@ -664,7 +660,7 @@ class AssistantController(BaseController):
 
     def __str__(self):
         """Return the class string representation."""
-        return f"Noveler Application [alpha] {self._name}"
+        return f"Noveler Application [alpha] Assistant Controller"
 
     def __repr__(self):
         """Return the class representation."""
