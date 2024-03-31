@@ -4,6 +4,10 @@ import uuid
 from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, Optional, Union, List, Literal
+from langchain_community.document_loaders.text import TextLoader
+from langchain_community.embeddings.ollama import OllamaEmbeddings
+from langchain_community.vectorstores.chroma import Chroma
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from ollama import Client, Message
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
@@ -220,13 +224,11 @@ class AssistantController(BaseController):
             The keep alive value to be used when making the request.
         """
 
-        if not priming:
+        with self._session as session:
 
-            with self._session as session:
-
-                model = session.query(OllamaModel).filter(
-                    OllamaModel.model == self._chat_model
-                ).first()
+            model = session.query(OllamaModel).filter(
+                OllamaModel.model == self._chat_model
+            ).first()
 
         messages = []
 
@@ -319,6 +321,7 @@ class AssistantController(BaseController):
     def rag_chat(
         self,
         prompt: str,
+        document: str,
         temperature: Optional[float] = 0.5,
         seed: Optional[int] = None,
         priming: str = None,
@@ -326,7 +329,112 @@ class AssistantController(BaseController):
         session_uuid: str = None,
         keep_alive: Optional[Union[float, str]] = None
     ):
-        pass
+        with self._session as session:
+
+            model = session.query(OllamaModel).filter(
+                OllamaModel.model == self._chat_model
+            ).first()
+
+        messages = []
+
+        if model:
+            if priming is not None:
+                messages.append(Message(role="system", content=priming))
+
+        session_uuid = self._session_uuid if not session_uuid else session_uuid
+
+        with self._session as session:
+
+            assistances = session.query(Assistance).filter_by(
+                session_uuid=session_uuid
+            ).order_by(Assistance.created).all()
+
+            if assistances:
+                for assistance in assistances:
+                    messages.append(Message(
+                        role="user", content=assistance.prompt
+                    ))
+                    messages.append(Message(
+                        role="assistant", content=assistance.content
+                    ))
+
+        # RAG chain here
+        loader = TextLoader(document)
+        input_docs = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+        splits = text_splitter.split_documents(input_docs)
+        # Create Ollama embeddings and vector store
+        embeddings = OllamaEmbeddings(model="nous-hermes:7b")
+        vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
+        # Create the retriever
+        retriever = vectorstore.as_retriever()
+        retrieved_docs = retriever.invoke(prompt)
+        formatted_context = "\n\n".join(doc.page_content for doc in retrieved_docs)
+        formatted_prompt = f"Question: {prompt}\n\nContext: {formatted_context}"
+        messages.append(Message(role="user", content=formatted_prompt))
+
+        if not options:
+            options = {
+                "temperature": temperature,
+                "num_ctx": self._chat_num_ctx
+            }
+
+        if not options.get("temperature"):
+            options["temperature"] = temperature
+
+        if not options.get("num_ctx"):
+            options["num_ctx"] = self._chat_num_ctx
+
+        keep_alive = self._chat_keep_alive if not keep_alive else keep_alive
+
+        with self._session as session:
+
+            try:
+
+                response = self._client.chat(
+                    model=self._chat_model,
+                    messages=messages,
+                    format='',
+                    options=options,
+                    keep_alive=keep_alive
+                )
+
+                assistance = Assistance(
+                    user_id=self._owner.id,
+                    session_uuid=session_uuid,
+                    assistant=self._name,
+                    model=self._chat_model,
+                    priming=priming,
+                    prompt=prompt,
+                    temperature=temperature,
+                    seed=seed,
+                    content=response["message"]["content"] if response.get("message") else None,
+                    done=response["done"],
+                    total_duration=response["total_duration"] if response.get("total_duration") else None,
+                    load_duration=response["load_duration"] if response.get("load_duration") else None,
+                    prompt_eval_count=response["prompt_eval_count"] if response.get("prompt_eval_count") else None,
+                    prompt_eval_duration=response["prompt_eval_duration"] if response.get("prompt_eval_duration") else None,
+                    eval_count=response["eval_count"] if response.get("eval_count") else None,
+                    eval_duration=response["eval_duration"] if response.get("eval_duration") else None,
+                    created=datetime.now()
+                )
+
+                summary = f"{self._owner.username} used the Chat Assistant"
+                activity = Activity(
+                    user_id=self._owner.id, summary=summary,
+                    created=datetime.now()
+                )
+
+                session.add(assistance)
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return response
 
     def describe_image(
             self,
