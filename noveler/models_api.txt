@@ -13,6 +13,31 @@ class Activity
     func serialize( ) : dict
     func unserialize ( data: dict ) : Activity
 
+class Assistance
+    const id: int
+    const user_id: int
+    const session_uuid: str
+    const assistant: str
+    const model: str
+    const priming: str
+    const prompt: str
+    const temperature: float 0.5 by default
+    const seed: int
+    const content: str
+    const done: bool
+    const total_duration: int
+    const load_duration: int
+    const prompt_eval_count: int
+    const prompt_eval_duration: int
+    const eval_count: int
+    const eval_duration: int
+    const created: str for input/output, datetime.datetime object otherwise
+    const user: User
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize ( data: dict ) : Assistance
+
 class Author
     const id: int
     const user_id: int
@@ -519,6 +544,22 @@ class NoteStory
     func __str__( ) : str
     func serialize( ) : dict
     func unserialize( data: dict ): NoteStory
+
+class OllamaModel
+    const id: int
+    const title: str
+    const model: str
+    const description: str
+    const template: str
+    const example: str
+    const priming: str
+    const params: str
+    const created: str for input/output, datetime.datetime object otherwise
+    const modified: str for input/output, datetime.datetime object otherwise
+    func __repr__( ) : str
+    func __str__( ) : str
+    func serialize( ) : dict
+    func unserialize( data: dict ) : OllamaModel
 
 class Scene
     const id: int
