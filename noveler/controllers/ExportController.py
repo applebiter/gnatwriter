@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Type
 from sqlalchemy.orm import Session
 from noveler.controllers import BaseController
-from noveler.models import User, Story, Activity, Character
+from noveler.models import User, Story, Activity, Character, Event
 
 
 class ExportController(BaseController):
@@ -352,6 +352,133 @@ End Date: {relationship['end_date']}
                 activity = Activity(
                     user_id=self._owner.id, summary=f'Character exported to \
                     TEXT by {self._owner.username}', created=datetime.now()
+                )
+
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+
+        return True
+
+    def export_event_to_json(self, event_id: int) -> bool:
+        """Export an event to a JSON file
+
+        Parameters
+        ----------
+        event_id : int
+            The id of the event to export
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise
+        """
+
+        with self._session as session:
+
+            event = session.query(Event).filter(
+                Event.id == event_id,
+                Event.user_id == self._owner.id
+            ).first()
+
+            if not event:
+                return False
+
+            json_event = json.dumps(event.serialize(), indent=4)
+            user_folder = f"{self._export_root}/{self._owner.uuid}"
+            event_folder = f"{user_folder}/events/{event_id}"
+
+            if not os.path.exists(event_folder):
+                os.makedirs(event_folder)
+
+            event_file = f"{event_folder}/event.json"
+
+            with open(event_file, "w") as output:
+
+                output.write(json_event)
+
+        with self._session as session:
+
+            try:
+
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Event exported to JSON by \
+                    {self._owner.username}', created=datetime.now()
+                )
+
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+
+        return True
+
+    def export_event_to_text(self, event_id: int) -> bool:
+        """Export an event to a text file
+
+        Parameters
+        ----------
+        event_id : int
+            The id of the event to export
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise
+        """
+
+        with self._session as session:
+
+            event = session.query(Event).filter(
+                Event.id == event_id,
+                Event.user_id == self._owner.id
+            ).first()
+
+            if not event:
+                return False
+
+            user_folder = f"{self._export_root}/{self._owner.uuid}"
+            event_folder = f"{user_folder}/events/{event_id}"
+
+            if not os.path.exists(event_folder):
+                os.makedirs(event_folder)
+
+            event_file = f"{event_folder}/event.txt"
+            dict_event = event.serialize()
+
+            with open(event_file, "w") as output:
+
+                output.write(f"Event report for {dict_event['title']}")
+
+                if dict_event["start_datetime"]:
+                    output.write(
+                        f"\n\nStart Datetime: {dict_event['start_datetime']}"
+                    )
+
+                if dict_event["end_datetime"]:
+                    output.write(
+                        f"\nEnd Datetime: {dict_event['end_datetime']}"
+                    )
+
+                if dict_event["description"]:
+                    output.write(f"\n\n{dict_event['description']}")
+
+        with self._session as session:
+
+            try:
+
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Event exported to TEXT by \
+                    {self._owner.username}', created=datetime.now()
                 )
 
                 session.add(activity)
