@@ -98,7 +98,7 @@ class Character(Base):
     )
     events: Mapped[Optional[List["CharacterEvent"]]] = relationship(
         "CharacterEvent", back_populates="character",
-        cascade="all, delete, delete-orphan"
+        cascade="all, delete, delete-orphan", lazy="joined"
     )
     images: Mapped[Optional[List["CharacterImage"]]] = relationship(
         "CharacterImage", back_populates="character", lazy="joined",
@@ -154,6 +154,48 @@ class Character(Base):
             A dictionary representation of the character
         """
 
+        relationships = []
+        for character_relationship in self.character_relationships:
+            relationships.append(
+                character_relationship.serialize()
+            )
+
+        traits = []
+        for trait in self.traits:
+            traits.append(
+                trait.serialize()
+            )
+
+        images = []
+        for character_image in self.images:
+            images.append(
+                character_image.serialize()
+            )
+
+        events = []
+        for event in self.events:
+            events.append(
+                event.serialize()
+            )
+
+        links = []
+        for character_link in self.links:
+            links.append(
+                character_link.serialize()
+            )
+
+        notes = []
+        for character_note in self.notes:
+            notes.append(
+                character_note.serialize()
+            )
+
+        stories = []
+        for character_story in self.stories:
+            stories.append(
+                character_story.serialize()
+            )
+
         return {
             'id': self.id,
             'user_id': self.user_id,
@@ -162,13 +204,22 @@ class Character(Base):
             'middle_name': self.middle_name,
             'last_name': self.last_name,
             'nickname': self.nickname,
+            'full_name': self.full_name,  # 'title first_name middle_name last_name (nickname)
             'gender': self.gender,
             'sex': self.sex,
+            'age': self.age,
             'date_of_birth': str(self.date_of_birth),
             'date_of_death': str(self.date_of_death),
             'description' : self.description,
             'created': str(self.created),
             'modified': str(self.modified),
+            'relationships': relationships,
+            'traits': traits,
+            'events': events,
+            'images': images,
+            'links': links,
+            'notes': notes,
+            'stories': stories
         }
 
     def unserialize(self, data: dict) -> "Character":
@@ -412,3 +463,60 @@ class Character(Base):
             raise ValueError("The character description must have no more than 65535 characters.")
 
         return description
+
+    @property
+    def age(self) -> int:
+        """Returns the character's age.
+
+        Returns
+        -------
+        int
+            The character's age
+        """
+
+        if self.date_of_birth:
+            if self.date_of_death:
+                return self.date_of_death.year - self.date_of_birth.year
+
+            else:
+                return datetime.now().year - self.date_of_birth.year
+
+        else:
+            return 0
+
+    @property
+    def full_name(self) -> str:
+        """Returns the character's full name.
+
+        Returns
+        -------
+        str
+            The character's full name
+        """
+
+        full_name = ""
+
+        if self.title:
+            full_name += f'{self.title} '
+
+        if self.first_name:
+            if self.title:
+                full_name += " "
+            full_name += f'{self.first_name}'
+
+        if self.middle_name:
+            if self.first_name or self.title:
+                full_name += " "
+            full_name += f'{self.middle_name}'
+
+        if self.last_name:
+            if self.middle_name or self.first_name or self.title:
+                full_name += " "
+            full_name += f'{self.last_name}'
+
+        if self.nickname:
+            if len(full_name) > 0:
+                full_name += " "
+            full_name += f'({self.nickname})'
+
+        return f'{full_name}'

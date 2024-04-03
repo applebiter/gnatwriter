@@ -57,9 +57,11 @@ class CharacterImage(Base):
     )
     user: Mapped["User"] = relationship("User")
     character: Mapped["Character"] = relationship(
-        "Character", back_populates="images")
+        "Character", back_populates="images"
+    )
     image: Mapped["Image"] = relationship(
-        "Image", back_populates="character")
+        "Image", back_populates="character", lazy="joined"
+    )
 
     def __repr__(self):
         """Returns a string representation of the relationship.
@@ -100,6 +102,7 @@ class CharacterImage(Base):
             'is_default': self.is_default,
             'created': str(self.created),
             'modified': str(self.modified),
+            'image': self.image.serialize()
         }
 
     def unserialize(self, data: dict) -> "CharacterImage":

@@ -43,7 +43,9 @@ class CharacterEvent(Base):
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
     character: Mapped["Character"] = relationship("Character", back_populates="events")
-    event: Mapped["Event"] = relationship("Event", back_populates="characters")
+    event: Mapped["Event"] = relationship(
+        "Event", back_populates="characters", lazy='joined'
+    )
 
     def __repr__(self):
         """Returns a string representation of the relationship.
@@ -81,6 +83,7 @@ class CharacterEvent(Base):
             'character_id': self.character_id,
             'event_id': self.event_id,
             'created': str(self.created),
+            'event': self.event.title,
         }
 
     def unserialize(self, data: dict) -> "CharacterEvent":

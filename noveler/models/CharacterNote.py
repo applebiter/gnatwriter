@@ -50,7 +50,7 @@ class CharacterNote(Base):
         "Character", back_populates="notes"
     )
     note: Mapped["Note"] = relationship(
-        "Note", back_populates="characters"
+        "Note", back_populates="characters", lazy='joined'
     )
 
     def __repr__(self):
@@ -89,6 +89,7 @@ class CharacterNote(Base):
             'character_id': self.character_id,
             'note_id': self.note_id,
             'created': str(self.created),
+            'note': self.note.serialize()
         }
 
     def unserialize(self, data: dict) -> "CharacterNote":

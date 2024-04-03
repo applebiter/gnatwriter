@@ -76,8 +76,7 @@ class CharacterRelationship(Base):
     )
     user: Mapped["User"] = relationship("User")
     parent_character: Mapped["Character"] = relationship(
-        "Character", foreign_keys="CharacterRelationship.parent_id",
-        lazy="joined"
+        "Character", foreign_keys="CharacterRelationship.parent_id"
     )
     related_character: Mapped["Character"] = relationship(
         "Character", back_populates="character_relationships",
@@ -117,11 +116,17 @@ class CharacterRelationship(Base):
             A dictionary representation of the relationship
         """
 
+        related_name = ""
+
+        if self.related_character:
+            related_name = self.related_character.full_name
+
         return {
             'user_id': self.user_id,
             'parent_id': self.parent_id,
             'position': self.position,
             'related_id': self.related_id,
+            'related_name': related_name,
             'relationship_type': self.relationship_type,
             'description': self.description,
             'start_date': self.start_date,

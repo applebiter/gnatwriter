@@ -1,12 +1,11 @@
 import json
 import os
-import re
 from configparser import ConfigParser
 from datetime import datetime
 from typing import Type
 from sqlalchemy.orm import Session
 from noveler.controllers import BaseController
-from noveler.models import User, Story, Chapter, Scene, Activity, Author, AuthorStory
+from noveler.models import User, Story, Activity, Character
 
 
 class ExportController(BaseController):
@@ -64,7 +63,6 @@ class ExportController(BaseController):
                 return False
 
             json_story = json.dumps(story.serialize(), indent=4)
-
             user_folder = f"{self._export_root}/{self._owner.uuid}"
             story_folder = f"{user_folder}/stories/{story_id}"
 
@@ -183,6 +181,177 @@ class ExportController(BaseController):
                 activity = Activity(
                     user_id=self._owner.id, summary=f'Story exported to TEXT by \
                     {self._owner.username}', created=datetime.now()
+                )
+
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+
+        return True
+
+    def export_character_to_json(self, character_id: int) -> bool:
+        """Export a character to a JSON file
+
+        Parameters
+        ----------
+        character_id : int
+            The id of the character to export
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise
+        """
+
+        with self._session as session:
+
+            character = session.query(Character).filter(
+                Character.id == character_id,
+                Character.user_id == self._owner.id
+            ).first()
+
+            if not character:
+                return False
+
+            json_character = json.dumps(character.serialize(), indent=4)
+            user_folder = f"{self._export_root}/{self._owner.uuid}"
+            character_folder = f"{user_folder}/characters/{character_id}"
+
+            if not os.path.exists(character_folder):
+                os.makedirs(character_folder)
+
+            character_file = f"{character_folder}/character.json"
+
+            with open(character_file, "w") as output:
+
+                output.write(json_character)
+
+        with self._session as session:
+
+            try:
+
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character exported to \
+                    JSON by {self._owner.username}', created=datetime.now()
+                )
+
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+
+        return True
+
+    def export_character_to_text(self, character_id: int) -> bool:
+        """Export a character to a text file
+
+        Parameters
+        ----------
+        character_id : int
+            The id of the character to export
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise
+        """
+
+        with self._session as session:
+
+            character = session.query(Character).filter(
+                Character.id == character_id,
+                Character.user_id == self._owner.id
+            ).first()
+
+            if not character:
+                return False
+
+            user_folder = f"{self._export_root}/{self._owner.uuid}"
+            character_folder = f"{user_folder}/characters/{character_id}"
+
+            if not os.path.exists(character_folder):
+                os.makedirs(character_folder)
+
+            character_file = f"{character_folder}/character.txt"
+            dict_character = character.serialize()
+
+            with open(character_file, "w") as output:
+
+                output.write(
+                    f"Character Profile for {dict_character['full_name']}"
+                )
+
+                if dict_character['description']:
+                    output.write(f"\n\n{dict_character['description']}")
+
+                if dict_character["gender"]:
+                    output.write(f"\n\nGender: {dict_character['gender']}")
+
+                if dict_character["sex"]:
+                    output.write(f"\nSex: {dict_character['sex']}")
+
+                if dict_character["age"]:
+                    output.write(f"\nAge: {dict_character['age']}")
+
+                if dict_character["date_of_birth"]:
+                    output.write(f"\nDate of Birth: {dict_character['date_of_birth']}")
+
+                if dict_character["date_of_death"]:
+                    output.write(f"\nDate of Death: {dict_character['date_of_death']}")
+
+                if len(dict_character["traits"]) > 0:
+                    output.write("\n\nTraits and Magnitudes on 0-100 Scale (0 = undetectable, 100 = maximum level):")
+                    for trait in dict_character["traits"]:
+                        output.write(f"\n{trait['name']} - {trait['magnitude']}")
+
+                if dict_character["relationships"]:
+                    output.write("\n\nRelationships to other Characters:")
+                    for relationship in dict_character["relationships"]:
+                        output.write(
+                            f"""\n\nRelationship to {relationship['related_name']} in the category of \
+{relationship['relationship_type']}:
+Start Date: {relationship['start_date']}
+End Date: {relationship['end_date']}
+                            """
+                        )
+                        output.write(
+                            f"\nDescription:  {relationship['description']}"
+                        )
+
+                if dict_character["events"]:
+                    output.write(
+                        "\n\nEvents with which this character is associated:"
+                    )
+                    for character_event in dict_character["events"]:
+                        output.write(
+                            f"\n{character_event['event']}"
+                        )
+
+                if dict_character["stories"]:
+                    output.write(
+                        "\n\nStories in which this character appears:"
+                    )
+                    for character_story in dict_character["stories"]:
+                        output.write(
+                            f"\n{character_story['story_name']}"
+                        )
+
+        with self._session as session:
+
+            try:
+
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character exported to \
+                    TEXT by {self._owner.username}', created=datetime.now()
                 )
 
                 session.add(activity)

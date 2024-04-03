@@ -47,7 +47,7 @@ class CharacterStory(Base):
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
     character: Mapped["Character"] = relationship(
-        "Character", back_populates="stories", lazy="joined"
+        "Character", back_populates="stories"
     )
     story: Mapped["Story"] = relationship(
         "Story", back_populates="characters", lazy="joined"
@@ -89,6 +89,7 @@ class CharacterStory(Base):
             'character_id': self.character_id,
             'story_id': self.story_id,
             'created': str(self.created),
+            'story_name': self.story.title,
         }
 
     def unserialize(self, data: dict) -> "CharacterStory":
