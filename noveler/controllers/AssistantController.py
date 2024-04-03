@@ -1,9 +1,12 @@
 import base64
 import os
+import shutil
 import uuid
 from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, Optional, Union, List, Literal, Mapping, Any
+
+from langchain_community.document_loaders.directory import DirectoryLoader
 from langchain_community.document_loaders.text import TextLoader
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.vectorstores.chroma import Chroma
@@ -319,7 +322,7 @@ class AssistantController(BaseController):
     def rag_chat(
         self,
         prompt: str,
-        document: str,
+        documents: List[str],  #
         temperature: Optional[float] = 0.5,
         seed: Optional[int] = None,
         priming: str = None,
@@ -356,19 +359,46 @@ class AssistantController(BaseController):
                         role="assistant", content=assistance.content
                     ))
 
-        # RAG chain here
-        loader = TextLoader(document)
+        if len(documents) > 1:
+
+            noveler_root = os.path.dirname(
+                os.path.dirname(os.path.abspath(__file__))
+            )
+            tmp_dir = f"{noveler_root}/tmp"
+            session_tmp_dir = f"{tmp_dir}/{self._session_uuid}"
+
+            if not os.path.exists(session_tmp_dir):
+                os.makedirs(session_tmp_dir)
+
+            for document in documents:
+                filename = os.path.basename(document).split('/')[-1]
+                if os.path.isfile(document) and not os.path.isfile(f"{session_tmp_dir}/{filename}"):
+                    shutil.copy(document, f"{session_tmp_dir}/{filename}")
+
+            loader = DirectoryLoader(path=session_tmp_dir, load_hidden=False)
+
+        else:
+
+            loader = TextLoader(file_path=documents[0])
+
         input_docs = loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-        splits = text_splitter.split_documents(input_docs)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000, chunk_overlap=0
+        )
+        splits = text_splitter.split_documents(documents=input_docs)
+
         # Create Ollama embeddings and vector store
-        embeddings = OllamaEmbeddings(model="nous-hermes:7b")
-        vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
+        embeddings = OllamaEmbeddings(model=f"{self._chat_model}")
+        vectorstore = Chroma.from_documents(
+            documents=splits, embedding=embeddings
+        )
+
         # Create the retriever
         retriever = vectorstore.as_retriever()
         retrieved_docs = retriever.invoke(prompt)
         formatted_context = "\n\n".join(doc.page_content for doc in retrieved_docs)
         formatted_prompt = f"Question: {prompt}\n\nContext: {formatted_context}"
+
         messages.append(Message(role="user", content=formatted_prompt))
 
         if not options:
@@ -417,7 +447,7 @@ class AssistantController(BaseController):
                     created=datetime.now()
                 )
 
-                summary = f"{self._owner.username} used the Chat Assistant"
+                summary = f"{self._owner.username} used the RAG Chat Assistant"
                 activity = Activity(
                     user_id=self._owner.id, summary=summary,
                     created=datetime.now()
