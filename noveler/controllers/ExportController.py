@@ -26,10 +26,6 @@ class ExportController(BaseController):
 
             export_root = config.get("export", "root")
             self._export_root = export_root
-            user_folder = f"{export_root}/{self._owner.uuid}"
-
-            if not os.path.exists(user_folder):
-                os.makedirs(user_folder)
 
         except Exception as e:
             raise e
@@ -52,6 +48,11 @@ class ExportController(BaseController):
             True if successful, False otherwise
         """
 
+        user_folder = f"{self._export_root}/{self._owner.uuid}"
+
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+
         with self._session as session:
 
             story = session.query(Story).filter(
@@ -63,7 +64,6 @@ class ExportController(BaseController):
                 return False
 
             json_story = json.dumps(story.serialize(), indent=4)
-            user_folder = f"{self._export_root}/{self._owner.uuid}"
             story_folder = f"{user_folder}/stories/{story_id}"
 
             if not os.path.exists(story_folder):
@@ -113,6 +113,11 @@ class ExportController(BaseController):
             True if successful, False otherwise
         """
 
+        user_folder = f"{self._export_root}/{self._owner.uuid}"
+
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+
         with self._session as session:
 
             story = session.query(Story).filter(
@@ -123,7 +128,6 @@ class ExportController(BaseController):
             if not story:
                 return False
 
-            user_folder = f"{self._export_root}/{self._owner.uuid}"
             story_folder = f"{user_folder}/stories/{story_id}"
 
             if not os.path.exists(story_folder):
@@ -208,6 +212,11 @@ class ExportController(BaseController):
             True if successful, False otherwise
         """
 
+        user_folder = f"{self._export_root}/{self._owner.uuid}"
+
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+
         with self._session as session:
 
             character = session.query(Character).filter(
@@ -219,7 +228,6 @@ class ExportController(BaseController):
                 return False
 
             json_character = json.dumps(character.serialize(), indent=4)
-            user_folder = f"{self._export_root}/{self._owner.uuid}"
             character_folder = f"{user_folder}/characters/{character_id}"
 
             if not os.path.exists(character_folder):
@@ -265,6 +273,11 @@ class ExportController(BaseController):
             True if successful, False otherwise
         """
 
+        user_folder = f"{self._export_root}/{self._owner.uuid}"
+
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+
         with self._session as session:
 
             character = session.query(Character).filter(
@@ -275,7 +288,6 @@ class ExportController(BaseController):
             if not character:
                 return False
 
-            user_folder = f"{self._export_root}/{self._owner.uuid}"
             character_folder = f"{user_folder}/characters/{character_id}"
 
             if not os.path.exists(character_folder):
@@ -379,6 +391,11 @@ End Date: {relationship['end_date']}
             True if successful, False otherwise
         """
 
+        user_folder = f"{self._export_root}/{self._owner.uuid}"
+
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+
         with self._session as session:
 
             event = session.query(Event).filter(
@@ -390,7 +407,6 @@ End Date: {relationship['end_date']}
                 return False
 
             json_event = json.dumps(event.serialize(), indent=4)
-            user_folder = f"{self._export_root}/{self._owner.uuid}"
             event_folder = f"{user_folder}/events/{event_id}"
 
             if not os.path.exists(event_folder):
@@ -436,6 +452,11 @@ End Date: {relationship['end_date']}
             True if successful, False otherwise
         """
 
+        user_folder = f"{self._export_root}/{self._owner.uuid}"
+
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+
         with self._session as session:
 
             event = session.query(Event).filter(
@@ -446,7 +467,6 @@ End Date: {relationship['end_date']}
             if not event:
                 return False
 
-            user_folder = f"{self._export_root}/{self._owner.uuid}"
             event_folder = f"{user_folder}/events/{event_id}"
 
             if not os.path.exists(event_folder):
