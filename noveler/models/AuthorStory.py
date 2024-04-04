@@ -42,8 +42,12 @@ class AuthorStory(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
-    author: Mapped["Author"] = relationship("Author", back_populates="stories")
-    story: Mapped["Story"] = relationship("Story", back_populates="authors")
+    author: Mapped["Author"] = relationship(
+        "Author", back_populates="stories", lazy="joined"
+    )
+    story: Mapped["Story"] = relationship(
+        "Story", back_populates="authors"
+    )
 
     def __repr__(self):
         """Returns a string representation of the relationship.

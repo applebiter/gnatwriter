@@ -1,22 +1,10 @@
 import os
-from configparser import ConfigParser
+import sys
 from os.path import realpath
-
+from configparser import ConfigParser
 from noveler.application import Noveler
-
-
-"""Example database connection strings
-
-noveler = Noveler(f"postgresql+psycopg://{dbuser}:{dbpassword}@{dbhost}:{dbport}/{dbname}", echo=False)
-    Shown here using the psycopg driver, also known as psycopg3
-noveler = Noveler(f"mysql+mysqlconnector://{dbuser}:{dbpassword}@{dbhost}:{dbport}/{dbname}", echo=False)
-    Shown here using the mysql-connector-python driver
-noveler = Noveler(f"sqlite:///{dbname}.db", echo=False)
-
-You supply the connection string to the Noveler class, and it will automatically generate the database schema. Shown 
-here using the sqlite3 driver, which is included in the Python standard library. The echo parameter is optional and
-defaults to False. If set to True, it will print all SQL commands to the console. This is useful for debugging.
-"""
+from noveler.views import *
+from PySide6.QtWidgets import QApplication, QTreeView
 
 # Load the configuration
 filepath = realpath(__file__)
@@ -33,11 +21,25 @@ database = config.get("postgresql", "database")
 
 # Take your pick
 
-# PostgreSQL - Fast, open source, and widely used by data scientists
-noveler = Noveler(f"postgresql+psycopg://{user}:{password}@{host}:{port}/{database}")
+# PostgreSQL - Fastest, open source, and widely used by data scientists
+# noveler = Noveler(f"postgresql+psycopg://{user}:{password}@{host}:{port}/{database}")
 
 # MySQL - Fast, open source, and widely used by web developers
 # noveler = Noveler(f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}")
 
-# SQLite - Fast, lightweight, and included in the Python standard library
-# noveler = Noveler(f"sqlite:///{database}.db")
+# SQLite - Fast, local, lightweight, and included in the Python standard library
+noveler = Noveler(f"sqlite:///{database}.db")
+
+app = QApplication(sys.argv)
+tree = QTreeView()
+model = QtGui.QStandardItemModel()
+# data = {"A": {"B": {"H": {}, "I": {"M": {}, "N": {}}}, "D": {}, "E": {}, "F": {}, "G": {"L": {}},
+#               "C": {"J": {}, "K": {}}}}
+story = noveler("story").get_story_by_id(1)
+data = story.serialize()
+fill_model_from_json(model.invisibleRootItem(), data)
+tree.setModel(model)
+tree.expandAll()
+tree.resize(360, 480)
+tree.show()
+sys.exit(app.exec())

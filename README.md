@@ -7,6 +7,9 @@ GGUF models of their choice, and different models for different kinds of tasks. 
 source program you can install on Windows, Linux, or Mac that allows you to interact with a variety of artificial 
 intelligence models (like ChatGPT or GPT 4, but scaled down to run on your desktop PC) to help you write your stories.
 
+###Update 
+Work has begun on the GUI app, which will be built using PyQt6.
+
 ### How to install
 Clone the repo and open it in a modern Python IDE, like PyCharm. PyCharm Community Edition is free. 
 
