@@ -13,17 +13,17 @@ class ExportController(BaseController):
 
     _export_root: str
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
         try:
 
             config = ConfigParser()
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-            config.read(f"{project_root}/noveler.cfg")
-
+            config.read(path_to_config)
             export_root = config.get("export", "root")
             self._export_root = export_root
 

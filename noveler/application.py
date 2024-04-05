@@ -48,11 +48,11 @@ def get_tick_count() -> int:
 class Noveler:
     """Main application class for Noveler
     """
-    _instance = None
-    project_root: str = None
+    _instance: "Noveler" = None
+    path_to_config: str = None
     database_type: str = None
     
-    def __new__(cls):
+    def __new__(cls, path_to_config: str):
         """Enforce Singleton pattern"""
 
         if cls._instance is None:
@@ -60,12 +60,11 @@ class Noveler:
 
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, path_to_config: str):
 
-        filepath = realpath(__file__)
-        self.project_root = os.path.dirname(os.path.dirname(filepath))
+        self.path_to_config = path_to_config
         config = ConfigParser()
-        config.read(f"{self.project_root}/noveler.cfg")
+        config.read(self.path_to_config)
         self.database_type = config.get("default_database", "type")
 
         if self.database_type == "sqlite":
@@ -114,23 +113,57 @@ class Noveler:
             self._session.commit()
 
         self._controllers = {
-            "activity": ActivityController(self._session, self._owner),
-            "assistant": AssistantController(self._session, self._owner),
-            "author": AuthorController(self._session, self._owner),
-            "bibliography": BibliographyController(self._session, self._owner),
-            "chapter": ChapterController(self._session, self._owner),
-            "character": CharacterController(self._session, self._owner),
-            "event": EventController(self._session, self._owner),
-            "export": ExportController(self._session, self._owner),
-            "image": ImageController(self._session, self._owner),
-            "link": LinkController(self._session, self._owner),
-            "location": LocationController(self._session, self._owner),
-            "note": NoteController(self._session, self._owner),
-            "ollama-model": OllamaModelController(self._session, self._owner),
-            "scene": SceneController(self._session, self._owner),
-            "story": StoryController(self._session, self._owner),
-            "submission": SubmissionController(self._session, self._owner),
-            "user": UserController(self._session, self._owner)
+            "activity": ActivityController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "assistant": AssistantController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "author": AuthorController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "bibliography": BibliographyController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "chapter": ChapterController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "character": CharacterController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "event": EventController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "export": ExportController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "image": ImageController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "link": LinkController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "location": LocationController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "note": NoteController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "ollama-model": OllamaModelController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "scene": SceneController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "story": StoryController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "submission": SubmissionController(
+                self.path_to_config, self._session, self._owner
+            ),
+            "user": UserController(
+                self.path_to_config, self._session, self._owner
+            )
         }
 
     def __call__(self, *args, **kwargs):

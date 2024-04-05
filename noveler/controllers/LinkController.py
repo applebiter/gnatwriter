@@ -35,10 +35,12 @@ class LinkController(BaseController):
         Search for links by title
     """
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
     def create_link(self, url: str, title: str) -> Link:
         """Create a new link

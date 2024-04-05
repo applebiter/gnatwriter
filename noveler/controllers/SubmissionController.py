@@ -37,10 +37,12 @@ class SubmissionController(BaseController):
         Get a single page of submissions associated with a story from the database
     """
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
     def create_submission(self, story_id: int, submitted_to: str, date_sent: str = None) -> Submission:
         """Create a new submission

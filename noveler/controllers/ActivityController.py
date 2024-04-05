@@ -22,10 +22,12 @@ class ActivityController(BaseController):
         Search for activities by summary
     """
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
     def get_activity_by_id(self, activity_id: int) -> Type[Activity] | None:
         """Get an activity by id

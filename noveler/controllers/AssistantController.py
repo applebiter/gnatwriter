@@ -85,9 +85,12 @@ class AssistantController(BaseController):
 
     _templates = {}
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
+        """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
         uuid4 = str(uuid.uuid4())
         uuid_exists = session.query(Assistance).filter(
@@ -101,8 +104,7 @@ class AssistantController(BaseController):
             ).first()
 
         config = ConfigParser()
-        project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        config.read(f"{project_root}/noveler.cfg")
+        config.read(self._path_to_config)
         ollama_url = config.read("ollama", "url")
 
         self._client = Client(host=ollama_url)  # If I make this a string instead of a bytearray, the ollama code breaks
@@ -364,9 +366,7 @@ class AssistantController(BaseController):
 
         if len(documents) > 1:
 
-            noveler_root = os.path.dirname(
-                os.path.dirname(os.path.abspath(__file__))
-            )
+            noveler_root = os.path.dirname(os.path.abspath(__file__))
             tmp_dir = f"{noveler_root}/tmp"
             session_tmp_dir = f"{tmp_dir}/{self._session_uuid}"
 

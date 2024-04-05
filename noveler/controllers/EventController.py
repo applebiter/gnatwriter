@@ -52,10 +52,12 @@ class EventController(BaseController):
         Get a single page of notes associated with an event from the database
     """
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
     def create_event(self, title: str, description: str = None, start_datetime: str = None,
                      end_datetime: str = None) -> Event:

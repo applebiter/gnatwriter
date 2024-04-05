@@ -64,10 +64,12 @@ class LocationController(BaseController):
         Get a single page of notes associated with a location from the database
     """
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
     def create_location(self, title: str, description: str = None, address: str = None, city: str = None,
                         state: str = None, country: str = None, zip_code: str = None, latitude: float = None,

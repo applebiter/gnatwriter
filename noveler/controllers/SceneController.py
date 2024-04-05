@@ -58,10 +58,12 @@ class SceneController(BaseController):
         Get all notes associated with a scene
     """
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
     def create_scene(
             self, story_id: int, chapter_id: int, title: str, description: str = None, content: str = None

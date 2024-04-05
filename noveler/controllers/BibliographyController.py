@@ -47,10 +47,12 @@ class BibliographyController(BaseController):
         Search for bibliographies by title associated with a story
     """
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
     def create_bibliography(
         self, story_id: int, title: str, pages: str = None,

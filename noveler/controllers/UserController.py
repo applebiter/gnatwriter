@@ -80,10 +80,12 @@ class UserController(BaseController):
         Search for users by username or email
     """
 
-    def __init__(self, session: Session, owner: Type[User]):
+    def __init__(
+            self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
-        super().__init__(session, owner)
+        super().__init__(path_to_config, session, owner)
 
     def create_user(self, username: str, password: str, email: str) -> User:
         """Create a new user
