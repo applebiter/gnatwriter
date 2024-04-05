@@ -38,7 +38,7 @@ stories or chapters, respectively:
     chapter = noveler("chapter").create_chapter(story.id, 'title', 'description')
     scene = noveler("scene").create_scene(story.id, chapter.id, 'title', 'description', 'content')
 
-Notes and web links can be attached to any of the above objects, as well as the 
+Notes and Links can be attached to any of the above objects, as well as the 
 other objects that are in the system, such as Events, Characters, and Locations.
 
 Each of these objects can be retrieved by their ID, and the objects can be 
