@@ -102,7 +102,7 @@ class AssistantController(BaseController):
 
         config = ConfigParser()
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        config.read(f"{project_root}/config.cfg")
+        config.read(f"{project_root}/noveler.cfg")
         ollama_url = config.read("ollama", "url")
 
         self._client = Client(host=ollama_url)  # If I make this a string instead of a bytearray, the ollama code breaks

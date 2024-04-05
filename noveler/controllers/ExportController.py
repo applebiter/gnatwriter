@@ -22,7 +22,7 @@ class ExportController(BaseController):
 
             config = ConfigParser()
             project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-            config.read(f"{project_root}/config.cfg")
+            config.read(f"{project_root}/noveler.cfg")
 
             export_root = config.get("export", "root")
             self._export_root = export_root

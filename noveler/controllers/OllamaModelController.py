@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Type
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 from noveler.controllers import BaseController
 from noveler.models import User, OllamaModel, Activity

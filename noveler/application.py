@@ -65,7 +65,7 @@ class Noveler:
         filepath = realpath(__file__)
         self.project_root = os.path.dirname(os.path.dirname(filepath))
         config = ConfigParser()
-        config.read(f"{self.project_root}/config.cfg")
+        config.read(f"{self.project_root}/noveler.cfg")
         self.database_type = config.get("default_database", "type")
 
         if self.database_type == "sqlite":

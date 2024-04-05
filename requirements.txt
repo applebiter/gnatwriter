@@ -1,6 +1,5 @@
-SQLAlchemy~=2.0.26
-bcrypt~=4.1.2
-uuid~=1.30
+SQLAlchemy~=2.0.28
 validators~=0.22.0
+uuid~=1.30
+bcrypt~=4.1.2
 ollama~=0.1.8
-PyQt6~=6.6.1
