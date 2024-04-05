@@ -24,7 +24,7 @@ From within your activated project, run `pip install noveler`.
 Import the `Noveler` class from the `noveler` module and create a new 
 instance:
 
-    from noveler.application import Noveler
+    from noveler import Noveler
 
     noveler = Noveler()
 
