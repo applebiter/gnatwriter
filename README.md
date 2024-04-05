@@ -24,6 +24,7 @@ app. Import the `Novel` class from the `noveler` module and create a new
 instance:
 
     ```python   
+
     from noveler.application import Noveler
 
     noveler = Noveler()
