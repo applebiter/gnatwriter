@@ -1,16 +1,18 @@
-[mysql]
-host = localhost
-port = 3306
-user = root
-password = password
-database = noveler
-
-[postgresql]
-host = localhost
-port = 5432
-user = postgres
-password = password
-database = noveler
+# [default_database]
+# type = mysql
+# host = localhost
+# port = 3306
+# user = root
+# password = password
+# database = noveler
+#
+# [default_database]
+# type = postgresql
+# host = localhost
+# port = 5432
+# user = postgres
+# password = password
+# database = noveler
 
 [default_database]
 type = sqlite
