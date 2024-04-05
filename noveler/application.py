@@ -1,4 +1,3 @@
-import time
 import uuid as uniqueid
 from configparser import ConfigParser
 from datetime import datetime
@@ -200,7 +199,7 @@ class Noveler:
         return self._controllers[args[0]]
 
     def __str__(self):
-        return "Noveler Application [alpha]"
+        return "Noveler Application [Version 0.1.0]"
 
     def __repr__(self):
         return f"{self.__class__.__name__}()"
