@@ -5,8 +5,7 @@ offers tools based on the Ollama ecosystem for running large language models
 (LLMs) locally. 
 
 ### Installation
-I'm still a newbie Python programmer, and have never used PyPi to distribute 
-anything, so until I can figure all that out:
+Manually:
 1. Download this repo
 2. Inside the project root, run `python3 -m venv .venv`. This will create a 
 virtual environment in the `.venv` directory.
@@ -18,9 +17,11 @@ virtual environment in the `.venv` directory.
 `noveler.cfg.example` and copy it to `noveler.cfg`. Change the settings as
 needed.
 
+Using pip:
+From within your activated project, run `pip install noveler`.
+
 ### Usage
-For now, the noveler.py script in the project root demonstrates how to use the
-app. Import the `Noveler` class from the `noveler` module and create a new 
+Import the `Noveler` class from the `noveler` module and create a new 
 instance:
 
     from noveler.application import Noveler
@@ -50,5 +51,11 @@ The same is true for Events, Locations, and Characters.
 
 Internally, the method uses the `json` module and dumps() method to 
 serialize the objects, so the output is formatted as very human-readable JSON.
+
+Noveler also exports Story and Character objects to plain text files, mainly to 
+use as input for the LLM tools. Noveler uses the Ollama ecosystem and supporting
+libraries to deliver a Retrieval-Augmented Generation session wherein the user 
+may talk to the LLM about a story and/or characters. The ability to export Events and
+Locations is not yet supported but will be in future releases.
 
 More documentation will be forthcoming.
