@@ -14,4 +14,17 @@ virtual environment in the `.venv` directory.
 `source .venv/bin/activate` on Linux or `.\.venv\Scripts\activate` on Windows.
 4. Install the project dependencies by running 
 `pip install -r requirements.txt`.
-5. Create a configuration file in the project root called `noveler.cfg`
+5. Find the example configuration file in the project root called 
+`noveler.cfg.example` and copy it to `noveler.cfg`. Change the settings as
+needed.
+
+### Usage
+For now, the noveler.py script in the project root demonstrates how to use the
+app. Import the `Novel` class from the `noveler` module and create a new 
+instance:
+
+    ```python   
+    from noveler.application import Noveler
+
+    noveler = Noveler()
+    ```
