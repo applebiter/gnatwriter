@@ -22,11 +22,11 @@ From within your activated project, run `pip install noveler`.
 
 ### Usage
 Import the `Noveler` class from the `noveler` module and create a new 
-instance:
+instance. Pass in the path to the configuration file as the only argument.
 
     from noveler import Noveler
 
-    noveler = Noveler()
+    noveler = Noveler('path/to/noveler.cfg')
 
 To use a controller, pass a controller name to the noveler instance. For 
 example, to create a story do the following:
