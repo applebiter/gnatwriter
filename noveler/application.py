@@ -1,5 +1,10 @@
+import os
+import time
 import uuid as uniqueid
+from configparser import ConfigParser
 from datetime import datetime
+from os.path import realpath
+
 import bcrypt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -35,16 +40,58 @@ def verify_password(password: str, hashed_password: str) -> bool:
     )
 
 
+def get_tick_count() -> int:
+    """Return the current number of milliseconds that have elapsed since the app started"""
+    return int(time.time() * 1000)
+
+
 class Noveler:
+    """Main application class for Noveler
+    """
+    _instance = None
+    project_root: str = None
+    database_type: str = None
+    
+    def __new__(cls):
+        """Enforce Singleton pattern"""
 
-    assistants: dict = {}
+        if cls._instance is None:
+            cls._instance = super(Noveler, cls).__new__(cls)
 
-    def __init__(self, engine: str, echo: bool = False):
+        return cls._instance
 
-        self._engine = create_engine(engine, echo=echo)
+    def __init__(self):
+
+        filepath = realpath(__file__)
+        self.project_root = os.path.dirname(os.path.dirname(filepath))
+        config = ConfigParser()
+        config.read(f"{self.project_root}/config.cfg")
+        self.database_type = config.get("default_database", "type")
+
+        if self.database_type == "sqlite":
+            database = config.get("default_database", "database")
+            self._engine = create_engine(f"sqlite:///{database}")
+        elif self.database_type == "postgresql":
+            user = config.get("default_database", "user")
+            password = config.get("default_database", "password")
+            host = config.get("default_database", "host")
+            port = config.get("default_database", "port")
+            database = config.get("default_database", "database")
+            self._engine = create_engine(
+                f"postgresql+psycopg://{user}:{password}@{host}:{port}/{database}"
+            )
+        elif self.database_type == "mysql":
+            user = config.get("default_database", "user")
+            password = config.get("default_database", "password")
+            host = config.get("default_database", "host")
+            port = config.get("default_database", "port")
+            database = config.get("default_database", "database")
+            self._engine = create_engine(
+                f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}"
+            )
+
         Base.metadata.create_all(self._engine)
         self._session = Session(bind=self._engine, expire_on_commit=False)
-
         self._owner = self._session.query(User).filter(
             User.username == "noveler"
         ).first()
