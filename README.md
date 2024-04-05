@@ -23,8 +23,6 @@ For now, the noveler.py script in the project root demonstrates how to use the
 app. Import the `Novel` class from the `noveler` module and create a new 
 instance:
 
-    ```
-    from noveler.application import Noveler
+    `from noveler.application import Noveler`
 
-    noveler = Noveler()
-    ```
+    `noveler = Noveler()` 
