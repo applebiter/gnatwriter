@@ -48,6 +48,31 @@ class Noveler:
 
     Attributes:
     -----------
+    _instance: Noveler
+        The instance of the Noveler class
+    _engine: Engine
+        The database engine
+    _session: Session
+        The database session
+    _owner: User
+        The owner of the application
+    database_type: str
+        The type of database being used
+    path_to_config: str
+        The path to the configuration file
+
+    Methods:
+    --------
+    __new__(cls, path_to_config: str) -> Noveler
+        Enforce Singleton pattern
+    __init__(self, path_to_config: str)
+        Initialize the application
+    __call__(self, *args, **kwargs) -> Controller
+        Return the controller requested
+    __str__(self) -> str
+        Return a string representation of the application
+    __repr__(self) -> str
+        Return a string representation of the application
     """
     _instance: "Noveler" = None
     _engine: "Engine" = None
