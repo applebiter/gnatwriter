@@ -48,7 +48,7 @@ The same is true for Events, Locations, and Characters.
 
     story_dict = noveler("story").get_story(story.id).serialize()
 
-The method used internally uses the `json` module and dumps() method to 
+Internally, the method uses the `json` module and dumps() method to 
 serialize the objects, so the output is formatted as very human-readable JSON.
 
 More documentation will be forthcoming.
