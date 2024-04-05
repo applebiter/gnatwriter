@@ -41,4 +41,11 @@ stories or chapters, respectively:
 Notes and web links can be attached to any of the above objects, as well as the 
 other objects that are in the system, such as Events, Characters, and Locations.
 
+Each of these objects can be retrieved by their ID, and the objects can be 
+serialized. Top-level objects can be serialized with their children, so that a 
+whole story, and all of its notes and web links, can be serialized in one go. 
+The same is true for Events, Locations, and Characters.
+
+    story_dict = noveler("story").get_story(story.id).serialize()
+
 More documentation will be forthcoming.
