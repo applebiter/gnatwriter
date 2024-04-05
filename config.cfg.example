@@ -12,7 +12,8 @@ user = postgres
 password = password
 database = noveler
 
-[sqlite]
+[default_database]
+type = sqlite
 database = noveler.db
 
 [formats]
@@ -21,10 +22,10 @@ date = "%Y-%m-%d"
 
 [ollama]
 url = http://localhost:11434
-chat_model = dolphin-phi:2.7b
+chat_model = nous-hermes:7b
 chat_context_window = 4096
 chat_memory_duration = 0
-generative_model =yarn-mistral:7b
+generative_model = nous-hermes:7b
 generative_context_window = 4096
 generative_memory_duration = 0
 multimodal_model = llava:7b
@@ -32,4 +33,4 @@ multimodal_context_window = 4096
 multimodal_memory_duration = 0
 
 [export]
-root = /home/<username>/<some folder>/noveler/noveler/export
+root = /path/to/noveler/exports
