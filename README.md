@@ -58,4 +58,4 @@ libraries to deliver a Retrieval-Augmented Generation session wherein the user
 may talk to the LLM about a story and/or characters. The ability to export Events and
 Locations is not yet supported but will be in future releases.
 
-More documentation will be forthcoming.
+More documentation can be found in [this project's wiki](https://github.com/applebiter/noveler/wiki/Introduction-to-Noveler).
