@@ -74,6 +74,7 @@ class Noveler:
     __repr__(self) -> str
         Return a string representation of the application
     """
+
     _instance: "Noveler" = None
     _engine: "Engine" = None
     _session: "Session" = None
