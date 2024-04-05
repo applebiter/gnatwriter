@@ -10,7 +10,7 @@ anything, so until I can figure all that out:
 1. Download this repo
 2. Inside the project root, run `python3 -m venv .venv`. This will create a 
 virtual environment in the `.venv` directory.
-3. From the project root, activate the virtual environment by running 
+3. While still in the project root, activate the virtual environment by running 
 `source .venv/bin/activate` on Linux or `.\.venv\Scripts\activate` on Windows.
 4. Install the project dependencies by running 
 `pip install -r requirements.txt`.
@@ -47,5 +47,8 @@ whole story, and all of its notes and web links, can be serialized in one go.
 The same is true for Events, Locations, and Characters.
 
     story_dict = noveler("story").get_story(story.id).serialize()
+
+The method used internally uses the `json` module and dumps() method to 
+serialize the objects, so the output is formatted as very human-readable JSON.
 
 More documentation will be forthcoming.
