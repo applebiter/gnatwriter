@@ -1,12 +1,11 @@
-import os
 import time
 import uuid as uniqueid
 from configparser import ConfigParser
 from datetime import datetime
-from os.path import realpath
+from typing import Type
 
 import bcrypt
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import Session
 from noveler.controllers import ActivityController, AuthorController, BibliographyController, ChapterController, \
     CharacterController, EventController, ImageController, LinkController, AssistantController, \
@@ -40,17 +39,22 @@ def verify_password(password: str, hashed_password: str) -> bool:
     )
 
 
-def get_tick_count() -> int:
-    """Return the current number of milliseconds that have elapsed since the app started"""
-    return int(time.time() * 1000)
-
-
 class Noveler:
     """Main application class for Noveler
+
+    This class is a Singleton class that is used to manage the application. It
+    is responsible for creating the database engine and session, and
+    initializing the controllers.
+
+    Attributes:
+    -----------
     """
     _instance: "Noveler" = None
-    path_to_config: str = None
+    _engine: "Engine" = None
+    _session: "Session" = None
+    _owner: Type[User] = None
     database_type: str = None
+    path_to_config: str = None
     
     def __new__(cls, path_to_config: str):
         """Enforce Singleton pattern"""
