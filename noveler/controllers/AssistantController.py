@@ -327,7 +327,7 @@ class AssistantController(BaseController):
     def rag_chat(
         self,
         prompt: str,
-        documents: List[str],  #
+        documents: List[str],
         temperature: Optional[float] = 0.5,
         seed: Optional[int] = None,
         priming: str = None,
@@ -693,7 +693,7 @@ class AssistantController(BaseController):
 
     def __str__(self):
         """Return the class string representation."""
-        return f"Noveler Application [alpha] Assistant Controller"
+        return f"Noveler Application Assistant Controller"
 
     def __repr__(self):
         """Return the class representation."""

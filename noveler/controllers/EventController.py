@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Event, CharacterEvent, Character, Activity, EventLocation, Location, Link, EventLink, \
@@ -59,8 +59,10 @@ class EventController(BaseController):
 
         super().__init__(path_to_config, session, owner)
 
-    def create_event(self, title: str, description: str = None, start_datetime: str = None,
-                     end_datetime: str = None) -> Event:
+    def create_event(
+        self, title: str, description: str = None, start_datetime: str = None,
+        end_datetime: str = None
+    ) -> Event:
         """Create a new event
 
         Parameters
@@ -104,8 +106,10 @@ class EventController(BaseController):
                 session.commit()
                 return event
 
-    def update_event(self, event_id: int, title: str, description: str, start_datetime: str,
-                     end_datetime: str) -> Type[Event]:
+    def update_event(
+        self, event_id: int, title: str, description: str, start_datetime: str,
+        end_datetime: str
+    ) -> Type[Event]:
         """Update an event
 
         Parameters
@@ -192,7 +196,7 @@ class EventController(BaseController):
                 session.commit()
                 return True
 
-    def get_all_events(self) -> list:
+    def get_all_events(self) -> List[Type[Event]]:
         """Get all events associated with a user
 
         Returns
@@ -206,7 +210,9 @@ class EventController(BaseController):
                 Event.user_id == self._owner.id
             ).all()
 
-    def get_all_events_page(self, page: int, per_page: int) -> list:
+    def get_all_events_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Event]]:
         """Get a single page of events associated with a user from the database
 
         Parameters
@@ -228,7 +234,9 @@ class EventController(BaseController):
                 Event.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_characters_to_event(self, event_id: int, character_ids: list) -> Type[Event]:
+    def append_characters_to_event(
+        self, event_id: int, character_ids: list
+    ) -> Type[Event]:
         """Append characters to an event
 
         Parameters
@@ -278,7 +286,9 @@ class EventController(BaseController):
                 session.commit()
                 return event
 
-    def get_characters_by_event_id(self, event_id: int) -> list:
+    def get_characters_by_event_id(
+        self, event_id: int
+    ) -> List[Type[Character]]:
         """Get all characters associated with an event
 
         Parameters
@@ -298,7 +308,9 @@ class EventController(BaseController):
             ).all():
                 yield session.query(Character).filter(Character.id == character_event.character_id).first()
 
-    def get_characters_page_by_event_id(self, event_id: int, page: int, per_page: int) -> list:
+    def get_characters_page_by_event_id(
+        self, event_id: int, page: int, per_page: int
+    ) -> List[Type[Character]]:
         """Get a single page of characters associated with an event from the database
 
         Parameters
@@ -325,7 +337,9 @@ class EventController(BaseController):
                     Character.id == character_event.character_id, Character.user_id == self._owner.id
                 ).first()
 
-    def append_locations_to_event(self, event_id: int, location_ids: list) -> Type[Event]:
+    def append_locations_to_event(
+        self, event_id: int, location_ids: list
+    ) -> Type[Event]:
         """Append locations to an event
 
         Parameters
@@ -375,7 +389,7 @@ class EventController(BaseController):
                 session.commit()
                 return event
 
-    def get_locations_by_event_id(self, event_id: int) -> list:
+    def get_locations_by_event_id(self, event_id: int) -> List[Type[Location]]:
         """Get all locations associated with an event
 
         Parameters
@@ -397,7 +411,9 @@ class EventController(BaseController):
                     Location.id == event_location.location_id, Location.user_id == self._owner.id
                 ).first()
 
-    def append_links_to_event(self, event_id: int, link_ids: list) -> Type[Event]:
+    def append_links_to_event(
+        self, event_id: int, link_ids: list
+    ) -> Type[Event]:
         """Append links to an event
 
         Parameters
@@ -447,7 +463,7 @@ class EventController(BaseController):
                 session.commit()
                 return event
 
-    def get_links_by_event_id(self, event_id: int) -> list:
+    def get_links_by_event_id(self, event_id: int) -> List[Type[Link]]:
         """Get all links associated with an event
 
         Parameters
@@ -469,7 +485,9 @@ class EventController(BaseController):
                     Link.id == event_link.link_id, Link.user_id == self._owner.id
                 ).first()
 
-    def get_links_page_by_event_id(self, event_id: int, page: int, per_page: int) -> list:
+    def get_links_page_by_event_id(
+        self, event_id: int, page: int, per_page: int
+    ) -> List[Type[Link]]:
         """Get a single page of links associated with an event from the database
 
         Parameters
@@ -493,7 +511,9 @@ class EventController(BaseController):
                 EventLink.event_id == event_id, EventLink.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_notes_to_event(self, event_id: int, note_ids: list) -> Type[Event]:
+    def append_notes_to_event(
+        self, event_id: int, note_ids: list
+    ) -> Type[Event]:
         """Append notes to an event
 
         Parameters
@@ -543,7 +563,7 @@ class EventController(BaseController):
                 session.commit()
                 return event
 
-    def get_notes_by_event_id(self, event_id: int) -> list:
+    def get_notes_by_event_id(self, event_id: int) -> List[Type[Note]]:
         """Get all notes associated with an event
 
         Parameters
@@ -565,7 +585,9 @@ class EventController(BaseController):
                     Note.id == event_note.note_id, Note.user_id == self._owner.id
                 ).first()
 
-    def get_notes_page_by_event_id(self, event_id: int, page: int, per_page: int) -> list:
+    def get_notes_page_by_event_id(
+        self, event_id: int, page: int, per_page: int
+    ) -> List[Type[Note]]:
         """Get a single page of notes associated with an event from the database
 
         Parameters

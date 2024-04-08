@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
@@ -123,9 +123,10 @@ class CharacterController(BaseController):
 
     def create_character(
             self, title: str = None, first_name: str = None,
-            middle_name: str = None, last_name: str = None, nickname: str = None,
-            gender: str = None, sex: str = None, date_of_birth: str = None,
-            date_of_death: str = None, description: str = None
+            middle_name: str = None, last_name: str = None,
+            nickname: str = None, gender: str = None, sex: str = None,
+            date_of_birth: str = None, date_of_death: str = None,
+            description: str = None
     ) -> Character:
         """Create a new character
 
@@ -198,10 +199,10 @@ class CharacterController(BaseController):
 
     def update_character(
             self, character_id: int = None, title: str = None,
-            first_name: str = None, middle_name: str = None, last_name: str = None,
-            nickname: str = None, gender: str = None, sex: str = None,
-            date_of_birth: str = None, date_of_death: str = None,
-            description: str = None
+            first_name: str = None, middle_name: str = None,
+            last_name: str = None, nickname: str = None, gender: str = None,
+            sex: str = None, date_of_birth: str = None,
+            date_of_death: str = None, description: str = None
     ) -> Type[Character]:
         """Update a character
 
@@ -372,7 +373,9 @@ class CharacterController(BaseController):
                 Character.user_id == self._owner.id
             ).all()
 
-    def get_all_characters_page(self, page: int, per_page: int) -> list:
+    def get_all_characters_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Character]]:
         """Get a single page of characters from the database associated with a user
 
         Parameters
@@ -415,7 +418,9 @@ class CharacterController(BaseController):
                 CharacterStory.story_id == story_id, CharacterStory.user_id == self._owner.id
             ).scalar()
 
-    def get_characters_by_story_id(self, story_id: int) -> list:
+    def get_characters_by_story_id(
+        self, story_id: int
+    ) -> List[Type[Character]]:
         """Get characters by story id
 
         The characters and stories are associated in the CharacterStory table.
@@ -439,7 +444,9 @@ class CharacterController(BaseController):
                     Character.id == character_story.character_id, Character.user_id == self._owner.id
                 ).first()
 
-    def get_characters_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
+    def get_characters_page_by_story_id(
+        self, story_id: int, page: int, per_page: int
+    ) -> List[Type[Character]]:
         """Get a single page of characters by story id
 
         The characters and stories are associated in the CharacterStory table.
@@ -468,7 +475,7 @@ class CharacterController(BaseController):
                     Character.id == character_story.character_id, Character.user_id == self._owner.id
                 ).first()
 
-    def search_characters(self, search: str) -> list:
+    def search_characters(self, search: str) -> List[Type[Character]]:
         """Search for characters by title, first name, middle name, last name, nickname, and description belonging to \
         a specific user
 
@@ -491,7 +498,9 @@ class CharacterController(BaseController):
                 Character.user_id == self._owner.id
             ).all()
 
-    def search_characters_by_story_id(self, story_id: int, search: str) -> list:
+    def search_characters_by_story_id(
+        self, story_id: int, search: str
+    ) -> List[Type[Character]]:
         """Search for characters by title, first name, middle name, last name, nickname, and description belonging to \
         a specific story
 
@@ -525,8 +534,10 @@ class CharacterController(BaseController):
                 CharacterStory.user_id == self._owner.id
             ).all()
 
-    def create_relationship(self, parent_id: int, related_id: int, relationship_type: str, description: str = None,
-                            start_date: str = None, end_date: str = None) -> CharacterRelationship:
+    def create_relationship(
+        self, parent_id: int, related_id: int, relationship_type: str,
+        description: str = None, start_date: str = None, end_date: str = None
+    ) -> CharacterRelationship:
         """Create a new character relationship
 
         There are many relationships for each character, and the linking class, CharacterRelationship, is used to
@@ -608,9 +619,11 @@ class CharacterController(BaseController):
                 session.commit()
                 return character_relationship
 
-    def update_relationship(self, relationship_id: int, parent_id: int, related_id: int, relationship_type: str,
-                            description: str = None, start_date: str = None, end_date: str = None) \
-            -> Type[CharacterRelationship]:
+    def update_relationship(
+        self, relationship_id: int, parent_id: int, related_id: int,
+        relationship_type: str, description: str = None, start_date: str = None,
+        end_date: str = None
+    ) -> Type[CharacterRelationship]:
         """Update a character relationship
 
         Parameters
@@ -666,7 +679,9 @@ class CharacterController(BaseController):
                 session.commit()
                 return character_relationship
 
-    def change_relationship_position(self, relationship_id: int, position: int) -> Type[CharacterRelationship]:
+    def change_relationship_position(
+        self, relationship_id: int, position: int
+    ) -> Type[CharacterRelationship]:
         """Set the position of a character relationship
 
         First, determine whether the new position is closer to 1 or further from 1. If closer to one, get all sibling
@@ -784,7 +799,9 @@ class CharacterController(BaseController):
                 session.commit()
                 return True
 
-    def get_relationship_by_id(self, relationship_id: int) -> Type[CharacterRelationship] | None:
+    def get_relationship_by_id(
+        self, relationship_id: int
+    ) -> Type[CharacterRelationship] | None:
         """Get a character relationship by id
 
         Parameters
@@ -804,7 +821,9 @@ class CharacterController(BaseController):
             ).first()
             return character_relationship if character_relationship else None
 
-    def get_relationships_by_character_id(self, parent_id: int) -> list:
+    def get_relationships_by_character_id(
+        self, parent_id: int
+    ) -> List[Type[CharacterRelationship]]:
         """Get character relationships by character id, from that character's perspective
 
         Parameters
@@ -823,7 +842,9 @@ class CharacterController(BaseController):
                 CharacterRelationship.parent_id == parent_id, CharacterRelationship.user_id == self._owner.id
             ).all()
 
-    def get_relationships_page_by_character_id(self, parent_id: int, page: int, per_page: int) -> list:
+    def get_relationships_page_by_character_id(
+        self, parent_id: int, page: int, per_page: int
+    ) -> List[Type[CharacterRelationship]]:
         """Get a single page of character relationships by character id, from that character's perspective
 
         Parameters
@@ -847,7 +868,9 @@ class CharacterController(BaseController):
                 CharacterRelationship.parent_id == parent_id, CharacterRelationship.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def create_trait(self, character_id: int, name: str, magnitude: int) -> CharacterTrait:
+    def create_trait(
+        self, character_id: int, name: str, magnitude: int
+    ) -> CharacterTrait:
         """Create a new character trait
 
         The position of the new trait must be determined by first finding the highest existing position among siblings,
@@ -905,7 +928,9 @@ class CharacterController(BaseController):
                 session.commit()
                 return character_trait
 
-    def update_trait(self, trait_id: int, name: str, magnitude: int) -> Type[CharacterTrait]:
+    def update_trait(
+        self, trait_id: int, name: str, magnitude: int
+    ) -> Type[CharacterTrait]:
         """Update a character trait
 
         Parameters
@@ -949,7 +974,9 @@ class CharacterController(BaseController):
                 session.commit()
                 return character_trait
 
-    def change_trait_position(self, trait_id: int, position: int) -> Type[CharacterTrait]:
+    def change_trait_position(
+        self, trait_id: int, position: int
+    ) -> Type[CharacterTrait]:
         """Set the position of a character trait
 
         First, determine whether the new position is closer to 1 or further from 1. If closer to one, get all sibling
@@ -1111,7 +1138,9 @@ class CharacterController(BaseController):
             ).first()
             return character_trait if character_trait else None
 
-    def get_traits_by_character_id(self, character_id: int) -> list:
+    def get_traits_by_character_id(
+        self, character_id: int
+    ) -> List[Type[CharacterTrait]]:
         """Get character traits by character id
 
         Parameters
@@ -1130,7 +1159,9 @@ class CharacterController(BaseController):
                 CharacterTrait.character_id == character_id, CharacterTrait.user_id == self._owner.id
             ).all()
 
-    def get_traits_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
+    def get_traits_page_by_character_id(
+        self, character_id: int, page: int, per_page: int
+    ) -> List[Type[CharacterTrait]]:
         """Get a single page of character traits by character id
 
         Parameters
@@ -1155,7 +1186,9 @@ class CharacterController(BaseController):
             ).offset(
                 offset).limit(per_page).all()
 
-    def append_events_to_character(self, character_id: int, event_ids: list) -> Type[Character]:
+    def append_events_to_character(
+        self, character_id: int, event_ids: list
+    ) -> Type[Character]:
         """Append events to a character
 
         Parameters
@@ -1205,7 +1238,9 @@ class CharacterController(BaseController):
                 session.commit()
                 return character
 
-    def get_events_by_character_id(self, character_id: int) -> list:
+    def get_events_by_character_id(
+        self, character_id: int
+    ) -> List[Type[Event]]:
         """Get all events associated with a character
 
         Using the association of the CharacterEvent table, get all events from teh Event table associated with a
@@ -1230,7 +1265,9 @@ class CharacterController(BaseController):
                     Event.id == character_event.event_id, Event.user_id == self._owner.id
                 ).first()
 
-    def get_events_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
+    def get_events_page_by_character_id(
+        self, character_id: int, page: int, per_page: int
+    ) -> List[Type[Event]]:
         """Get a single page of events associated with a character from the database
 
         Parameters
@@ -1254,7 +1291,9 @@ class CharacterController(BaseController):
                 CharacterEvent.character_id == character_id, CharacterEvent.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_links_to_character(self, character_id: int, link_ids: list) -> Type[Character]:
+    def append_links_to_character(
+        self, character_id: int, link_ids: list
+    ) -> Type[Character]:
         """Append links to a character
 
         Parameters
@@ -1304,7 +1343,7 @@ class CharacterController(BaseController):
                 session.commit()
                 return character
 
-    def get_links_by_character_id(self, character_id: int) -> list:
+    def get_links_by_character_id(self, character_id: int) -> List[Type[Link]]:
         """Get all links associated with a character
 
         Parameters
@@ -1326,7 +1365,9 @@ class CharacterController(BaseController):
                     Link.id == character_link.link_id, Link.user_id == self._owner.id
                 ).first()
 
-    def get_links_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
+    def get_links_page_by_character_id(
+        self, character_id: int, page: int, per_page: int
+    ) -> List[Type[Link]]:
         """Get a single page of links associated with a character from the database
 
         Parameters
@@ -1350,7 +1391,9 @@ class CharacterController(BaseController):
                 CharacterLink.character_id == character_id, CharacterLink.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_notes_to_character(self, character_id: int, note_ids: list) -> Type[Character]:
+    def append_notes_to_character(
+        self, character_id: int, note_ids: list
+    ) -> Type[Character]:
         """Append notes to a character
 
         Parameters
@@ -1400,7 +1443,7 @@ class CharacterController(BaseController):
                 session.commit()
                 return character
 
-    def get_notes_by_character_id(self, character_id: int) -> list:
+    def get_notes_by_character_id(self, character_id: int) -> List[Type[Note]]:
         """Get all notes associated with a character
 
         Parameters
@@ -1422,7 +1465,9 @@ class CharacterController(BaseController):
                     Note.id == character_note.note_id, Note.user_id == self._owner.id
                 ).first()
 
-    def get_notes_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
+    def get_notes_page_by_character_id(
+        self, character_id: int, page: int, per_page: int
+    ) -> List[Type[Note]]:
         """Get a single page of notes associated with a character from the database
 
         Parameters
@@ -1446,7 +1491,9 @@ class CharacterController(BaseController):
                 CharacterNote.character_id == character_id, CharacterNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_images_to_character(self, character_id: int, image_ids: list) -> Type[Character]:
+    def append_images_to_character(
+        self, character_id: int, image_ids: list
+    ) -> Type[Character]:
         """Append images to a character
 
         As images are appended to the character, before each image is appended, the highest position among other images
@@ -1510,7 +1557,9 @@ class CharacterController(BaseController):
                 session.commit()
                 return character
 
-    def change_image_position(self, image_id: int, position: int) -> Type[CharacterImage]:
+    def change_image_position(
+        self, image_id: int, position: int
+    ) -> Type[CharacterImage]:
         """Set the position of a character image
 
         First, determine whether the new position is closer to 1 or further from 1. If closer to one, get all sibling
@@ -1601,7 +1650,9 @@ class CharacterController(BaseController):
                 session.commit()
                 return character_image
 
-    def change_image_default_status(self, image_id: int, is_default: bool) -> Type[CharacterImage]:
+    def change_image_default_status(
+        self, image_id: int, is_default: bool
+    ) -> Type[CharacterImage]:
         """Set the default status of a character image
 
         If changing the value from true to false, it is straightforward - make the value change and save the object.
@@ -1735,7 +1786,9 @@ class CharacterController(BaseController):
                 CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
             ).scalar()
 
-    def get_images_by_character_id(self, character_id: int) -> list:
+    def get_images_by_character_id(
+        self, character_id: int
+    ) -> List[Type[Image]]:
         """Get all images associated with a character
 
         The images will be returned in the order of their position. A yield is used to return the images one at a time.
@@ -1759,7 +1812,9 @@ class CharacterController(BaseController):
                     Image.id == character_image.image_id, Image.user_id == self._owner.id
                 ).first()
 
-    def get_images_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
+    def get_images_page_by_character_id(
+        self, character_id: int, page: int, per_page: int
+    ) -> List[Type[Image]]:
         """Get a single page of images associated with a character from the database
 
         The images will be returned in the order of their position. A yield is used to return the images one at a time.

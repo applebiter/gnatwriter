@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Image, Activity, ImageLocation
@@ -49,7 +49,8 @@ class ImageController(BaseController):
         super().__init__(path_to_config, session, owner)
 
     def create_image(
-            self, filename: str, dirname: str, size_in_bytes: int, mime_type: str, caption: str = None
+        self, filename: str, dirname: str, size_in_bytes: int, mime_type: str,
+        caption: str = None
     ) -> Image:
         """Create a new image
 
@@ -175,7 +176,7 @@ class ImageController(BaseController):
                 session.commit()
                 return True
 
-    def get_all_images(self) -> list:
+    def get_all_images(self) -> List[Type[Image]]:
         """Get all images associated with a user
 
         Returns
@@ -189,7 +190,9 @@ class ImageController(BaseController):
                 Image.user_id == self._owner.id
             ).all()
 
-    def get_all_images_page(self, page: int, per_page: int) -> list:
+    def get_all_images_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Image]]:
         """Get a single page of images associated with a user from the database
 
         Parameters
@@ -211,7 +214,7 @@ class ImageController(BaseController):
                 Image.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def search_images(self, search: str) -> list:
+    def search_images(self, search: str) -> List[Type[Image]]:
         """Search for images by caption
 
         Parameters
@@ -230,7 +233,9 @@ class ImageController(BaseController):
                 Image.caption.like(f'%{search}%'), Image.user_id == self._owner.id
             ).all()
 
-    def get_images_by_character_id(self, character_id: int) -> list:
+    def get_images_by_character_id(
+        self, character_id: int
+    ) -> List[Type[Image]]:
         """Get all images associated with a character
 
         Parameters
@@ -249,7 +254,9 @@ class ImageController(BaseController):
                 Image.character_id == character_id, Image.user_id == self._owner.id
             ).all()
 
-    def get_images_page_by_character_id(self, character_id: int, page: int, per_page: int) -> list:
+    def get_images_page_by_character_id(
+        self, character_id: int, page: int, per_page: int
+    ) -> List[Type[Image]]:
         """Get a single page of images associated with a character from the database
 
         Parameters
@@ -273,7 +280,7 @@ class ImageController(BaseController):
                 Image.character_id == character_id, Image.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def get_images_by_location_id(self, location_id: int) -> list:
+    def get_images_by_location_id(self, location_id: int) -> List[Type[Image]]:
         """Get all images associated with a location
 
         Images and Locations are associated through ImageLocation objects. This method will use yield to return the
@@ -298,7 +305,9 @@ class ImageController(BaseController):
                     Image.id == image_location.image_id, Image.user_id == self._owner.id
                 ).first()
 
-    def get_images_page_by_location_id(self, location_id: int, page: int, per_page: int) -> list:
+    def get_images_page_by_location_id(
+        self, location_id: int, page: int, per_page: int
+    ) -> List[Type[Image]]:
         """Get a single page of images associated with a location from the database
 
         Images and Locations are associated through ImageLocation objects. This method will use yield to return the

@@ -6,7 +6,8 @@ from noveler.models import User, OllamaModel, Activity
 
 
 class OllamaModelController(BaseController):
-    """Ollama model controller class
+    """The OllamaModelController class encapsulates the logic for managing
+    Ollama models in the database.
     """
 
     def __init__(

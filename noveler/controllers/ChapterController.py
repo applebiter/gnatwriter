@@ -1,7 +1,7 @@
 import os
 from configparser import ConfigParser
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from noveler.controllers import BaseController
@@ -389,7 +389,7 @@ class ChapterController(BaseController):
 
             return chapter if chapter else None
 
-    def get_all_chapters(self) -> list | None:
+    def get_all_chapters(self) -> list:
         """Get all chapters associated with a user
 
         Chapters are sorted by story id and position.
@@ -406,7 +406,7 @@ class ChapterController(BaseController):
                 Chapter.user_id == self._owner.id
             ).order_by(Chapter.story_id, Chapter.position).all()
 
-    def get_all_chapters_page(self, page: int, per_page: int) -> list | None:
+    def get_all_chapters_page(self, page: int, per_page: int) -> List[Type[Chapter]]:
         """Get a single page of chapters from the database associated with a user
 
         Chapters are sorted by story id and position.
@@ -434,7 +434,7 @@ class ChapterController(BaseController):
                 Chapter.story_id, Chapter.position
             ).offset(offset).limit(per_page).all()
 
-    def get_chapters_by_story_id(self, story_id: int) -> list | None:
+    def get_chapters_by_story_id(self, story_id: int) -> List[Type[Chapter]]:
         """Get all chapters associated with a story
 
         The returned list will be sorted by the position.
@@ -511,7 +511,7 @@ class ChapterController(BaseController):
                 Chapter.user_id == self._owner.id
             ).scalar()
 
-    def search_chapters(self, search: str) -> list:
+    def search_chapters(self, search: str) -> List[Type[Chapter]]:
         """Search for chapters by title and description belonging to a specific user
 
         Parameters
@@ -533,7 +533,7 @@ class ChapterController(BaseController):
                 Chapter.user_id == self._owner.id
             ).all()
 
-    def search_chapters_by_story_id(self, story_id: int, search: str) -> list:
+    def search_chapters_by_story_id(self, story_id: int, search: str) -> List[Type[Chapter]]:
         """Search for chapters by title and description belonging to a specific story
 
         Parameters
@@ -605,7 +605,7 @@ class ChapterController(BaseController):
 
             return scene if scene else None
 
-    def get_all_scenes_by_chapter_id(self, chapter_id: int) -> list[Type[Scene]]:
+    def get_all_scenes_by_chapter_id(self, chapter_id: int) -> List[Type[Scene]]:
         """Get all scenes associated with a chapter
 
         Parameters
@@ -686,7 +686,7 @@ class ChapterController(BaseController):
                 session.commit()
                 return chapter
 
-    def get_links_by_chapter_id(self, chapter_id: int) -> list[Type[Link]]:
+    def get_links_by_chapter_id(self, chapter_id: int) -> List[Type[Link]]:
         """Get all links associated with a chapter
 
         Parameters
@@ -772,7 +772,7 @@ class ChapterController(BaseController):
                 session.commit()
                 return chapter
 
-    def get_notes_by_chapter_id(self, chapter_id: int) -> list[Type[Note]]:
+    def get_notes_by_chapter_id(self, chapter_id: int) -> List[Type[Note]]:
         """Get all notes associated with a chapter
 
         Parameters
