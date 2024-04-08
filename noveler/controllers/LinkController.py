@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Link, Activity, LinkStory
@@ -182,7 +182,7 @@ class LinkController(BaseController):
                 Link.id == link_id, Link.user_id == self._owner.id
             ).first()
 
-    def get_links_by_story_id(self, story_id: int) -> list:
+    def get_links_by_story_id(self, story_id: int) -> List[Type[Link]]:
         """Get all links associated with a story
 
         The LinkStory objects are the associations between links and stories. This method returns a list of links
@@ -204,7 +204,7 @@ class LinkController(BaseController):
                 LinkStory.story_id == story_id, LinkStory.user_id == self._owner.id
             ).all()
 
-    def get_all_links(self) -> list:
+    def get_all_links(self) -> List[Type[Link]]:
         """Get all links associated with an owner
 
         Returns
@@ -216,7 +216,7 @@ class LinkController(BaseController):
         with self._session as session:
             return session.query(Link).filter(Link.user_id == self._owner.id).all()
 
-    def get_all_links_page(self, page: int, per_page: int) -> list:
+    def get_all_links_page(self, page: int, per_page: int) -> List[Type[Link]]:
         """Get a single page of links associated with an owner from the database
 
         Parameters
@@ -236,7 +236,7 @@ class LinkController(BaseController):
             offset = (page - 1) * per_page
             return session.query(Link).filter(Link.user_id == self._owner.id).offset(offset).limit(per_page).all()
 
-    def search_links(self, search: str) -> list:
+    def search_links(self, search: str) -> List[Type[Link]]:
         """Search for links by title
 
         Parameters

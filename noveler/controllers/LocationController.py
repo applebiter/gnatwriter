@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
@@ -11,7 +11,7 @@ class LocationController(BaseController):
 
     Attributes
     ----------
-    _self : LocationController
+    _instance : LocationController
         The instance of the location controller
     _owner : User
         The current user of the location controller
@@ -71,9 +71,11 @@ class LocationController(BaseController):
 
         super().__init__(path_to_config, session, owner)
 
-    def create_location(self, title: str, description: str = None, address: str = None, city: str = None,
-                        state: str = None, country: str = None, zip_code: str = None, latitude: float = None,
-                        longitude: float = None) -> Location:
+    def create_location(
+        self, title: str, description: str = None, address: str = None,
+        city: str = None, state: str = None, country: str = None,
+        zip_code: str = None, latitude: float = None, longitude: float = None
+    ) -> Location:
         """Create a new location
 
         Parameters
@@ -127,9 +129,12 @@ class LocationController(BaseController):
                 session.commit()
                 return location
 
-    def update_location(self, location_id: int, title: str, description: str = None, address: str = None,
-                        city: str = None, state: str = None, country: str = None, zip_code: str = None,
-                        latitude: float = None, longitude: float = None) -> Type[Location]:
+    def update_location(
+        self, location_id: int, title: str, description: str = None,
+        address: str = None, city: str = None, state: str = None,
+        country: str = None, zip_code: str = None, latitude: float = None,
+        longitude: float = None
+    ) -> Type[Location]:
         """Update a location
 
         Parameters
@@ -233,7 +238,7 @@ class LocationController(BaseController):
                 session.commit()
                 return True
 
-    def get_all_locations(self) -> list:
+    def get_all_locations(self) -> List[Type[Location]]:
         """Get all locations associated with an owner
 
         Returns
@@ -245,7 +250,9 @@ class LocationController(BaseController):
         with self._session as session:
             return session.query(Location).filter(Location.user_id == self._owner.id).all()
 
-    def get_all_locations_page(self, page: int, per_page: int) -> list:
+    def get_all_locations_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Location]]:
         """Get a single page of locations associated with an owner from the database
 
         Parameters
@@ -267,7 +274,9 @@ class LocationController(BaseController):
                 Location.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def search_locations_by_title_and_description(self, search: str) -> list:
+    def search_locations_by_title_and_description(
+        self, search: str
+    ) -> List[Type[Location]]:
         """Search for locations by title and description
 
         Parameters
@@ -287,7 +296,7 @@ class LocationController(BaseController):
                 or_(Location.title.like(f'%{search}%'), Location.description.like(f'%{search}%'))
             ).all()
 
-    def search_locations_by_address(self, search: str) -> list:
+    def search_locations_by_address(self, search: str) -> List[Type[Location]]:
         """Search for locations by address
 
         Parameters
@@ -306,7 +315,7 @@ class LocationController(BaseController):
                 Location.address.like(f'%{search}%'), Location.user_id == self._owner.id
             ).all()
 
-    def search_locations_by_city(self, search: str) -> list:
+    def search_locations_by_city(self, search: str) -> List[Type[Location]]:
         """Search for locations by city
 
         Parameters
@@ -325,7 +334,7 @@ class LocationController(BaseController):
                 Location.city.like(f'%{search}%'), Location.user_id == self._owner.id
             ).all()
 
-    def search_locations_by_state(self, search: str) -> list:
+    def search_locations_by_state(self, search: str) -> List[Type[Location]]:
         """Search for locations by state
 
         Parameters
@@ -344,7 +353,7 @@ class LocationController(BaseController):
                 Location.state.like(f'%{search}%'), Location.user_id == self._owner.id
             ).all()
 
-    def search_locations_by_country(self, search: str) -> list:
+    def search_locations_by_country(self, search: str) -> List[Type[Location]]:
         """Search for locations by country
 
         Parameters
@@ -363,7 +372,7 @@ class LocationController(BaseController):
                 Location.country.like(f'%{search}%'), Location.user_id == self._owner.id
             ).all()
 
-    def search_locations_by_zip_code(self, search: str) -> list:
+    def search_locations_by_zip_code(self, search: str) -> List[Type[Location]]:
         """Search for locations by zip code
 
         Parameters
@@ -382,7 +391,9 @@ class LocationController(BaseController):
                 Location.zip_code.like(f'%{search}%'), Location.user_id == self._owner.id
             ).all()
 
-    def append_images_to_location(self, location_id: int, image_ids: list) -> Type[Location]:
+    def append_images_to_location(
+        self, location_id: int, image_ids: list
+    ) -> Type[Location]:
         """Append images to a location
 
         Parameters
@@ -441,7 +452,7 @@ class LocationController(BaseController):
                 session.commit()
                 return location
 
-    def get_images_by_location_id(self, location_id: int) -> list:
+    def get_images_by_location_id(self, location_id: int) -> List[Type[Image]]:
         """Get all images associated with a location
 
         The images should be returned in the order determined by the position field in the ImageLocation table.
@@ -469,7 +480,9 @@ class LocationController(BaseController):
                     Image.user_id == self._owner.id
                 ).first()
 
-    def get_images_page_by_location_id(self, location_id: int, page: int, per_page: int) -> list:
+    def get_images_page_by_location_id(
+        self, location_id: int, page: int, per_page: int
+    ) -> List[Type[Image]]:
         """Get a single page of images associated with a location from the database
 
         Parameters
@@ -493,7 +506,9 @@ class LocationController(BaseController):
                 ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_links_to_location(self, location_id: int, link_ids: list) -> Type[Location]:
+    def append_links_to_location(
+        self, location_id: int, link_ids: list
+    ) -> Type[Location]:
         """Append links to a location
 
         Parameters
@@ -544,7 +559,7 @@ class LocationController(BaseController):
                 session.commit()
                 return location
 
-    def get_links_by_location_id(self, location_id: int) -> list:
+    def get_links_by_location_id(self, location_id: int) -> List[Type[Link]]:
         """Get all links associated with a location
 
         Parameters
@@ -566,7 +581,9 @@ class LocationController(BaseController):
                     Link.id == link_location.link_id, Link.user_id == self._owner.id
                 ).first()
 
-    def get_links_page_by_location_id(self, location_id: int, page: int, per_page: int) -> list:
+    def get_links_page_by_location_id(
+        self, location_id: int, page: int, per_page: int
+    ) -> List[Type[Link]]:
         """Get a single page of links associated with a location from the database
 
         Parameters
@@ -590,7 +607,9 @@ class LocationController(BaseController):
                 LinkLocation.location_id == location_id, LinkLocation.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def append_notes_to_location(self, location_id: int, note_ids: list) -> Type[Location]:
+    def append_notes_to_location(
+        self, location_id: int, note_ids: list
+    ) -> Type[Location]:
         """Append notes to a location
 
         Parameters
@@ -641,7 +660,7 @@ class LocationController(BaseController):
                 session.commit()
                 return location
 
-    def get_notes_by_location_id(self, location_id: int) -> list:
+    def get_notes_by_location_id(self, location_id: int) -> List[Type[Note]]:
         """Get all notes associated with a location
 
         Parameters
@@ -663,7 +682,9 @@ class LocationController(BaseController):
                     Note.id == location_note.note_id, Note.user_id == self._owner.id
                 ).first()
 
-    def get_notes_page_by_location_id(self, location_id: int, page: int, per_page: int) -> list:
+    def get_notes_page_by_location_id(
+        self, location_id: int, page: int, per_page: int
+    ) -> List[Type[Note]]:
         """Get a single page of notes associated with a location from the database
 
         Parameters
