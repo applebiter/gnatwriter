@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
@@ -11,7 +11,7 @@ class NoteController(BaseController):
 
     Attributes
     ----------
-    _self : NoteController
+    _instance : NoteController
         The instance of the note controller
     _owner : User
         The current user of the note controller
@@ -187,7 +187,7 @@ class NoteController(BaseController):
                 Note.id == note_id, Note.user_id == self._owner.id
             ).first()
 
-    def get_all_notes(self) -> list:
+    def get_all_notes(self) -> List[Type[Note]]:
         """Get all notes associated with an owner
 
         Returns
@@ -199,7 +199,7 @@ class NoteController(BaseController):
         with self._session as session:
             return session.query(Note).filter(Note.user_id == self._owner.id).all()
 
-    def get_all_notes_page(self, page: int, per_page: int) -> list:
+    def get_all_notes_page(self, page: int, per_page: int) -> List[Type[Note]]:
         """Get a single page of notes associated with an owner from the database
 
         Parameters
@@ -221,7 +221,7 @@ class NoteController(BaseController):
                 Note.owner_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def search_notes(self, search: str) -> list:
+    def search_notes(self, search: str) -> List[Type[Note]]:
         """Search for notes by title and content
 
         Parameters

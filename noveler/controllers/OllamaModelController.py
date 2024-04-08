@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy.orm import Session
 from noveler.controllers import BaseController
 from noveler.models import User, OllamaModel, Activity
@@ -11,7 +11,7 @@ class OllamaModelController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
@@ -95,7 +95,7 @@ class OllamaModelController(BaseController):
 
             return model if model else None
 
-    def get_models(self) -> list:
+    def get_models(self) -> List[Type[OllamaModel]]:
         """Get all models stored in the database
 
         Returns
