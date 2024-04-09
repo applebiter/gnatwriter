@@ -1,7 +1,7 @@
 import os
 from configparser import ConfigParser
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
@@ -13,7 +13,7 @@ class SceneController(BaseController):
 
     Attributes
     ----------
-    _self : SceneController
+    _instance : SceneController
         The instance of the scene controller
     _owner : User
         The current user of the scene controller
@@ -66,7 +66,8 @@ class SceneController(BaseController):
         super().__init__(path_to_config, session, owner)
 
     def create_scene(
-            self, story_id: int, chapter_id: int, title: str, description: str = None, content: str = None
+        self, story_id: int, chapter_id: int, title: str,
+        description: str = None, content: str = None
     ) -> Scene:
         """Create a new scene
 
@@ -121,7 +122,10 @@ class SceneController(BaseController):
                 session.commit()
                 return scene
 
-    def update_scene(self, scene_id: int, title: str, description: str = None, content: str = None) -> Type[Scene]:
+    def update_scene(
+        self, scene_id: int, title: str, description: str = None,
+        content: str = None
+    ) -> Type[Scene]:
         """Update a scene
 
         Parameters
@@ -354,7 +358,7 @@ class SceneController(BaseController):
                 Scene.user_id == self._owner.id
             ).first()
 
-    def get_all_scenes(self) -> list:
+    def get_all_scenes(self) -> List[Type[Scene]]:
         """Get all scenes associated with an owner
 
         Scenes are sorted by story id, chapter id, and position in ascending order.
@@ -370,7 +374,9 @@ class SceneController(BaseController):
                 Scene.story_id, Scene.chapter_id, Scene.position
             ).all()
 
-    def get_all_scenes_page(self, page: int, per_page: int) -> list:
+    def get_all_scenes_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Scene]]:
         """Get a single page of scenes associated with an owner from the database
 
         Scenes are sorted by story id, chapter id, and position in ascending order
@@ -394,7 +400,7 @@ class SceneController(BaseController):
                 Scene.user_id == self._owner.id
             ).order_by(Scene.story_id, Scene.chapter_id, Scene.position).offset(offset).limit(per_page).all()
 
-    def get_scenes_by_story_id(self, story_id: int) -> list:
+    def get_scenes_by_story_id(self, story_id: int) -> List[Type[Scene]]:
         """Get all scenes associated with a story
 
         Scenes are sorted by chapter id and position in ascending order
@@ -417,7 +423,9 @@ class SceneController(BaseController):
                 Scene.chapter_id, Scene.position
             ).all()
 
-    def get_scenes_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
+    def get_scenes_page_by_story_id(
+        self, story_id: int, page: int, per_page: int
+    ) -> List[Type[Scene]]:
         """Get a single page of scenes associated with a story from the database
 
         Parameters
@@ -443,7 +451,7 @@ class SceneController(BaseController):
                 Scene.chapter_id, Scene.position
             ).offset(offset).limit(per_page).all()
 
-    def get_scenes_by_chapter_id(self, chapter_id: int) -> list:
+    def get_scenes_by_chapter_id(self, chapter_id: int) -> List[Type[Scene]]:
         """Get all scenes associated with a chapter
 
         Scenes are sorted by position in ascending order
@@ -464,7 +472,9 @@ class SceneController(BaseController):
                 Scene.chapter_id == chapter_id, Scene.user_id == self._owner.id
             ).order_by(Scene.position).all()
 
-    def get_scenes_page_by_chapter_id(self, chapter_id: int, page: int, per_page: int) -> list:
+    def get_scenes_page_by_chapter_id(
+        self, chapter_id: int, page: int, per_page: int
+    ) -> List[Type[Scene]]:
         """Get a single page of scenes associated with a chapter from the database
 
         Scenes are sorted by position in ascending order
@@ -490,7 +500,7 @@ class SceneController(BaseController):
                 Scene.chapter_id == chapter_id, Scene.user_id == self._owner.id
             ).order_by(Scene.position).offset(offset).limit(per_page).all()
 
-    def search_scenes(self, search: str) -> list:
+    def search_scenes(self, search: str) -> List[Type[Scene]]:
         """Search for scenes by title, description, and content
 
         Parameters
@@ -511,7 +521,9 @@ class SceneController(BaseController):
                 Scene.user_id == self._owner.id
             ).all()
 
-    def append_links_to_scene(self, scene_id: int, link_ids: list) -> Type[Scene]:
+    def append_links_to_scene(
+        self, scene_id: int, link_ids: list
+    ) -> Type[Scene]:
         """Append links to a scene
 
         Parameters
@@ -561,7 +573,7 @@ class SceneController(BaseController):
                 session.commit()
                 return scene
 
-    def get_links_by_scene_id(self, scene_id: int) -> list:
+    def get_links_by_scene_id(self, scene_id: int) -> List[Type[Link]]:
         """Get all links associated with a scene
 
         Parameters
@@ -580,7 +592,9 @@ class SceneController(BaseController):
                 LinkScene.scene_id == scene_id, LinkScene.user_id == self._owner.id
             ).all()
 
-    def append_notes_to_scene(self, scene_id: int, note_ids: list) -> Type[Scene]:
+    def append_notes_to_scene(
+        self, scene_id: int, note_ids: list
+    ) -> Type[Scene]:
         """Append notes to a scene
 
         Parameters
@@ -630,7 +644,7 @@ class SceneController(BaseController):
                 session.commit()
                 return scene
 
-    def get_notes_by_scene_id(self, scene_id: int) -> list:
+    def get_notes_by_scene_id(self, scene_id: int) -> List[Type[Note]]:
         """Get all notes associated with a scene
 
         Parameters
