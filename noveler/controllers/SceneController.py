@@ -337,7 +337,7 @@ class SceneController(BaseController):
                 Scene.user_id == self._owner.id
             ).count()
 
-    def get_scene_by_id(self, scene_id: int) -> Type[Scene]:
+    def get_scene_by_id(self, scene_id: int) -> Type[Scene] | None:
         """Get a scene by id
 
         Parameters
@@ -516,8 +516,11 @@ class SceneController(BaseController):
 
         with self._session as session:
             return session.query(Scene).filter(
-                or_(Scene.title.like(f'%{search}%'), Scene.description.like(f'%{search}%'),
-                    Scene.content.like(f'%{search}%')),
+                or_(
+                    Scene.title.like(f'%{search}%'),
+                    Scene.description.like(f'%{search}%'),
+                    Scene.content.like(f'%{search}%')
+                ),
                 Scene.user_id == self._owner.id
             ).all()
 

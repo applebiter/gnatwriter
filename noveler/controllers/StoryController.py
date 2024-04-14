@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
@@ -12,7 +12,7 @@ class StoryController(BaseController):
 
     Attributes
     ----------
-    _self : StoryController
+    _instance : StoryController
         The instance of the story controller
     _owner : User
         The current user of the story controller
@@ -119,7 +119,9 @@ class StoryController(BaseController):
                 session.commit()
                 return story
 
-    def update_story(self, story_id: int, title: str, description: str = None) -> Type[Story]:
+    def update_story(
+        self, story_id: int, title: str, description: str = None
+    ) -> Type[Story]:
         """Update a story
 
         Parameters
@@ -252,7 +254,7 @@ class StoryController(BaseController):
             ).first()
             return story
 
-    def get_all_stories(self) -> list:
+    def get_all_stories(self) -> List[Type[Story]]:
         """Get all stories associated with an owner
 
         Returns
@@ -264,7 +266,9 @@ class StoryController(BaseController):
         with self._session as session:
             return session.query(Story).filter(Story.user_id == self._owner.id).all()
 
-    def get_all_stories_page(self, page: int, per_page: int) -> list:
+    def get_all_stories_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Story]]:
         """Get a single page of stories associated with an owner from the database
 
         Parameters
@@ -286,7 +290,7 @@ class StoryController(BaseController):
                 Story.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def search_stories(self, search: str) -> list:
+    def search_stories(self, search: str) -> List[Type[Story]]:
         """Search for stories by title and description
 
         Parameters
@@ -306,7 +310,9 @@ class StoryController(BaseController):
                 Story.user_id == self._owner.id
             ).all()
 
-    def append_authors_to_story(self, story_id: int, author_ids: list) -> Type[Story]:
+    def append_authors_to_story(
+        self, story_id: int, author_ids: list
+    ) -> Type[Story]:
         """Append authors to a story
 
         Parameters
@@ -377,7 +383,7 @@ class StoryController(BaseController):
                 AuthorStory.user_id == self._owner.id
             ).count() > 0
 
-    def get_authors_by_story_id(self, story_id: int) -> list:
+    def get_authors_by_story_id(self, story_id: int) -> List[Type[Author]]:
         """Get all authors associated with a story
 
         Parameters
@@ -417,7 +423,9 @@ class StoryController(BaseController):
                 Chapter.user_id == self._owner.id
             ).count() > 0
 
-    def get_chapter_by_position(self, story_id: int, position: int) -> Type[Chapter]:
+    def get_chapter_by_position(
+        self, story_id: int, position: int
+    ) -> Type[Chapter]:
         """Get a chapter by position
 
         Parameters
@@ -441,7 +449,9 @@ class StoryController(BaseController):
                 Chapter.position == position
             ).first()
 
-    def get_all_chapters_by_story_id(self, story_id: int) -> list:
+    def get_all_chapters_by_story_id(
+        self, story_id: int
+    ) -> List[Type[Chapter]]:
         """Get all chapters associated with a story
 
         Parameters
@@ -462,7 +472,9 @@ class StoryController(BaseController):
                 Chapter.user_id == self._owner.id
             ).order_by(Chapter.position).all()
 
-    def append_characters_to_story(self, story_id: int, character_ids: list) -> Type[Story]:
+    def append_characters_to_story(
+        self, story_id: int, character_ids: list
+    ) -> Type[Story]:
         """Append characters to a story
 
         Parameters
@@ -542,7 +554,9 @@ class StoryController(BaseController):
                 CharacterStory.story_id == story_id, Character
             ).count() > 0
 
-    def get_characters_by_story_id(self, story_id: int) -> list:
+    def get_characters_by_story_id(
+        self, story_id: int
+    ) -> List[Type[Character]]:
         """Get all characters associated with a story
 
         Parameters
@@ -562,7 +576,9 @@ class StoryController(BaseController):
                 CharacterStory.story_id == story_id, Character
             ).all()
 
-    def get_characters_page_by_story_id(self, story_id: int, page: int, per_page: int) -> list:
+    def get_characters_page_by_story_id(
+        self, story_id: int, page: int, per_page: int
+    ) -> List[Type[Character]]:
         """Get a single page of characters associated with a story from the database
 
         Parameters
@@ -588,7 +604,9 @@ class StoryController(BaseController):
                 CharacterStory.story_id == story_id, Character
             ).offset(offset).limit(per_page).all()
 
-    def append_links_to_story(self, story_id: int, link_ids: list) -> Type[Story]:
+    def append_links_to_story(
+        self, story_id: int, link_ids: list
+    ) -> Type[Story]:
         """Append links to a story
 
         Parameters
@@ -657,7 +675,7 @@ class StoryController(BaseController):
                 LinkStory.story_id == story_id, LinkStory
             ).count() > 0
 
-    def get_links_by_story_id(self, story_id: int) -> list:
+    def get_links_by_story_id(self, story_id: int) -> List[Type[Link]]:
         """Get all links associated with a story
 
         Parameters
@@ -676,7 +694,9 @@ class StoryController(BaseController):
                 LinkStory.story_id == story_id, LinkStory.user_id == self._owner.id
             ).all()
 
-    def append_notes_to_story(self, story_id: int, note_ids: list) -> Type[Story]:
+    def append_notes_to_story(
+        self, story_id: int, note_ids: list
+    ) -> Type[Story]:
         """Append notes to a story
 
         Parameters
