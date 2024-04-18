@@ -766,7 +766,7 @@ class StoryController(BaseController):
                 NoteStory.story_id == story_id, NoteStory
             ).count() > 0
 
-    def get_notes_by_story_id(self, story_id: int) -> list:
+    def get_notes_by_story_id(self, story_id: int) -> List[Type[Note]]:
         """Get all notes associated with a story
 
         Parameters

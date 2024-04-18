@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 from datetime import datetime, date
-from typing import Type
+from typing import Type, List
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Submission, Activity
@@ -11,7 +11,7 @@ class SubmissionController(BaseController):
 
     Attributes
     ----------
-    _self : SubmissionController
+    _instance : SubmissionController
         The instance of the submission controller
     _owner : User
         The current user of the submission controller
@@ -44,7 +44,9 @@ class SubmissionController(BaseController):
 
         super().__init__(path_to_config, session, owner)
 
-    def create_submission(self, story_id: int, submitted_to: str, date_sent: str = None) -> Submission:
+    def create_submission(
+        self, story_id: int, submitted_to: str, date_sent: str = None
+    ) -> Submission:
         """Create a new submission
 
         Parameters
@@ -103,8 +105,8 @@ class SubmissionController(BaseController):
 
     def update_submission(
         self, submission_id: int, submitted_to: str, date_sent: str,
-            date_reply_received: str, date_published: str, date_paid: str,
-            result: str, amount: float
+        date_reply_received: str, date_published: str, date_paid: str,
+        result: str, amount: float
     ) -> Type[Submission]:
         """Update a submission
 
@@ -208,7 +210,7 @@ class SubmissionController(BaseController):
                 session.commit()
                 return True
 
-    def get_all_submissions_by_owner_id(self) -> list:
+    def get_all_submissions(self) -> List[Type[Submission]]:
         """Get all submissions associated with an owner
 
         Returns
@@ -223,7 +225,9 @@ class SubmissionController(BaseController):
                 Submission.user_id == self._owner.id
             ).all()
 
-    def get_all_submissions_page(self, page: int, per_page: int) -> list:
+    def get_all_submissions_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Submission]]:
         """Get a single page of submissions associated with an owner from the database
 
         Parameters
@@ -247,7 +251,9 @@ class SubmissionController(BaseController):
                 Submission.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def get_submissions_by_story_id(self, story_id: int) -> list:
+    def get_submissions_by_story_id(
+        self, story_id: int
+    ) -> List[Type[Submission]]:
         """Get all submissions associated with a story
 
         Parameters
@@ -269,7 +275,7 @@ class SubmissionController(BaseController):
 
     def get_submissions_page_by_story_id(
         self, story_id: int, page: int, per_page: int
-    ) -> list:
+    ) -> List[Type[Submission]]:
         """Get a single page of submissions associated with a story from the database
 
         Parameters

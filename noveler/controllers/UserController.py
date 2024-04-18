@@ -1,10 +1,9 @@
 import uuid
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 import bcrypt
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-import noveler
 from noveler.controllers.BaseController import BaseController
 from noveler.models import User, Activity
 
@@ -39,7 +38,7 @@ class UserController(BaseController):
 
     Attributes
     ----------
-    _self : UserController
+    _instance : UserController
         The instance of the user controller
     _owner : User
         The current user of the user controller
@@ -140,7 +139,7 @@ class UserController(BaseController):
                         User.uuid == uuid4
                     ).first()
 
-                password = noveler.controllers.hash_password(password)
+                password = hash_password(password)
                 created = datetime.now()
                 modified = created
 
@@ -162,7 +161,10 @@ class UserController(BaseController):
                 session.commit()
                 return user
 
-    def register_user(self, username: str, password: str, repassword: str, email: str, reemail: str) -> User:
+    def register_user(
+        self, username: str, password: str, repassword: str, email: str,
+        reemail: str
+    ) -> User:
         """Register a new user identity
 
         This method is for self-registration of new users. It is available to secondary users of the website and the
@@ -216,7 +218,7 @@ class UserController(BaseController):
                     uuid4 = str(uuid.uuid4())
                     uuid_exists = session.query(User).filter(User.uuid == uuid4).first()
 
-                password = noveler.controllers.hash_password(password)
+                password = hash_password(password)
                 created = datetime.now()
                 modified = created
                 user = User(uuid=uuid4, username=username, password=password, email=email, created=created,
@@ -348,7 +350,7 @@ class UserController(BaseController):
                 if not candidate:
                     raise Exception('User not found.')
 
-                if not noveler.controllers.verify_password(password, candidate.password):
+                if not verify_password(password, candidate.password):
                     raise ValueError('Invalid password.')
 
                 activity = Activity(user_id=candidate.id,
@@ -365,7 +367,9 @@ class UserController(BaseController):
                 session.commit()
                 return candidate
 
-    def change_password(self, user_id: int, old_password: str, new_password, repassword: str) -> User:
+    def change_password(
+        self, user_id: int, old_password: str, new_password, repassword: str
+    ) -> User:
         """Change user password
 
         Parameters
@@ -390,13 +394,13 @@ class UserController(BaseController):
         if not user:
             raise ValueError('User not found.')
 
-        if not noveler.controllers.verify_password(old_password, user.password):
+        if not verify_password(old_password, user.password):
             raise ValueError('Invalid password.')
 
         if new_password != repassword:
             raise ValueError('The new passwords do not match.')
 
-        new_password = noveler.controllers.hash_password(new_password)
+        new_password = hash_password(new_password)
         user.password = new_password
         user.modified = str(datetime.now())
 
@@ -567,7 +571,7 @@ class UserController(BaseController):
         with self._session as session:
             return session.query(User).all()
 
-    def get_all_users_page(self, page: int, per_page: int) -> list:
+    def get_all_users_page(self, page: int, per_page: int) -> List[Type[User]]:
         """Get a single page of users from the database
 
         Parameters
@@ -587,7 +591,7 @@ class UserController(BaseController):
             offset = (page - 1) * per_page
             return session.query(User).offset(offset).limit(per_page).all()
 
-    def search_users(self, search: str) -> list:
+    def search_users(self, search: str) -> List[Type[User]]:
         """Search for users by username or email
 
         Parameters
