@@ -143,12 +143,16 @@ class UserController(BaseController):
                 created = datetime.now()
                 modified = created
 
-                user = User(uuid=uuid4, username=username, password=password, email=email, created=created,
-                            modified=modified, is_active=True)
+                user = User(
+                    uuid=uuid4, username=username, password=password,
+                    email=email, created=created, modified=modified,
+                    is_active=True
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'User {user.username} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'User {user.username} \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(user)
                 session.add(activity)
@@ -221,8 +225,11 @@ class UserController(BaseController):
                 password = hash_password(password)
                 created = datetime.now()
                 modified = created
-                user = User(uuid=uuid4, username=username, password=password, email=email, created=created,
-                            modified=modified, is_active=False)
+                user = User(
+                    uuid=uuid4, username=username, password=password,
+                    email=email, created=created, modified=modified,
+                    is_active=False
+                )
 
                 session.add(user)
 
@@ -233,9 +240,10 @@ class UserController(BaseController):
             else:
                 session.commit()
 
-                activity = Activity(user_id=user.id,
-                                    summary=f'User {user.username} registered by {user.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=user.id, summary=f'User {user.username} registered \
+                    by {user.username}', created=datetime.now()
+                )
 
                 try:
                     session.add(activity)
@@ -272,9 +280,10 @@ class UserController(BaseController):
             try:
                 user.is_active = True
                 user.modified = datetime.now()
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'User {user.username} activated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'User {user.username} \
+                    activated by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(user)
                 session.add(activity)
@@ -311,9 +320,11 @@ class UserController(BaseController):
             try:
                 user.is_active = False
                 user.modified = datetime.now()
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'User {user.username} deactivated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'User {user.username} \
+                    deactivated by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(user)
                 session.add(activity)
@@ -353,9 +364,13 @@ class UserController(BaseController):
                 if not verify_password(password, candidate.password):
                     raise ValueError('Invalid password.')
 
-                activity = Activity(user_id=candidate.id,
-                                    summary=f'User {candidate.username} logged in',
-                                    created=datetime.now())
+                if not candidate.is_active:
+                    raise ValueError('User account is not activated.')
+
+                activity = Activity(
+                    user_id=candidate.id, summary=f'User {candidate.username} \
+                    logged in', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -407,9 +422,10 @@ class UserController(BaseController):
         with self._session as session:
 
             try:
-                activity = Activity(user_id=user.id,
-                                    summary=f'User {user.username} changed their password',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=user.id, summary=f'User {user.username} changed \
+                    their password', created=datetime.now()
+                )
 
                 session.add(user)
                 session.add(activity)
@@ -444,9 +460,10 @@ class UserController(BaseController):
                 if not user:
                     raise ValueError('User not found.')
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'User {user.username} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'User {user.username} \
+                    deleted by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(user)
                 session.add(activity)
@@ -559,7 +576,7 @@ class UserController(BaseController):
         with self._session as session:
             return session.query(func.count(User.id)).scalar()
 
-    def get_all_users(self) -> list:
+    def get_all_users(self) -> List[Type[User]]:
         """Get all users
 
         Returns
