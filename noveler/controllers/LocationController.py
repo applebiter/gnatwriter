@@ -65,7 +65,7 @@ class LocationController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
@@ -110,13 +110,18 @@ class LocationController(BaseController):
                 created = datetime.now()
                 modified = created
 
-                location = Location(user_id=self._owner.id, title=title, description=description, address=address,
-                                    city=city, state=state, country=country, zip_code=zip_code, latitude=latitude,
-                                    longitude=longitude, created=created, modified=modified)
+                location = Location(
+                    user_id=self._owner.id, title=title,
+                    description=description, address=address, city=city,
+                    state=state, country=country, zip_code=zip_code,
+                    latitude=latitude, longitude=longitude, created=created,
+                    modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Location {location.id} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Location {location.id} \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(location)
                 session.add(activity)
@@ -169,7 +174,8 @@ class LocationController(BaseController):
         with self._session as session:
             try:
                 location = session.query(Location).filter(
-                    Location.id == location_id, Location.user_id == self._owner.id
+                    Location.id == location_id,
+                    Location.user_id == self._owner.id
                 ).first()
 
                 if not location:
@@ -186,9 +192,10 @@ class LocationController(BaseController):
                 location.longitude = longitude
                 location.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Location {location.id} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Location {location.id} \
+                    updated by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -217,15 +224,17 @@ class LocationController(BaseController):
         with self._session as session:
             try:
                 location = session.query(Location).filter(
-                    Location.id == location_id, Location.user_id == self._owner.id
+                    Location.id == location_id,
+                    Location.user_id == self._owner.id
                 ).first()
 
                 if not location:
                     raise ValueError('Location not found.')
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Location {location.id} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Location {location.id} \
+                    deleted by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(location)
                 session.add(activity)
@@ -248,7 +257,9 @@ class LocationController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Location).filter(Location.user_id == self._owner.id).all()
+            return session.query(Location).filter(
+                Location.user_id == self._owner.id
+            ).all()
 
     def get_all_locations_page(
         self, page: int, per_page: int
@@ -293,7 +304,10 @@ class LocationController(BaseController):
         with self._session as session:
             return session.query(Location).filter(
                 Location.user_id == self._owner.id,
-                or_(Location.title.like(f'%{search}%'), Location.description.like(f'%{search}%'))
+                or_(
+                    Location.title.like(f'%{search}%'),
+                    Location.description.like(f'%{search}%')
+                )
             ).all()
 
     def search_locations_by_address(self, search: str) -> List[Type[Location]]:
@@ -312,7 +326,8 @@ class LocationController(BaseController):
 
         with self._session as session:
             return session.query(Location).filter(
-                Location.address.like(f'%{search}%'), Location.user_id == self._owner.id
+                Location.address.like(f'%{search}%'),
+                Location.user_id == self._owner.id
             ).all()
 
     def search_locations_by_city(self, search: str) -> List[Type[Location]]:
@@ -331,7 +346,8 @@ class LocationController(BaseController):
 
         with self._session as session:
             return session.query(Location).filter(
-                Location.city.like(f'%{search}%'), Location.user_id == self._owner.id
+                Location.city.like(f'%{search}%'),
+                Location.user_id == self._owner.id
             ).all()
 
     def search_locations_by_state(self, search: str) -> List[Type[Location]]:
@@ -350,7 +366,8 @@ class LocationController(BaseController):
 
         with self._session as session:
             return session.query(Location).filter(
-                Location.state.like(f'%{search}%'), Location.user_id == self._owner.id
+                Location.state.like(f'%{search}%'),
+                Location.user_id == self._owner.id
             ).all()
 
     def search_locations_by_country(self, search: str) -> List[Type[Location]]:
@@ -369,7 +386,8 @@ class LocationController(BaseController):
 
         with self._session as session:
             return session.query(Location).filter(
-                Location.country.like(f'%{search}%'), Location.user_id == self._owner.id
+                Location.country.like(f'%{search}%'),
+                Location.user_id == self._owner.id
             ).all()
 
     def search_locations_by_zip_code(self, search: str) -> List[Type[Location]]:
@@ -388,7 +406,8 @@ class LocationController(BaseController):
 
         with self._session as session:
             return session.query(Location).filter(
-                Location.zip_code.like(f'%{search}%'), Location.user_id == self._owner.id
+                Location.zip_code.like(f'%{search}%'),
+                Location.user_id == self._owner.id
             ).all()
 
     def append_images_to_location(
@@ -412,7 +431,8 @@ class LocationController(BaseController):
         with self._session as session:
             try:
                 location = session.query(Location).filter(
-                    Location.id == location_id, Location.user_id == self._owner.id
+                    Location.id == location_id,
+                    Location.user_id == self._owner.id
                 ).first()
 
                 if not location:
@@ -420,26 +440,36 @@ class LocationController(BaseController):
 
                 for image_id in image_ids:
                     image = session.query(Image).filter(
-                        Image.id == image_id, Image.user_id == self._owner.id
+                        Image.id == image_id,
+                        Image.user_id == self._owner.id
                     ).first()
 
                     if not image:
                         raise ValueError('Image not found.')
 
-                    position = session.query(func.max(ImageLocation.position)).filter(
+                    position = session.query(
+                        func.max(ImageLocation.position)
+                    ).filter(
                         ImageLocation.location_id == location_id
                     ).scalar()
                     position = position + 1 if position else 1
                     is_default = False
                     created = datetime.now()
                     modified = created
-                    image_location = ImageLocation(user_id=self._owner.id, location_id=location_id, image_id=image_id,
-                                                   position=position, is_default=is_default, created=created,
-                                                   modified=modified)
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Image {image.caption[:50]} associated with \
-                                        location {location.title[:50]} by {self._owner.username}',
-                                        created=datetime.now())
+                    image_location = ImageLocation(
+                        user_id=self._owner.id, location_id=location_id,
+                        image_id=image_id, position=position,
+                        is_default=is_default, created=created,
+                        modified=modified
+                    )
+
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Image \
+                        {image.caption[:50]} associated with location \
+                        {location.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(image_location)
                     session.add(activity)
@@ -472,7 +502,7 @@ class LocationController(BaseController):
 
             for image_location in session.query(ImageLocation).filter(
                 ImageLocation.location_id == location_id,
-                    ImageLocation.user_id == self._owner.id
+                ImageLocation.user_id == self._owner.id
             ).order_by(ImageLocation.position).all():
 
                 yield session.query(Image).filter(
@@ -503,7 +533,8 @@ class LocationController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(ImageLocation).filter(
-                ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
+                ImageLocation.location_id == location_id,
+                ImageLocation.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_links_to_location(
@@ -527,7 +558,8 @@ class LocationController(BaseController):
         with self._session as session:
             try:
                 location = session.query(Location).filter(
-                    Location.id == location_id, Location.user_id == self._owner.id
+                    Location.id == location_id,
+                    Location.user_id == self._owner.id
                 ).first()
 
                 if not location:
@@ -535,18 +567,24 @@ class LocationController(BaseController):
 
                 for link_id in link_ids:
                     link = session.query(Link).filter(
-                        Link.id == link_id, Link.user_id == self._owner.id
+                        Link.id == link_id,
+                        Link.user_id == self._owner.id
                     ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
 
-                    link_location = LinkLocation(user_id=self._owner.id, location_id=location_id, link_id=link_id,
-                                                 created=datetime.now())
+                    link_location = LinkLocation(
+                        user_id=self._owner.id, location_id=location_id,
+                        link_id=link_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Link {link.title[:50]} associated with \
-                                        location {location.title[:50]} by {self._owner.username}',
-                                        created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Link \
+                        {link.title[:50]} associated with location \
+                        {location.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(link_location)
                     session.add(activity)
@@ -575,10 +613,12 @@ class LocationController(BaseController):
 
         with self._session as session:
             for link_location in session.query(LinkLocation).filter(
-                LinkLocation.location_id == location_id, LinkLocation.user_id == self._owner.id
+                LinkLocation.location_id == location_id,
+                LinkLocation.user_id == self._owner.id
             ).all():
                 yield session.query(Link).filter(
-                    Link.id == link_location.link_id, Link.user_id == self._owner.id
+                    Link.id == link_location.link_id,
+                    Link.user_id == self._owner.id
                 ).first()
 
     def get_links_page_by_location_id(
@@ -604,7 +644,8 @@ class LocationController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(LinkLocation).filter(
-                LinkLocation.location_id == location_id, LinkLocation.user_id == self._owner.id
+                LinkLocation.location_id == location_id,
+                LinkLocation.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_notes_to_location(
@@ -628,7 +669,8 @@ class LocationController(BaseController):
         with self._session as session:
             try:
                 location = session.query(Location).filter(
-                    Location.id == location_id, Location.user_id == self._owner.id
+                    Location.id == location_id,
+                    Location.user_id == self._owner.id
                 ).first()
 
                 if not location:
@@ -636,18 +678,24 @@ class LocationController(BaseController):
 
                 for note_id in note_ids:
                     note = session.query(Note).filter(
-                        Note.id == note_id, Note.user_id == self._owner.id
+                        Note.id == note_id,
+                        Note.user_id == self._owner.id
                     ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
 
-                    location_note = LocationNote(user_id=self._owner.id, location_id=location_id, note_id=note_id,
-                                                 created=datetime.now())
+                    location_note = LocationNote(
+                        user_id=self._owner.id, location_id=location_id,
+                        note_id=note_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Note {note.title[:50]} associated with \
-                                        location {location.title[:50]} by {self._owner.username}',
-                                        created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Note \
+                        {note.title[:50]} associated with location \
+                        {location.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(location_note)
                     session.add(activity)
@@ -676,10 +724,12 @@ class LocationController(BaseController):
 
         with self._session as session:
             for location_note in session.query(LocationNote).filter(
-                LocationNote.location_id == location_id, LocationNote.user_id == self._owner.id
+                LocationNote.location_id == location_id,
+                LocationNote.user_id == self._owner.id
             ).all():
                 yield session.query(Note).filter(
-                    Note.id == location_note.note_id, Note.user_id == self._owner.id
+                    Note.id == location_note.note_id,
+                    Note.user_id == self._owner.id
                 ).first()
 
     def get_notes_page_by_location_id(
@@ -705,5 +755,6 @@ class LocationController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(LocationNote).filter(
-                LocationNote.location_id == location_id, LocationNote.user_id == self._owner.id
+                LocationNote.location_id == location_id,
+                LocationNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()

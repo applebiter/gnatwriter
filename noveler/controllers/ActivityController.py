@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, List
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from noveler.controllers import BaseController
@@ -7,6 +7,17 @@ from noveler.models import User, Activity
 
 class ActivityController(BaseController):
     """Activity controller encapsulates activity management functionality
+
+    Attributes
+    ----------
+    _instance : ActivityController
+        The instance of the activity controller
+    _path_to_config : str
+        The path to the configuration file
+    _session : Session
+        The database session object
+    _owner : Type[User]
+        The current user of the controller
 
     Methods
     -------
@@ -20,6 +31,8 @@ class ActivityController(BaseController):
         Get activity count associated with a user
     search_activities(search: str)
         Search for activities by summary
+    search_activities_page(search: str, page: int, per_page: int)
+        Search for activities by summary and get a single page of activities associated with a user, sorted by created date with most recent first
     """
 
     def __init__(
@@ -52,7 +65,7 @@ class ActivityController(BaseController):
 
             return activity if activity else None
 
-    def get_activities(self) -> list:
+    def get_activities(self) -> List[Type[Activity]]:
         """Get all activities associated with a user, sorted by created date with most recent first
 
         Returns
@@ -67,7 +80,9 @@ class ActivityController(BaseController):
                 Activity.user_id == self._owner.id
             ).order_by(Activity.created.desc()).all()
 
-    def get_activities_page(self, page: int, per_page: int) -> list:
+    def get_activities_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Activity]]:
         """Get a single page of activities associated with a user, sorted by created date with most recent first
 
         Parameters
@@ -89,7 +104,9 @@ class ActivityController(BaseController):
 
             return session.query(Activity).filter(
                 Activity.user_id == self._owner.id
-            ).order_by(Activity.created.desc()).offset(offset).limit(per_page).all()
+            ).order_by(
+                Activity.created.desc()
+            ).offset(offset).limit(per_page).all()
 
     def get_activity_count(self) -> int:
         """Get activity count associated with a user
@@ -106,7 +123,7 @@ class ActivityController(BaseController):
                 Activity.user_id == self._owner.id
             ).scalar()
 
-    def search_activities(self, search: str) -> list:
+    def search_activities(self, search: str) -> List[Type[Activity]]:
         """Search for activities by summary
 
         Parameters
@@ -127,3 +144,33 @@ class ActivityController(BaseController):
                 Activity.user_id == self._owner.id
             ).all()
 
+    def search_activities_page(
+        self, search: str, page: int, per_page: int
+    ) -> List[Type[Activity]]:
+        """Search for activities by summary and get a single page of activities associated with a user
+
+        Parameters
+        ----------
+        search : str
+            The search string
+        page : int
+            The page number
+        per_page : int
+            The number of rows per page
+
+        Returns
+        -------
+        list
+            A list of activity objects
+        """
+
+        with self._session as session:
+
+            offset = (page - 1) * per_page
+
+            return session.query(Activity).filter(
+                Activity.summary.like(f'%{search}%'),
+                Activity.user_id == self._owner.id
+            ).order_by(
+                Activity.created.desc()
+            ).offset(offset).limit(per_page).all()

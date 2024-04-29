@@ -5,7 +5,7 @@ from noveler.models import User, Base
 
 
 class Activity(Base):
-    """The Activity class represents an activity that a user has done.
+    """The Activity class documents any controller endpoint activities.
 
     Attributes
     ----------
@@ -18,7 +18,7 @@ class Activity(Base):
         created: str
             The activity's creation date in datetime form: yyy-mm-dd hh:mm:ss
         user: User
-            The user who owns this entry
+            The system user or user currently logged in
 
     Methods
     -------
@@ -41,7 +41,9 @@ class Activity(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     summary: Mapped[str] = mapped_column(String(250), nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
-    user: Mapped["User"] = relationship("User", back_populates="activities")
+    user: Mapped["User"] = relationship(
+        "User", back_populates="activities"
+    )
 
     def __repr__(self):
         """Returns a string representation of the activity.
@@ -52,7 +54,7 @@ class Activity(Base):
             A string representation of the activity
         """
 
-        return f'<Activity {self.summary[:50]!r}>'
+        return f'<Activity {self.summary!r}>'
 
     def __str__(self):
         """Returns a string representation of the activity.
@@ -63,7 +65,7 @@ class Activity(Base):
             A string representation of the activity
         """
 
-        return f'Activity: {self.summary[:50]}'
+        return f'{self.summary}'
 
     def serialize(self) -> dict:
         """Returns a dictionary representation of the activity.
@@ -104,9 +106,13 @@ class Activity(Base):
 
     @validates("summary")
     def validate_summary(self, key, summary: str) -> str:
-        """Validates the summary's length."""
+        """Validates the summary's length.
+        """
 
         if len(summary) > 250:
-            raise ValueError("The activity summary must not have more than 250 characters.")
+            raise ValueError(
+                """The activity summary must be no more than 250 characters in length.
+                """
+            )
 
         return summary

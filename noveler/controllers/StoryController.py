@@ -74,7 +74,7 @@ class StoryController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
@@ -101,12 +101,15 @@ class StoryController(BaseController):
                 created = datetime.now()
                 modified = created
 
-                story = Story(user_id=self._owner.id, title=title, description=description, created=created,
-                              modified=modified)
+                story = Story(
+                    user_id=self._owner.id, title=title, description=description,
+                    created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Story {story.title[:50]} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Story {story.title[:50]} \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(story)
                 session.add(activity)
@@ -142,7 +145,8 @@ class StoryController(BaseController):
         with self._session as session:
             try:
                 story = session.query(Story).filter(
-                    Story.id == story_id, Story.user_id == self._owner.id
+                    Story.id == story_id,
+                    Story.user_id == self._owner.id
                 ).first()
 
                 if not story:
@@ -152,9 +156,10 @@ class StoryController(BaseController):
                 story.description = description
                 story.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Story {story.id} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Story {story.id} updated \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -183,15 +188,17 @@ class StoryController(BaseController):
         with self._session as session:
             try:
                 story = session.query(Story).filter(
-                    Story.id == story_id, Story.user_id == self._owner.id
+                    Story.id == story_id,
+                    Story.user_id == self._owner.id
                 ).first()
 
                 if not story:
                     raise ValueError('Story not found.')
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Story {story.id} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Story {story.id} deleted \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(story)
                 session.add(activity)
@@ -250,7 +257,8 @@ class StoryController(BaseController):
 
         with self._session as session:
             story = session.query(Story).filter(
-                Story.id == story_id, Story.user_id == self._owner.id
+                Story.id == story_id,
+                Story.user_id == self._owner.id
             ).first()
             return story
 
@@ -264,7 +272,9 @@ class StoryController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Story).filter(Story.user_id == self._owner.id).all()
+            return session.query(Story).filter(
+                Story.user_id == self._owner.id
+            ).all()
 
     def get_all_stories_page(
         self, page: int, per_page: int
@@ -306,7 +316,10 @@ class StoryController(BaseController):
 
         with self._session as session:
             return session.query(Story).filter(
-                or_(Story.title.like(f'%{search}%'), Story.description.like(f'%{search}%')),
+                or_(
+                    Story.title.like(f'%{search}%'),
+                    Story.description.like(f'%{search}%')
+                ),
                 Story.user_id == self._owner.id
             ).all()
 
@@ -331,7 +344,8 @@ class StoryController(BaseController):
         with self._session as session:
             try:
                 story = session.query(Story).filter(
-                    Story.id == story_id, Story.user_id == self._owner.id
+                    Story.id == story_id,
+                    Story.user_id == self._owner.id
                 ).first()
 
                 if not story:
@@ -339,18 +353,24 @@ class StoryController(BaseController):
 
                 for author_id in author_ids:
                     author = session.query(Author).filter(
-                        Author.id == author_id, Author.user_id == self._owner.id
+                        Author.id == author_id,
+                        Author.user_id == self._owner.id
                     ).first()
 
                     if not author:
                         raise ValueError('Author not found.')
 
-                    author_story = AuthorStory(user_id=self._owner.id, author_id=author_id, story_id=story_id,
-                                               created=datetime.now())
+                    author_story = AuthorStory(
+                        user_id=self._owner.id, author_id=author_id,
+                        story_id=story_id, created=datetime.now()
+                    )
                     story.authors.append(author_story)
 
-                activity = Activity(user_id=self._owner.id, summary=f'Authors appended to story {story.title[:50]} by \
-                                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Authors appended to \
+                    story {story.title[:50]} by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -399,7 +419,8 @@ class StoryController(BaseController):
 
         with self._session as session:
             return session.query(Author).join(AuthorStory).filter(
-                AuthorStory.story_id == story_id, AuthorStory.user_id == self._owner.id
+                AuthorStory.story_id == story_id,
+                AuthorStory.user_id == self._owner.id
             ).all()
 
     def has_chapters(self, story_id: int) -> bool:
@@ -625,7 +646,8 @@ class StoryController(BaseController):
         with self._session as session:
             try:
                 story = session.query(Story).filter(
-                    Story.id == story_id, Story.user_id == self._owner.id
+                    Story.id == story_id,
+                    Story.user_id == self._owner.id
                 ).first()
 
                 if not story:
@@ -633,18 +655,25 @@ class StoryController(BaseController):
 
                 for link_id in link_ids:
                     link = session.query(Link).filter(
-                        Link.id == link_id, Link.user_id == self._owner.id
+                        Link.id == link_id,
+                        Link.user_id == self._owner.id
                     ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
 
-                    link_story = LinkStory(user_id=self._owner.id, story_id=story_id, link_id=link_id, created=datetime.now())
+                    link_story = LinkStory(
+                        user_id=self._owner.id, story_id=story_id,
+                        link_id=link_id, created=datetime.now()
+                    )
 
                     story.links.append(link_story)
 
-                activity = Activity(user_id=self._owner.id, summary=f'Links appended to story {story.title[:50]} by \
-                                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Links appended to story \
+                    {story.title[:50]} by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -691,7 +720,8 @@ class StoryController(BaseController):
 
         with self._session as session:
             return session.query(Link).join(LinkStory).filter(
-                LinkStory.story_id == story_id, LinkStory.user_id == self._owner.id
+                LinkStory.story_id == story_id,
+                LinkStory.user_id == self._owner.id
             ).all()
 
     def append_notes_to_story(
@@ -715,7 +745,8 @@ class StoryController(BaseController):
         with self._session as session:
             try:
                 story = session.query(Story).filter(
-                    Story.id == story_id, Story.user_id == self._owner.id
+                    Story.id == story_id,
+                    Story.user_id == self._owner.id
                 ).first()
 
                 if not story:
@@ -723,18 +754,25 @@ class StoryController(BaseController):
 
                 for note_id in note_ids:
                     note = session.query(Note).filter(
-                        Note.id == note_id, Note.user_id == self._owner.id
+                        Note.id == note_id,
+                        Note.user_id == self._owner.id
                     ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
 
-                    note_story = NoteStory(user_id=self._owner.id, story_id=story_id, note_id=note_id, created=datetime.now())
+                    note_story = NoteStory(
+                        user_id=self._owner.id, story_id=story_id,
+                        note_id=note_id, created=datetime.now()
+                    )
 
                     story.notes.append(note_story)
 
-                activity = Activity(user_id=self._owner.id, summary=f'Notes appended to story {story.title[:50]} by \
-                                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Notes appended to story \
+                    {story.title[:50]} by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -782,5 +820,6 @@ class StoryController(BaseController):
 
         with self._session as session:
             return session.query(Note).join(NoteStory).filter(
-                NoteStory.story_id == story_id, NoteStory.user_id == self._owner.id
+                NoteStory.story_id == story_id,
+                NoteStory.user_id == self._owner.id
             ).all()

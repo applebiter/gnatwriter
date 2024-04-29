@@ -59,7 +59,7 @@ class SceneController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
@@ -93,23 +93,32 @@ class SceneController(BaseController):
         with self._session as session:
             try:
                 title_exists = session.query(Scene).filter(
-                    Scene.title == title, Scene.chapter_id == chapter_id, Scene.user_id == self._owner.id
+                    Scene.title == title,
+                    Scene.chapter_id == chapter_id,
+                    Scene.user_id == self._owner.id
                 ).first()
 
                 if title_exists:
                     raise Exception('This chapter already has a scene with the same title.')
 
-                position = session.query(func.max(Scene.position)).filter(Scene.chapter_id == chapter_id).scalar()
+                position = session.query(
+                    func.max(Scene.position)
+                ).filter(Scene.chapter_id == chapter_id).scalar()
                 position = int(position) + 1 if position else 1
                 created = datetime.now()
                 modified = created
 
-                scene = Scene(user_id=self._owner.id, story_id=story_id, chapter_id=chapter_id, position=position,
-                              title=title, description=description, content=content, created=created, modified=modified)
+                scene = Scene(
+                    user_id=self._owner.id, story_id=story_id,
+                    chapter_id=chapter_id, position=position, title=title,
+                    description=description, content=content, created=created,
+                    modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Scene {scene.title[:50]} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Scene {scene.title[:50]} \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(scene)
                 session.add(activity)
@@ -148,7 +157,8 @@ class SceneController(BaseController):
         with self._session as session:
             try:
                 scene = session.query(Scene).filter(
-                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                    Scene.id == scene_id,
+                    Scene.user_id == self._owner.id
                 ).first()
 
                 if not scene:
@@ -159,9 +169,10 @@ class SceneController(BaseController):
                 scene.content = content
                 scene.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Scene {scene.id} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Scene {scene.id} updated \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -245,9 +256,11 @@ class SceneController(BaseController):
                 scene.position = position
                 scene.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Scene {scene.title[:50]} position changed by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Scene {scene.title[:50]} \
+                    position changed by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -301,9 +314,10 @@ class SceneController(BaseController):
                     )
                     sibling.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Scene {scene.id} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Scene {scene.id} deleted \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(scene)
                 session.add(activity)
@@ -370,7 +384,9 @@ class SceneController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Scene).filter(Scene.user_id == self._owner.id).order_by(
+            return session.query(Scene).filter(
+                Scene.user_id == self._owner.id
+            ).order_by(
                 Scene.story_id, Scene.chapter_id, Scene.position
             ).all()
 
@@ -398,7 +414,9 @@ class SceneController(BaseController):
             offset = (page - 1) * per_page
             return session.query(Scene).filter(
                 Scene.user_id == self._owner.id
-            ).order_by(Scene.story_id, Scene.chapter_id, Scene.position).offset(offset).limit(per_page).all()
+            ).order_by(
+                Scene.story_id, Scene.chapter_id, Scene.position
+            ).offset(offset).limit(per_page).all()
 
     def get_scenes_by_story_id(self, story_id: int) -> List[Type[Scene]]:
         """Get all scenes associated with a story
@@ -418,7 +436,8 @@ class SceneController(BaseController):
 
         with self._session as session:
             return session.query(Scene).filter(
-                Scene.story_id == story_id, Scene.user_id == self._owner.id
+                Scene.story_id == story_id,
+                Scene.user_id == self._owner.id
             ).order_by(
                 Scene.chapter_id, Scene.position
             ).all()
@@ -446,7 +465,8 @@ class SceneController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Scene).filter(
-                Scene.story_id == story_id, Scene.user_id == self._owner.id
+                Scene.story_id == story_id,
+                Scene.user_id == self._owner.id
             ).order_by(
                 Scene.chapter_id, Scene.position
             ).offset(offset).limit(per_page).all()
@@ -469,7 +489,8 @@ class SceneController(BaseController):
 
         with self._session as session:
             return session.query(Scene).filter(
-                Scene.chapter_id == chapter_id, Scene.user_id == self._owner.id
+                Scene.chapter_id == chapter_id,
+                Scene.user_id == self._owner.id
             ).order_by(Scene.position).all()
 
     def get_scenes_page_by_chapter_id(
@@ -497,7 +518,8 @@ class SceneController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Scene).filter(
-                Scene.chapter_id == chapter_id, Scene.user_id == self._owner.id
+                Scene.chapter_id == chapter_id,
+                Scene.user_id == self._owner.id
             ).order_by(Scene.position).offset(offset).limit(per_page).all()
 
     def search_scenes(self, search: str) -> List[Type[Scene]]:
@@ -545,7 +567,8 @@ class SceneController(BaseController):
         with self._session as session:
             try:
                 scene = session.query(Scene).filter(
-                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                    Scene.id == scene_id,
+                    Scene.user_id == self._owner.id
                 ).first()
 
                 if not scene:
@@ -553,17 +576,23 @@ class SceneController(BaseController):
 
                 for link_id in link_ids:
                     link = session.query(Link).filter(
-                        Link.id == link_id, Link.user_id == self._owner.id
+                        Link.id == link_id,
+                        Link.user_id == self._owner.id
                     ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
 
-                    link_scene = LinkScene(user_id=self._owner.id, link_id=link_id, scene_id=scene_id,
-                                           created=datetime.now())
+                    link_scene = LinkScene(
+                        user_id=self._owner.id, link_id=link_id,
+                        scene_id=scene_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Links appended to scene {scene.id} by \
-                                        {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Links appended to \
+                        scene {scene.id} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(link_scene)
                     session.add(activity)
@@ -592,7 +621,8 @@ class SceneController(BaseController):
 
         with self._session as session:
             return session.query(Link).join(LinkScene).filter(
-                LinkScene.scene_id == scene_id, LinkScene.user_id == self._owner.id
+                LinkScene.scene_id == scene_id,
+                LinkScene.user_id == self._owner.id
             ).all()
 
     def append_notes_to_scene(
@@ -616,7 +646,8 @@ class SceneController(BaseController):
         with self._session as session:
             try:
                 scene = session.query(Scene).filter(
-                    Scene.id == scene_id, Scene.user_id == self._owner.id
+                    Scene.id == scene_id,
+                    Scene.user_id == self._owner.id
                 ).first()
 
                 if not scene:
@@ -624,17 +655,23 @@ class SceneController(BaseController):
 
                 for note_id in note_ids:
                     note = session.query(Note).filter(
-                        Note.id == note_id, Note.user_id == self._owner.id
+                        Note.id == note_id,
+                        Note.user_id == self._owner.id
                     ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
 
-                    note_scene = NoteScene(user_id=self._owner.id, note_id=note_id, scene_id=scene_id,
-                                           created=datetime.now())
+                    note_scene = NoteScene(
+                        user_id=self._owner.id, note_id=note_id,
+                        scene_id=scene_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Notes appended to scene {scene.id} by \
-                                        {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Notes appended to \
+                        scene {scene.id} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(note_scene)
                     session.add(activity)
@@ -663,5 +700,6 @@ class SceneController(BaseController):
 
         with self._session as session:
             return session.query(Note).join(NoteScene).filter(
-                NoteScene.scene_id == scene_id, NoteScene.user_id == self._owner.id
+                NoteScene.scene_id == scene_id,
+                NoteScene.user_id == self._owner.id
             ).all()

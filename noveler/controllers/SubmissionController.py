@@ -38,7 +38,7 @@ class SubmissionController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 

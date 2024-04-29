@@ -28,7 +28,9 @@ class BaseController:
 
         return cls._instance
 
-    def __init__(self, path_to_config: str, session: Session, owner: Type[User]):
+    def __init__(
+        self, path_to_config: str, session: Session, owner: Type[User]
+    ):
         """Initialize the class"""
 
         self._path_to_config = path_to_config

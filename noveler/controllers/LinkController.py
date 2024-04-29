@@ -10,7 +10,7 @@ class LinkController(BaseController):
 
     Attributes
     ----------
-    _self : LinkController
+    _instance : LinkController
         The instance of the link controller
     _owner : User
         The current user of the link controller
@@ -36,7 +36,7 @@ class LinkController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
@@ -63,11 +63,15 @@ class LinkController(BaseController):
                 created = datetime.now()
                 modified = created
 
-                link = Link(user_id=self._owner.id, url=url, title=title, created=created, modified=modified)
+                link = Link(
+                    user_id=self._owner.id, url=url, title=title,
+                    created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Link {link.title[:50]} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Link {link.title[:50]} \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(link)
                 session.add(activity)
@@ -101,7 +105,8 @@ class LinkController(BaseController):
         with self._session as session:
             try:
                 link = session.query(Link).filter(
-                    Link.id == link_id, Link.user_id == self._owner.id
+                    Link.id == link_id,
+                    Link.user_id == self._owner.id
                 ).first()
 
                 if not link:
@@ -111,9 +116,10 @@ class LinkController(BaseController):
                 link.title = title
                 link.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Link {link.id} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Link {link.id} updated \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -142,15 +148,17 @@ class LinkController(BaseController):
         with self._session as session:
             try:
                 link = session.query(Link).filter(
-                    Link.id == link_id, Link.user_id == self._owner.id
+                    Link.id == link_id,
+                    Link.user_id == self._owner.id
                 ).first()
 
                 if not link:
                     raise ValueError('Link not found.')
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Link {link.id} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Link {link.id} deleted \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(link)
                 session.add(activity)
@@ -179,7 +187,8 @@ class LinkController(BaseController):
 
         with self._session as session:
             return session.query(Link).filter(
-                Link.id == link_id, Link.user_id == self._owner.id
+                Link.id == link_id,
+                Link.user_id == self._owner.id
             ).first()
 
     def get_links_by_story_id(self, story_id: int) -> List[Type[Link]]:
@@ -201,7 +210,8 @@ class LinkController(BaseController):
 
         with self._session as session:
             return session.query(Link).join(LinkStory).filter(
-                LinkStory.story_id == story_id, LinkStory.user_id == self._owner.id
+                LinkStory.story_id == story_id,
+                LinkStory.user_id == self._owner.id
             ).all()
 
     def get_all_links(self) -> List[Type[Link]]:
@@ -214,7 +224,9 @@ class LinkController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Link).filter(Link.user_id == self._owner.id).all()
+            return session.query(Link).filter(
+                Link.user_id == self._owner.id
+            ).all()
 
     def get_all_links_page(self, page: int, per_page: int) -> List[Type[Link]]:
         """Get a single page of links associated with an owner from the database
@@ -234,7 +246,9 @@ class LinkController(BaseController):
 
         with self._session as session:
             offset = (page - 1) * per_page
-            return session.query(Link).filter(Link.user_id == self._owner.id).offset(offset).limit(per_page).all()
+            return session.query(Link).filter(
+                Link.user_id == self._owner.id
+            ).offset(offset).limit(per_page).all()
 
     def search_links(self, search: str) -> List[Type[Link]]:
         """Search for links by title
@@ -252,5 +266,6 @@ class LinkController(BaseController):
 
         with self._session as session:
             return session.query(Link).filter(
-                Link.title.like(f'%{search}%'), Link.user_id == self._owner.id
+                Link.title.like(f'%{search}%'),
+                Link.user_id == self._owner.id
             ).all()

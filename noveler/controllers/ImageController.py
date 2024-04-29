@@ -42,7 +42,7 @@ class ImageController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
@@ -78,12 +78,16 @@ class ImageController(BaseController):
                 created = datetime.now()
                 modified = created
 
-                image = Image(user_id=self._owner.id, caption=caption, filename=filename, dirname=dirname,
-                              size_in_bytes=size_in_bytes, mime_type=mime_type, created=created, modified=modified)
+                image = Image(
+                    user_id=self._owner.id, caption=caption, filename=filename,
+                    dirname=dirname, size_in_bytes=size_in_bytes,
+                    mime_type=mime_type, created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Image {image.id} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Image {image.id} created \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(image)
                 session.add(activity)
@@ -115,7 +119,8 @@ class ImageController(BaseController):
         with self._session as session:
             try:
                 image = session.query(Image).filter(
-                    Image.id == image_id, Image.user_id == self._owner.id
+                    Image.id == image_id,
+                    Image.user_id == self._owner.id
                 ).first()
 
                 if not image:
@@ -124,9 +129,10 @@ class ImageController(BaseController):
                 image.caption = caption
                 image.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Image {image.id} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Image {image.id} updated \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -155,15 +161,17 @@ class ImageController(BaseController):
         with self._session as session:
             try:
                 image = session.query(Image).filter(
-                    Image.id == image_id, Image.user_id == self._owner.id
+                    Image.id == image_id,
+                    Image.user_id == self._owner.id
                 ).first()
 
                 if not image:
                     raise ValueError('Image not found.')
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Image {image.id} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Image {image.id} deleted \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(image)
                 session.add(activity)
@@ -230,7 +238,8 @@ class ImageController(BaseController):
 
         with self._session as session:
             return session.query(Image).filter(
-                Image.caption.like(f'%{search}%'), Image.user_id == self._owner.id
+                Image.caption.like(f'%{search}%'),
+                Image.user_id == self._owner.id
             ).all()
 
     def get_images_by_character_id(
@@ -251,7 +260,8 @@ class ImageController(BaseController):
 
         with self._session as session:
             return session.query(Image).filter(
-                Image.character_id == character_id, Image.user_id == self._owner.id
+                Image.character_id == character_id,
+                Image.user_id == self._owner.id
             ).all()
 
     def get_images_page_by_character_id(
@@ -277,7 +287,8 @@ class ImageController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(Image).filter(
-                Image.character_id == character_id, Image.user_id == self._owner.id
+                Image.character_id == character_id,
+                Image.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def get_images_by_location_id(self, location_id: int) -> List[Type[Image]]:
@@ -299,10 +310,12 @@ class ImageController(BaseController):
 
         with self._session as session:
             for image_location in session.query(ImageLocation).filter(
-                ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
+                ImageLocation.location_id == location_id,
+                    ImageLocation.user_id == self._owner.id
             ).all():
                 yield session.query(Image).filter(
-                    Image.id == image_location.image_id, Image.user_id == self._owner.id
+                    Image.id == image_location.image_id,
+                    Image.user_id == self._owner.id
                 ).first()
 
     def get_images_page_by_location_id(
@@ -331,8 +344,10 @@ class ImageController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             for image_location in session.query(ImageLocation).filter(
-                ImageLocation.location_id == location_id, ImageLocation.user_id == self._owner.id
+                ImageLocation.location_id == location_id,
+                ImageLocation.user_id == self._owner.id
             ).offset(offset).limit(per_page).all():
                 yield session.query(Image).filter(
-                    Image.id == image_location.image_id, Image.user_id == self._owner.id
+                    Image.id == image_location.image_id,
+                    Image.user_id == self._owner.id
                 ).first()

@@ -11,7 +11,7 @@ class EventController(BaseController):
 
     Attributes
     ----------
-    _self : EventController
+    _instance : EventController
         The instance of the event controller
     _owner : User
         The current user of the event controller
@@ -53,7 +53,7 @@ class EventController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
@@ -87,13 +87,16 @@ class EventController(BaseController):
                 created = datetime.now()
                 modified = created
 
-                event = Event(user_id=self._owner.id, title=title, description=description,
-                              start_datetime=start_datetime, end_datetime=end_datetime, created=created,
-                              modified=modified)
+                event = Event(
+                    user_id=self._owner.id, title=title, description=description,
+                    start_datetime=start_datetime, end_datetime=end_datetime,
+                    created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Event {event.title[:50]} created by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Event {event.title[:50]} \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(event)
                 session.add(activity)
@@ -144,9 +147,10 @@ class EventController(BaseController):
                 event.end_datetime = end_datetime
                 event.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Event {event.id} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Event {event.id} updated \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -175,15 +179,17 @@ class EventController(BaseController):
         with self._session as session:
             try:
                 event = session.query(Event).filter(
-                    Event.id == event_id, Event.user_id == self._owner.id
+                    Event.id == event_id,
+                    Event.user_id == self._owner.id
                 ).first()
 
                 if not event:
                     raise ValueError('Event not found.')
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Event {event.id} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Event {event.id} deleted \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(event)
                 session.add(activity)
@@ -255,7 +261,8 @@ class EventController(BaseController):
         with self._session as session:
             try:
                 event = session.query(Event).filter(
-                    Event.id == event_id, Event.user_id == self._owner.id
+                    Event.id == event_id,
+                    Event.user_id == self._owner.id
                 ).first()
 
                 if not event:
@@ -263,17 +270,24 @@ class EventController(BaseController):
 
                 for character_id in character_ids:
                     character = session.query(Character).filter(
-                        Character.id == character_id, Character.user_id == self._owner.id
+                        Character.id == character_id,
+                        Character.user_id == self._owner.id
                     ).first()
 
                     if not character:
                         raise ValueError('Character not found.')
 
-                    character_event = CharacterEvent(user_id=self._owner.id, event_id=event_id,
-                                                     character_id=character_id, created=datetime.now())
+                    character_event = CharacterEvent(
+                        user_id=self._owner.id, event_id=event_id,
+                        character_id=character_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Character {character.__str__} associated with\
-                                         event {event.title[:50]} by {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Character \
+                        {character.__str__} associated with event \
+                        {event.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(character_event)
                     session.add(activity)
@@ -304,9 +318,12 @@ class EventController(BaseController):
 
         with self._session as session:
             for character_event in session.query(CharacterEvent).filter(
-                CharacterEvent.event_id == event_id, CharacterEvent.user_id == self._owner.id
+                CharacterEvent.event_id == event_id,
+                    CharacterEvent.user_id == self._owner.id
             ).all():
-                yield session.query(Character).filter(Character.id == character_event.character_id).first()
+                yield session.query(Character).filter(
+                    Character.id == character_event.character_id
+                ).first()
 
     def get_characters_page_by_event_id(
         self, event_id: int, page: int, per_page: int
@@ -331,10 +348,12 @@ class EventController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             for character_event in session.query(CharacterEvent).filter(
-                CharacterEvent.event_id == event_id, CharacterEvent.user_id == self._owner.id
+                CharacterEvent.event_id == event_id,
+                CharacterEvent.user_id == self._owner.id
             ).offset(offset).limit(per_page).all():
                 yield session.query(Character).filter(
-                    Character.id == character_event.character_id, Character.user_id == self._owner.id
+                    Character.id == character_event.character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
     def append_locations_to_event(
@@ -358,7 +377,8 @@ class EventController(BaseController):
         with self._session as session:
             try:
                 event = session.query(Event).filter(
-                    Event.id == event_id, Event.user_id == self._owner.id
+                    Event.id == event_id,
+                    Event.user_id == self._owner.id
                 ).first()
 
                 if not event:
@@ -366,17 +386,24 @@ class EventController(BaseController):
 
                 for location_id in location_ids:
                     location = session.query(Location).filter(
-                        Location.id == location_id, Location.user_id == self._owner.id
+                        Location.id == location_id,
+                        Location.user_id == self._owner.id
                     ).first()
 
                     if not location:
                         raise ValueError('Location not found.')
 
-                    event_location = EventLocation(user_id=self._owner.id, event_id=event_id, location_id=location_id,
-                                                   created=datetime.now())
+                    event_location = EventLocation(
+                        user_id=self._owner.id, event_id=event_id,
+                        location_id=location_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Location {location.name[:50]} associated with\
-                                         event {event.title[:50]} by {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Location \
+                        {location.name[:50]} associated with event \
+                        {event.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(event_location)
                     session.add(activity)
@@ -405,10 +432,12 @@ class EventController(BaseController):
 
         with self._session as session:
             for event_location in session.query(EventLocation).filter(
-                EventLocation.event_id == event_id, EventLocation.user_id == self._owner.id
+                EventLocation.event_id == event_id,
+                    EventLocation.user_id == self._owner.id
             ).all():
                 yield session.query(Location).filter(
-                    Location.id == event_location.location_id, Location.user_id == self._owner.id
+                    Location.id == event_location.location_id,
+                    Location.user_id == self._owner.id
                 ).first()
 
     def append_links_to_event(
@@ -432,7 +461,8 @@ class EventController(BaseController):
         with self._session as session:
             try:
                 event = session.query(Event).filter(
-                    Event.id == event_id, Event.user_id == self._owner.id
+                    Event.id == event_id,
+                    Event.user_id == self._owner.id
                 ).first()
 
                 if not event:
@@ -440,17 +470,24 @@ class EventController(BaseController):
 
                 for link_id in link_ids:
                     link = session.query(Link).filter(
-                        Link.id == link_id, Link.user_id == self._owner.id
+                        Link.id == link_id,
+                        Link.user_id == self._owner.id
                     ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
 
-                    event_link = EventLink(user_id=self._owner.id, event_id=event_id, link_id=link_id,
-                                           created=datetime.now())
+                    event_link = EventLink(
+                        user_id=self._owner.id, event_id=event_id,
+                        link_id=link_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Link {link.title[:50]} associated with \
-                                        event {event.title[:50]} by {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Link\
+                        {link.title[:50]} associated with event \
+                        {event.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(event_link)
                     session.add(activity)
@@ -479,15 +516,18 @@ class EventController(BaseController):
 
         with self._session as session:
             for event_link in session.query(EventLink).filter(
-                EventLink.event_id == event_id, EventLink.user_id == self._owner.id
+                EventLink.event_id == event_id,
+                    EventLink.user_id == self._owner.id
             ).all():
                 yield session.query(Link).filter(
-                    Link.id == event_link.link_id, Link.user_id == self._owner.id
+                    Link.id == event_link.link_id,
+                    Link.user_id == self._owner.id
                 ).first()
 
     def get_links_page_by_event_id(
         self, event_id: int, page: int, per_page: int
     ) -> List[Type[Link]]:
+
         """Get a single page of links associated with an event from the database
 
         Parameters
@@ -508,7 +548,8 @@ class EventController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(EventLink).filter(
-                EventLink.event_id == event_id, EventLink.user_id == self._owner.id
+                EventLink.event_id == event_id,
+                EventLink.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_notes_to_event(
@@ -532,7 +573,8 @@ class EventController(BaseController):
         with self._session as session:
             try:
                 event = session.query(Event).filter(
-                    Event.id == event_id, Event.user_id == self._owner.id
+                    Event.id == event_id,
+                    Event.user_id == self._owner.id
                 ).first()
 
                 if not event:
@@ -540,17 +582,24 @@ class EventController(BaseController):
 
                 for note_id in note_ids:
                     note = session.query(Note).filter(
-                        Note.id == note_id, Note.user_id == self._owner.id
+                        Note.id == note_id,
+                        Note.user_id == self._owner.id
                     ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
 
-                    event_note = EventNote(user_id=self._owner.id, event_id=event_id, note_id=note_id,
-                                           created=datetime.now())
+                    event_note = EventNote(
+                        user_id=self._owner.id, event_id=event_id,
+                        note_id=note_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Note {note.title[:50]} associated with \
-                                        event {event.title[:50]} by {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Note \
+                        {note.title[:50]} associated with event \
+                        {event.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(event_note)
                     session.add(activity)
@@ -579,10 +628,12 @@ class EventController(BaseController):
 
         with self._session as session:
             for event_note in session.query(EventNote).filter(
-                EventNote.event_id == event_id, EventNote.user_id == self._owner.id
+                EventNote.event_id == event_id,
+                    EventNote.user_id == self._owner.id
             ).all():
                 yield session.query(Note).filter(
-                    Note.id == event_note.note_id, Note.user_id == self._owner.id
+                    Note.id == event_note.note_id,
+                    Note.user_id == self._owner.id
                 ).first()
 
     def get_notes_page_by_event_id(
@@ -608,5 +659,6 @@ class EventController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(EventNote).filter(
-                EventNote.event_id == event_id, EventNote.user_id == self._owner.id
+                EventNote.event_id == event_id,
+                EventNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()

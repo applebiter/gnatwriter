@@ -105,6 +105,5 @@ class OllamaModelController(BaseController):
         """
 
         with self._session as session:
-
             return session.query(OllamaModel).all()
 

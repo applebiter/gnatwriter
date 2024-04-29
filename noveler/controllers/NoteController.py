@@ -35,7 +35,7 @@ class NoteController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
@@ -116,9 +116,10 @@ class NoteController(BaseController):
                 note.content = content
                 note.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Note {note.id} updated by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Note {note.id} updated \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -147,15 +148,17 @@ class NoteController(BaseController):
         with self._session as session:
             try:
                 note = session.query(Note).filter(
-                    Note.id == note_id, Note.user_id == self._owner.id
+                    Note.id == note_id,
+                    Note.user_id == self._owner.id
                 ).first()
 
                 if not note:
                     raise ValueError('Note not found.')
 
-                activity = Activity(user_id=self._owner.id,
-                                    summary=f'Note {note.id} deleted by {self._owner.username}',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Note {note.id} deleted \
+                    by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(note)
                 session.add(activity)
@@ -184,7 +187,8 @@ class NoteController(BaseController):
 
         with self._session as session:
             return session.query(Note).filter(
-                Note.id == note_id, Note.user_id == self._owner.id
+                Note.id == note_id,
+                Note.user_id == self._owner.id
             ).first()
 
     def get_all_notes(self) -> List[Type[Note]]:
@@ -197,7 +201,9 @@ class NoteController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Note).filter(Note.user_id == self._owner.id).all()
+            return session.query(Note).filter(
+                Note.user_id == self._owner.id
+            ).all()
 
     def get_all_notes_page(self, page: int, per_page: int) -> List[Type[Note]]:
         """Get a single page of notes associated with an owner from the database
@@ -237,6 +243,9 @@ class NoteController(BaseController):
 
         with self._session as session:
             return session.query(Note).filter(
-                or_(Note.title.like(f'%{search}%'), Note.content.like(f'%{search}%')),
+                or_(
+                    Note.title.like(f'%{search}%'),
+                    Note.content.like(f'%{search}%')
+                ),
                 Note.user_id == self._owner.id
             ).all()

@@ -13,7 +13,7 @@ class CharacterController(BaseController):
 
     Attributes
     ----------
-    _self : CharacterController
+    _instance : CharacterController
         The instance of the characters controller
     _owner : User
         The current user of the characters controller
@@ -115,18 +115,17 @@ class CharacterController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
         super().__init__(path_to_config, session, owner)
 
     def create_character(
-            self, title: str = None, first_name: str = None,
-            middle_name: str = None, last_name: str = None,
-            nickname: str = None, gender: str = None, sex: str = None,
-            date_of_birth: str = None, date_of_death: str = None,
-            description: str = None
+        self, title: str = None, first_name: str = None,
+        middle_name: str = None, last_name: str = None, nickname: str = None,
+        gender: str = None, sex: str = None, date_of_birth: str = None,
+        date_of_death: str = None, description: str = None
     ) -> Character:
         """Create a new character
 
@@ -341,7 +340,8 @@ class CharacterController(BaseController):
 
         with self._session as session:
             character = session.query(Character).filter(
-                Character.id == character_id, Character.user_id == self._owner.id
+                Character.id == character_id,
+                Character.user_id == self._owner.id
             ).first()
             return character if character else None
 
@@ -359,7 +359,7 @@ class CharacterController(BaseController):
                 Character.user_id == self._owner.id
             ).scalar()
 
-    def get_all_characters(self) -> list:
+    def get_all_characters(self) -> List[Type[Character]]:
         """Get all characters associated with a user
 
         Returns
@@ -414,8 +414,11 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
-            return session.query(func.count(CharacterStory.character_id)).filter(
-                CharacterStory.story_id == story_id, CharacterStory.user_id == self._owner.id
+            return session.query(
+                func.count(CharacterStory.character_id)
+            ).filter(
+                CharacterStory.story_id == story_id,
+                CharacterStory.user_id == self._owner.id
             ).scalar()
 
     def get_characters_by_story_id(
@@ -438,10 +441,12 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_story in session.query(CharacterStory).filter(
-                    CharacterStory.story_id == story_id, CharacterStory.user_id == self._owner.id
+                CharacterStory.story_id == story_id,
+                CharacterStory.user_id == self._owner.id
             ).all():
                 yield session.query(Character).filter(
-                    Character.id == character_story.character_id, Character.user_id == self._owner.id
+                    Character.id == character_story.character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
     def get_characters_page_by_story_id(
@@ -469,10 +474,12 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             for character_story in session.query(CharacterStory).filter(
-                    CharacterStory.story_id == story_id, CharacterStory.user_id == self._owner.id
+                CharacterStory.story_id == story_id,
+                    CharacterStory.user_id == self._owner.id
             ).offset(offset).limit(per_page).all():
                 yield session.query(Character).filter(
-                    Character.id == character_story.character_id, Character.user_id == self._owner.id
+                    Character.id == character_story.character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
     def search_characters(self, search: str) -> List[Type[Character]]:
@@ -492,9 +499,14 @@ class CharacterController(BaseController):
 
         with self._session as session:
             return session.query(Character).filter(
-                or_(Character.title.like(f'%{search}%'), Character.first_name.like(f'%{search}%'),
-                    Character.middle_name.like(f'%{search}%'), Character.last_name.like(f'%{search}%'),
-                    Character.nickname.like(f'%{search}%'), Character.description.like(f'%{search}%')),
+                or_(
+                    Character.title.like(f'%{search}%'),
+                    Character.first_name.like(f'%{search}%'),
+                    Character.middle_name.like(f'%{search}%'),
+                    Character.last_name.like(f'%{search}%'),
+                    Character.nickname.like(f'%{search}%'),
+                    Character.description.like(f'%{search}%')
+                ),
                 Character.user_id == self._owner.id
             ).all()
 
@@ -598,15 +610,18 @@ class CharacterController(BaseController):
                 position = 1 if not position else position + 1
                 created = datetime.now()
                 modified = created
-                character_relationship = CharacterRelationship(user_id=self._owner.id, parent_id=parent.id,
-                                                               related_id=related.id, position=position,
-                                                               relationship_type=relationship_type,
-                                                               description=description, start_date=start_date,
-                                                               end_date=end_date, created=created,
-                                                               modified=modified)
+                character_relationship = CharacterRelationship(
+                    user_id=self._owner.id, parent_id=parent.id,
+                    related_id=related.id, position=position,
+                    relationship_type=relationship_type,
+                    description=description, start_date=start_date,
+                    end_date=end_date, created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character relationship created by \
-                                        {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character relationship \
+                    created by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(character_relationship)
                 session.add(activity)
@@ -651,8 +666,11 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character_relationship = session.query(CharacterRelationship).filter(
-                    CharacterRelationship.id == relationship_id, CharacterRelationship.user_id == self._owner.id
+                character_relationship = session.query(
+                    CharacterRelationship
+                ).filter(
+                    CharacterRelationship.id == relationship_id,
+                    CharacterRelationship.user_id == self._owner.id
                 ).first()
 
                 if not character_relationship:
@@ -666,8 +684,10 @@ class CharacterController(BaseController):
                 character_relationship.end_date = end_date
                 character_relationship.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character relationship updated by \
-                                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character relationship \
+                    updated by {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -721,26 +741,30 @@ class CharacterController(BaseController):
 
                 if position < character_relationship.position:
                     for sibling in session.query(CharacterRelationship).filter(
-                            CharacterRelationship.parent_id == character_relationship.parent_id,
-                            CharacterRelationship.position >= position,
-                            CharacterRelationship.position < character_relationship.position,
-                            CharacterRelationship.user_id == self._owner.id
+                        CharacterRelationship.parent_id == character_relationship.parent_id,
+                        CharacterRelationship.position >= position,
+                        CharacterRelationship.position < character_relationship.position,
+                        CharacterRelationship.user_id == self._owner.id
                     ).all():
                         sibling.position += 1
 
                 else:
                     for sibling in session.query(CharacterRelationship).filter(
-                            CharacterRelationship.parent_id == character_relationship.parent_id,
-                            CharacterRelationship.position > character_relationship.position,
-                            CharacterRelationship.position <= position, CharacterRelationship.user_id == self._owner.id
+                        CharacterRelationship.parent_id == character_relationship.parent_id,
+                        CharacterRelationship.position > character_relationship.position,
+                        CharacterRelationship.position <= position,
+                        CharacterRelationship.user_id == self._owner.id
                     ).all():
                         sibling.position -= 1
 
                 character_relationship.position = position
                 character_relationship.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character relationship position updated by \
-                                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character relationship \
+                    position updated by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -771,22 +795,27 @@ class CharacterController(BaseController):
 
         with self._session as session:
             try:
-                character_relationship = session.query(CharacterRelationship).filter(
-                    CharacterRelationship.id == relationship_id, CharacterRelationship.user_id == self._owner.id
+                character_relationship = session.query(
+                    CharacterRelationship
+                ).filter(
+                    CharacterRelationship.id == relationship_id,
+                    CharacterRelationship.user_id == self._owner.id
                 ).first()
 
                 if not character_relationship:
                     raise ValueError('Character relationship not found.')
 
                 for sibling in session.query(CharacterRelationship).filter(
-                        CharacterRelationship.parent_id == character_relationship.parent_id,
-                        CharacterRelationship.position > character_relationship.position,
-                        CharacterRelationship.user_id == self._owner.id
+                    CharacterRelationship.parent_id == character_relationship.parent_id,
+                    CharacterRelationship.position > character_relationship.position,
+                    CharacterRelationship.user_id == self._owner.id
                 ).all():
                     sibling.position -= 1
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character relationship deleted by \
-                                    {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character relationship \
+                    deleted by {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(character_relationship)
                 session.add(activity)
@@ -816,8 +845,11 @@ class CharacterController(BaseController):
         """
 
         with self._session as session:
-            character_relationship = session.query(CharacterRelationship).filter(
-                CharacterRelationship.id == relationship_id, CharacterRelationship.user_id == self._owner.id
+            character_relationship = session.query(
+                CharacterRelationship
+            ).filter(
+                CharacterRelationship.id == relationship_id,
+                CharacterRelationship.user_id == self._owner.id
             ).first()
             return character_relationship if character_relationship else None
 
@@ -839,7 +871,8 @@ class CharacterController(BaseController):
 
         with self._session as session:
             return session.query(CharacterRelationship).filter(
-                CharacterRelationship.parent_id == parent_id, CharacterRelationship.user_id == self._owner.id
+                CharacterRelationship.parent_id == parent_id,
+                CharacterRelationship.user_id == self._owner.id
             ).all()
 
     def get_relationships_page_by_character_id(
@@ -865,7 +898,8 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(CharacterRelationship).filter(
-                CharacterRelationship.parent_id == parent_id, CharacterRelationship.user_id == self._owner.id
+                CharacterRelationship.parent_id == parent_id,
+                CharacterRelationship.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def create_trait(
@@ -897,25 +931,34 @@ class CharacterController(BaseController):
                     raise ValueError('Character id, name, and magnitude must be provided.')
 
                 character = session.query(Character).filter(
-                    Character.id == character_id, Character.user_id == self._owner.id
+                    Character.id == character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
                 if not character:
                     raise ValueError('Character not found.')
 
-                position = session.query(func.max(CharacterTrait.position)).filter(
-                    CharacterTrait.character_id == character_id, CharacterTrait.user_id == self._owner.id
+                position = session.query(
+                    func.max(CharacterTrait.position)
+                ).filter(
+                    CharacterTrait.character_id == character_id,
+                    CharacterTrait.user_id == self._owner.id
                 ).scalar()
 
                 position = 1 if not position else position + 1
                 created = datetime.now()
                 modified = created
-                character_trait = CharacterTrait(user_id=self._owner.id, character_id=character_id, position=position,
-                                                 name=name, magnitude=magnitude, created=created, modified=modified)
+                character_trait = CharacterTrait(
+                    user_id=self._owner.id, character_id=character_id,
+                    position=position, name=name, magnitude=magnitude,
+                    created=created, modified=modified
+                )
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character trait {name} \
-                                    created by {self._owner.username} for "{character.__str__}"',
-                                    created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character trait {name} \
+                    created by {self._owner.username} for "{character.__str__}"',
+                    created=datetime.now()
+                )
 
                 session.add(character_trait)
                 session.add(activity)
@@ -951,7 +994,8 @@ class CharacterController(BaseController):
         with self._session as session:
             try:
                 character_trait = session.query(CharacterTrait).filter(
-                    CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
+                    CharacterTrait.id == trait_id,
+                    CharacterTrait.user_id == self._owner.id
                 ).first()
 
                 if not character_trait:
@@ -961,8 +1005,11 @@ class CharacterController(BaseController):
                 character_trait.magnitude = magnitude
                 character_trait.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character trait {character_trait.__str__} \
-                                    updated by {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character trait \
+                    {character_trait.__str__} updated by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -1029,31 +1076,40 @@ class CharacterController(BaseController):
                 if position < character_trait.position:
                     siblings = session.query(CharacterTrait).filter(
                         CharacterTrait.character_id == character_trait.character_id,
-                        CharacterTrait.position >= position, CharacterTrait.user_id == self._owner.id,
+                        CharacterTrait.position >= position,
+                        CharacterTrait.user_id == self._owner.id,
                         CharacterTrait.position < character_trait.position
                     ).all()
 
                     for sibling in siblings:
                         sibling.position += 1
-                        sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                        sibling.created = datetime.strptime(
+                            str(sibling.created), datetime_format
+                        )
                         sibling.modified = datetime.now()
 
                 else:
                     siblings = session.query(CharacterTrait).filter(
                         CharacterTrait.character_id == character_trait.character_id,
                         CharacterTrait.position > character_trait.position,
-                        CharacterTrait.position <= position, CharacterTrait.user_id == self._owner.id
+                        CharacterTrait.position <= position,
+                        CharacterTrait.user_id == self._owner.id
                     ).all()
 
                     for sibling in siblings:
                         sibling.position -= 1
-                        sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                        sibling.created = datetime.strptime(
+                            str(sibling.created), datetime_format
+                        )
                         sibling.modified = datetime.now()
 
                 character_trait.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character trait {character_trait.__str__} \
-                                    position changed by {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character trait \
+                    {character_trait.__str__} position changed by \
+                    {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -1090,22 +1146,29 @@ class CharacterController(BaseController):
                 datetime_format = config.get("formats", "datetime")
 
                 character_trait = session.query(CharacterTrait).filter(
-                    CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
+                    CharacterTrait.id == trait_id,
+                    CharacterTrait.user_id == self._owner.id
                 ).first()
 
                 if not character_trait:
                     raise ValueError('Character trait not found.')
 
                 for sibling in session.query(CharacterTrait).filter(
-                        CharacterTrait.character_id == character_trait.character_id,
-                        CharacterTrait.position > character_trait.position, CharacterTrait.user_id == self._owner.id
+                    CharacterTrait.character_id == character_trait.character_id,
+                    CharacterTrait.position > character_trait.position,
+                    CharacterTrait.user_id == self._owner.id
                 ).all():
                     sibling.position -= 1
-                    sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                    sibling.created = datetime.strptime(
+                        str(sibling.created), datetime_format
+                    )
                     sibling.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character trait {character_trait.__str__} \
-                                    deleted by {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character trait \
+                    {character_trait.__str__} deleted by \
+                    {self._owner.username}', created=datetime.now()
+                )
 
                 session.delete(character_trait)
                 session.add(activity)
@@ -1134,7 +1197,8 @@ class CharacterController(BaseController):
 
         with self._session as session:
             character_trait = session.query(CharacterTrait).filter(
-                CharacterTrait.id == trait_id, CharacterTrait.user_id == self._owner.id
+                CharacterTrait.id == trait_id,
+                CharacterTrait.user_id == self._owner.id
             ).first()
             return character_trait if character_trait else None
 
@@ -1156,7 +1220,8 @@ class CharacterController(BaseController):
 
         with self._session as session:
             return session.query(CharacterTrait).filter(
-                CharacterTrait.character_id == character_id, CharacterTrait.user_id == self._owner.id
+                CharacterTrait.character_id == character_id,
+                CharacterTrait.user_id == self._owner.id
             ).all()
 
     def get_traits_page_by_character_id(
@@ -1182,7 +1247,8 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(CharacterTrait).filter(
-                CharacterTrait.character_id == character_id, CharacterTrait.user_id == self._owner.id
+                CharacterTrait.character_id == character_id,
+                CharacterTrait.user_id == self._owner.id
             ).offset(
                 offset).limit(per_page).all()
 
@@ -1207,7 +1273,8 @@ class CharacterController(BaseController):
         with self._session as session:
             try:
                 character = session.query(Character).filter(
-                    Character.id == character_id, Character.user_id == self._owner.id
+                    Character.id == character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
                 if not character:
@@ -1221,11 +1288,16 @@ class CharacterController(BaseController):
                     if not event:
                         raise ValueError('Event not found.')
 
-                    character_event = CharacterEvent(user_id=self._owner.id, character_id=character_id,
-                                                     event_id=event_id, created=datetime.now())
+                    character_event = CharacterEvent(
+                        user_id=self._owner.id, character_id=character_id,
+                        event_id=event_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Event {event.title[:50]} associated with \
-                                        {character.__str__} by {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Event \
+                        {event.title[:50]} associated with {character.__str__} \
+                        by {self._owner.username}', created=datetime.now()
+                    )
 
                     session.add(character_event)
                     session.add(activity)
@@ -1259,10 +1331,12 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_event in session.query(CharacterEvent).filter(
-                    CharacterEvent.character_id == character_id, CharacterEvent.user_id == self._owner.id
+                CharacterEvent.character_id == character_id,
+                    CharacterEvent.user_id == self._owner.id
             ).all():
                 yield session.query(Event).filter(
-                    Event.id == character_event.event_id, Event.user_id == self._owner.id
+                    Event.id == character_event.event_id,
+                    Event.user_id == self._owner.id
                 ).first()
 
     def get_events_page_by_character_id(
@@ -1288,7 +1362,8 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(CharacterEvent).filter(
-                CharacterEvent.character_id == character_id, CharacterEvent.user_id == self._owner.id
+                CharacterEvent.character_id == character_id,
+                CharacterEvent.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_links_to_character(
@@ -1312,7 +1387,8 @@ class CharacterController(BaseController):
         with self._session as session:
             try:
                 character = session.query(Character).filter(
-                    Character.id == character_id, Character.user_id == self._owner.id
+                    Character.id == character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
                 if not character:
@@ -1320,17 +1396,23 @@ class CharacterController(BaseController):
 
                 for link_id in link_ids:
                     link = session.query(Link).filter(
-                        Link.id == link_id, Link.user_id == self._owner.id
+                        Link.id == link_id,
+                        Link.user_id == self._owner.id
                     ).first()
 
                     if not link:
                         raise ValueError('Link not found.')
 
-                    character_link = CharacterLink(user_id=self._owner.id, character_id=character_id, link_id=link_id,
-                                                   created=datetime.now())
+                    character_link = CharacterLink(
+                        user_id=self._owner.id, character_id=character_id,
+                        link_id=link_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Link {link.title[:50]} associated with \
-                                        {character.__str__} by {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Link \
+                        {link.title[:50]} associated with {character.__str__} \
+                        by {self._owner.username}', created=datetime.now()
+                    )
 
                     session.add(character_link)
                     session.add(activity)
@@ -1359,10 +1441,12 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_link in session.query(CharacterLink).filter(
-                    CharacterLink.character_id == character_id, CharacterLink.user_id == self._owner.id
+                CharacterLink.character_id == character_id,
+                CharacterLink.user_id == self._owner.id
             ).all():
                 yield session.query(Link).filter(
-                    Link.id == character_link.link_id, Link.user_id == self._owner.id
+                    Link.id == character_link.link_id,
+                    Link.user_id == self._owner.id
                 ).first()
 
     def get_links_page_by_character_id(
@@ -1388,7 +1472,8 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(CharacterLink).filter(
-                CharacterLink.character_id == character_id, CharacterLink.user_id == self._owner.id
+                CharacterLink.character_id == character_id,
+                CharacterLink.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_notes_to_character(
@@ -1412,7 +1497,8 @@ class CharacterController(BaseController):
         with self._session as session:
             try:
                 character = session.query(Character).filter(
-                    Character.id == character_id, Character.user_id == self._owner.id
+                    Character.id == character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
                 if not character:
@@ -1420,17 +1506,23 @@ class CharacterController(BaseController):
 
                 for note_id in note_ids:
                     note = session.query(Note).filter(
-                        Note.id == note_id, Note.user_id == self._owner.id
+                        Note.id == note_id,
+                        Note.user_id == self._owner.id
                     ).first()
 
                     if not note:
                         raise ValueError('Note not found.')
 
-                    character_note = CharacterNote(user_id=self._owner.id, character_id=character_id, note_id=note_id,
-                                                   created=datetime.now())
+                    character_note = CharacterNote(
+                        user_id=self._owner.id, character_id=character_id,
+                        note_id=note_id, created=datetime.now()
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Note {note.title[:50]} associated with \
-                                        {character.__str__} by {self._owner.username}', created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Note \
+                        {note.title[:50]} associated with {character.__str__} \
+                        by {self._owner.username}', created=datetime.now()
+                    )
 
                     session.add(character_note)
                     session.add(activity)
@@ -1459,10 +1551,12 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_note in session.query(CharacterNote).filter(
-                    CharacterNote.character_id == character_id, CharacterNote.user_id == self._owner.id
+                CharacterNote.character_id == character_id,
+                CharacterNote.user_id == self._owner.id
             ).all():
                 yield session.query(Note).filter(
-                    Note.id == character_note.note_id, Note.user_id == self._owner.id
+                    Note.id == character_note.note_id,
+                    Note.user_id == self._owner.id
                 ).first()
 
     def get_notes_page_by_character_id(
@@ -1488,7 +1582,8 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             return session.query(CharacterNote).filter(
-                CharacterNote.character_id == character_id, CharacterNote.user_id == self._owner.id
+                CharacterNote.character_id == character_id,
+                CharacterNote.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
     def append_images_to_character(
@@ -1516,7 +1611,8 @@ class CharacterController(BaseController):
         with self._session as session:
             try:
                 character = session.query(Character).filter(
-                    Character.id == character_id, Character.user_id == self._owner.id
+                    Character.id == character_id,
+                    Character.user_id == self._owner.id
                 ).first()
 
                 if not character:
@@ -1524,27 +1620,37 @@ class CharacterController(BaseController):
 
                 for image_id in image_ids:
                     image = session.query(Image).filter(
-                        Image.id == image_id, Image.user_id == self._owner.id
+                        Image.id == image_id,
+                        Image.user_id == self._owner.id
                     ).first()
 
                     if not image:
                         raise ValueError('Image not found.')
 
-                    position = session.query(func.max(CharacterImage.position)).filter(
-                        CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
+                    position = session.query(
+                        func.max(CharacterImage.position)
+                    ).filter(
+                        CharacterImage.character_id == character_id,
+                        CharacterImage.user_id == self._owner.id
                     ).scalar()
 
                     position = 1 if not position else position + 1
                     is_default = False
                     created = datetime.now()
                     modified = created
-                    character_image = CharacterImage(user_id=self._owner.id, character_id=character_id,
-                                                     image_id=image_id, position=position, is_default=is_default,
-                                                     created=created, modified=modified)
+                    character_image = CharacterImage(
+                        user_id=self._owner.id, character_id=character_id,
+                        image_id=image_id, position=position,
+                        is_default=is_default, created=created,
+                        modified=modified
+                    )
 
-                    activity = Activity(user_id=self._owner.id, summary=f'Image {image.filename[:50]} associated with \
-                                        character {str(character)[:50]} by {self._owner.username}',
-                                        created=datetime.now())
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Image \
+                        {image.filename[:50]} associated with character \
+                        {str(character)[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
 
                     session.add(character_image)
                     session.add(activity)
@@ -1590,7 +1696,8 @@ class CharacterController(BaseController):
                 datetime_format = config.get("formats", "datetime")
 
                 character_image = session.query(CharacterImage).filter(
-                    CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id
+                    CharacterImage.id == image_id,
+                    CharacterImage.user_id == self._owner.id
                 ).first()
 
                 if not character_image:
@@ -1599,7 +1706,9 @@ class CharacterController(BaseController):
                 if position < 1:
                     raise ValueError('Position must be greater than 0.')
 
-                highest_position = session.query(func.max(CharacterImage.position)).filter(
+                highest_position = session.query(
+                    func.max(CharacterImage.position)
+                ).filter(
                     CharacterImage.character_id == character_image.character_id,
                     CharacterImage.user_id == self._owner.id
                 ).scalar()
@@ -1613,32 +1722,41 @@ class CharacterController(BaseController):
                 if position < character_image.position:
                     siblings = session.query(CharacterImage).filter(
                         CharacterImage.character_id == character_image.character_id,
-                        CharacterImage.position >= position, CharacterImage.user_id == self._owner.id,
+                        CharacterImage.position >= position,
+                        CharacterImage.user_id == self._owner.id,
                         CharacterImage.position < character_image.position
                     ).all()
 
                     for sibling in siblings:
                         sibling.position += 1
-                        sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                        sibling.created = datetime.strptime(
+                            str(sibling.created), datetime_format
+                        )
                         sibling.modified = datetime.now()
 
                 else:
                     siblings = session.query(CharacterImage).filter(
                         CharacterImage.character_id == character_image.character_id,
                         CharacterImage.position > character_image.position,
-                        CharacterImage.position <= position, CharacterImage.user_id == self._owner.id
+                        CharacterImage.position <= position,
+                        CharacterImage.user_id == self._owner.id
                     ).all()
 
                     for sibling in siblings:
                         sibling.position -= 1
-                        sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                        sibling.created = datetime.strptime(
+                            str(sibling.created), datetime_format
+                        )
                         sibling.modified = datetime.now()
 
                 character_image.position = position
                 character_image.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character image {character_image.__str__} \
-                                    position changed by {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character image \
+                    {character_image.__str__} position changed by \
+                    {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -1676,7 +1794,8 @@ class CharacterController(BaseController):
         with self._session as session:
             try:
                 character_image = session.query(CharacterImage).filter(
-                    CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id
+                    CharacterImage.id == image_id,
+                    CharacterImage.user_id == self._owner.id
                 ).first()
 
                 if not character_image:
@@ -1687,8 +1806,8 @@ class CharacterController(BaseController):
 
                 if is_default:
                     for sibling in session.query(CharacterImage).filter(
-                            CharacterImage.character_id == character_image.character_id,
-                            CharacterImage.user_id == self._owner.id
+                        CharacterImage.character_id == character_image.character_id,
+                        CharacterImage.user_id == self._owner.id
                     ).all():
                         sibling.is_default = False
                         sibling.modified = datetime.now()
@@ -1696,8 +1815,11 @@ class CharacterController(BaseController):
                 character_image.is_default = is_default
                 character_image.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character image {character_image.__str__} \
-                                    default status changed by {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character image \
+                    {character_image.__str__} default status changed by \
+                    {self._owner.username}', created=datetime.now()
+                )
 
                 session.add(activity)
 
@@ -1735,25 +1857,33 @@ class CharacterController(BaseController):
                 datetime_format = config.get("formats", "datetime")
 
                 character_image = session.query(CharacterImage).filter(
-                    CharacterImage.id == image_id, CharacterImage.user_id == self._owner.id
+                    CharacterImage.id == image_id,
+                    CharacterImage.user_id == self._owner.id
                 ).first()
                 image = session.query(Image).filter(
-                    Image.id == character_image.image_id, Image.user_id == self._owner.id
+                    Image.id == character_image.image_id,
+                    Image.user_id == self._owner.id
                 ).first()
 
                 if not character_image:
                     raise ValueError('Character image not found.')
 
                 for sibling in session.query(CharacterImage).filter(
-                        CharacterImage.character_id == character_image.character_id,
-                        CharacterImage.position > character_image.position, CharacterImage.user_id == self._owner.id
+                    CharacterImage.character_id == character_image.character_id,
+                    CharacterImage.position > character_image.position,
+                        CharacterImage.user_id == self._owner.id
                 ).all():
                     sibling.position -= 1
-                    sibling.created = datetime.strptime(str(sibling.created), datetime_format)
+                    sibling.created = datetime.strptime(
+                        str(sibling.created), datetime_format
+                    )
                     sibling.modified = datetime.now()
 
-                activity = Activity(user_id=self._owner.id, summary=f'Character image {image.caption[:50]} \
-                                    deleted by {self._owner.username}', created=datetime.now())
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Character image \
+                    {image.caption[:50]} deleted by {self._owner.username}',
+                    created=datetime.now()
+                )
 
                 session.delete(character_image)
                 session.delete(image)
@@ -1783,7 +1913,8 @@ class CharacterController(BaseController):
 
         with self._session as session:
             return session.query(func.count(CharacterImage.id)).filter(
-                CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
+                CharacterImage.character_id == character_id,
+                CharacterImage.user_id == self._owner.id
             ).scalar()
 
     def get_images_by_character_id(
@@ -1806,10 +1937,12 @@ class CharacterController(BaseController):
 
         with self._session as session:
             for character_image in session.query(CharacterImage).filter(
-                    CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
+                CharacterImage.character_id == character_id,
+                    CharacterImage.user_id == self._owner.id
             ).order_by(CharacterImage.position).all():
                 yield session.query(Image).filter(
-                    Image.id == character_image.image_id, Image.user_id == self._owner.id
+                    Image.id == character_image.image_id,
+                    Image.user_id == self._owner.id
                 ).first()
 
     def get_images_page_by_character_id(
@@ -1837,8 +1970,12 @@ class CharacterController(BaseController):
         with self._session as session:
             offset = (page - 1) * per_page
             for character_image in session.query(CharacterImage).filter(
-                    CharacterImage.character_id == character_id, CharacterImage.user_id == self._owner.id
-            ).order_by(CharacterImage.position).offset(offset).limit(per_page).all():
+                CharacterImage.character_id == character_id,
+                    CharacterImage.user_id == self._owner.id
+            ).order_by(
+                CharacterImage.position
+            ).offset(offset).limit(per_page).all():
                 yield session.query(Image).filter(
-                    Image.id == character_image.image_id, Image.user_id == self._owner.id
+                    Image.id == character_image.image_id,
+                    Image.user_id == self._owner.id
                 ).first()

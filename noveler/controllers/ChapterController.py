@@ -61,7 +61,7 @@ class ChapterController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+        self, path_to_config: str, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
@@ -389,7 +389,7 @@ class ChapterController(BaseController):
 
             return chapter if chapter else None
 
-    def get_all_chapters(self) -> list:
+    def get_all_chapters(self) -> List[Type[Chapter]]:
         """Get all chapters associated with a user
 
         Chapters are sorted by story id and position.
@@ -406,7 +406,9 @@ class ChapterController(BaseController):
                 Chapter.user_id == self._owner.id
             ).order_by(Chapter.story_id, Chapter.position).all()
 
-    def get_all_chapters_page(self, page: int, per_page: int) -> List[Type[Chapter]]:
+    def get_all_chapters_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Chapter]]:
         """Get a single page of chapters from the database associated with a user
 
         Chapters are sorted by story id and position.
@@ -459,7 +461,7 @@ class ChapterController(BaseController):
 
     def get_chapters_page_by_story_id(
         self, story_id: int, page: int, per_page: int
-    ) -> list | None:
+    ) -> List[Type[Chapter]] | None:
         """Get a single page of chapters associated with a story from the database
 
         The returned list will be sorted by the position.
@@ -528,12 +530,16 @@ class ChapterController(BaseController):
         with self._session as session:
 
             return session.query(Chapter).filter(
-                or_(Chapter.title.like(f'%{search}%'),
-                Chapter.description.like(f'%{search}%')),
+                or_(
+                    Chapter.title.like(f'%{search}%'),
+                    Chapter.description.like(f'%{search}%')
+                ),
                 Chapter.user_id == self._owner.id
             ).all()
 
-    def search_chapters_by_story_id(self, story_id: int, search: str) -> List[Type[Chapter]]:
+    def search_chapters_by_story_id(
+        self, story_id: int, search: str
+    ) -> List[Type[Chapter]]:
         """Search for chapters by title and description belonging to a specific story
 
         Parameters
@@ -552,8 +558,10 @@ class ChapterController(BaseController):
         with self._session as session:
 
             return session.query(Chapter).filter(
-                or_(Chapter.title.like(f'%{search}%'),
-                Chapter.description.like(f'%{search}%')),
+                or_(
+                    Chapter.title.like(f'%{search}%'),
+                    Chapter.description.like(f'%{search}%')
+                ),
                 Chapter.story_id == story_id,
                 Chapter.user_id == self._owner.id
             ).all()
@@ -579,7 +587,9 @@ class ChapterController(BaseController):
                 Scene.user_id == self._owner.id
             ).count() > 0
 
-    def get_scene_by_position(self, chapter_id: int, position: int) -> Type[Scene] | None:
+    def get_scene_by_position(
+        self, chapter_id: int, position: int
+    ) -> Type[Scene] | None:
         """Get a scene by position
 
         Parameters
@@ -605,7 +615,9 @@ class ChapterController(BaseController):
 
             return scene if scene else None
 
-    def get_all_scenes_by_chapter_id(self, chapter_id: int) -> List[Type[Scene]]:
+    def get_all_scenes_by_chapter_id(
+        self, chapter_id: int
+    ) -> List[Type[Scene]]:
         """Get all scenes associated with a chapter
 
         Parameters

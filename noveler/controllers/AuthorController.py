@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
@@ -11,12 +11,14 @@ class AuthorController(BaseController):
 
     Attributes
     ----------
-    _self : AuthorController
+    _instance : AuthorController
         The instance of the author controller
-    _owner : User
-        The current user of the author controller
+    _path_to_config : str
+        The path to the configuration file
     _session : Session
-        The database session
+        The database session object
+    _owner : User
+        The current user of the controller
 
     Methods
     -------
@@ -319,7 +321,7 @@ class AuthorController(BaseController):
                 Author.user_id == self._owner.id
             ).scalar()
 
-    def get_all_authors(self) -> list:
+    def get_all_authors(self) -> List[Type[Author]]:
         """Get all authors associated with a user
 
         Returns
@@ -358,7 +360,9 @@ class AuthorController(BaseController):
                 Author.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def get_authors_by_story_id(self, story_id: int) -> list:
+    def get_authors_by_story_id(
+        self, story_id: int
+    ) -> List[Type[Author]] | None:
         """Get all authors associated with a story
 
         Parameters
@@ -368,8 +372,8 @@ class AuthorController(BaseController):
 
         Returns
         -------
-        list
-            A list of author objects
+        list | None
+            A list of author objects or None if not found
         """
 
         with self._session as session:
@@ -381,7 +385,7 @@ class AuthorController(BaseController):
 
             return story.authors if story else None
 
-    def search_authors(self, search: str) -> list:
+    def search_authors(self, search: str) -> List[Type[Author]]:
         """Search for authors by name
 
         Parameters

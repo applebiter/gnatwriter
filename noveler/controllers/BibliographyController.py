@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
@@ -11,7 +11,7 @@ class BibliographyController(BaseController):
 
     Attributes
     ----------
-    _self : BibliographyController
+    _instance : BibliographyController
         The instance of the bibliography controller
     _owner : User
         The current user of the bibliography controller
@@ -236,7 +236,7 @@ class BibliographyController(BaseController):
                 return True
 
     def get_bibliography_by_id(
-            self, bibliography_id: int
+        self, bibliography_id: int
     ) -> Type[Bibliography] | None:
         """Get a bibliography by id
 
@@ -261,7 +261,7 @@ class BibliographyController(BaseController):
             return bibliography if bibliography else None
 
     def get_bibliography_by_title(
-            self, title: str
+        self, title: str
     ) -> Type[Bibliography] | None:
         """Get a bibliography by title
 
@@ -300,7 +300,7 @@ class BibliographyController(BaseController):
                 Bibliography.user_id == self._owner.id
             ).scalar()
 
-    def get_all_bibliographies(self) -> list:
+    def get_all_bibliographies(self) -> List[Type[Bibliography]]:
         """Get all bibliographies associated with a user
 
         Returns
@@ -315,7 +315,9 @@ class BibliographyController(BaseController):
                 Bibliography.user_id == self._owner.id
             ).all()
 
-    def get_bibliographies_page(self, page: int, per_page: int) -> list:
+    def get_bibliographies_page(
+        self, page: int, per_page: int
+    ) -> List[Type[Bibliography]]:
         """Get a single page of bibliographies from the database associated with a user
 
         Parameters
@@ -339,7 +341,9 @@ class BibliographyController(BaseController):
                 Bibliography.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
 
-    def get_bibliographies_by_story_id(self, story_id: int) -> list:
+    def get_bibliographies_by_story_id(
+        self, story_id: int
+    ) -> List[Type[Bibliography]]:
         """Get all bibliographies associated with a story
 
         Parameters
@@ -364,7 +368,7 @@ class BibliographyController(BaseController):
 
     def get_bibliographies_page_by_story_id(
         self, story_id: int, page: int, per_page: int
-    ) -> list:
+    ) -> List[Type[Bibliography]]:
         """Get a single page of bibliographies associated with a story from the database
 
         Parameters
@@ -393,7 +397,7 @@ class BibliographyController(BaseController):
 
             return bibliographies if bibliographies else None
 
-    def search_bibliographies(self, search: str) -> list:
+    def search_bibliographies(self, search: str) -> List[Type[Bibliography]]:
         """Search for bibliographies by title associated with a user
 
         Parameters
@@ -416,7 +420,7 @@ class BibliographyController(BaseController):
 
     def search_bibliographies_by_story_id(
         self, story_id: int, search: str
-    ) -> list:
+    ) -> List[Type[Bibliography]]:
         """Search for bibliographies by title associated with a story
 
         Parameters
