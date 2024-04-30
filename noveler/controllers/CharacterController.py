@@ -125,9 +125,8 @@ class CharacterController(BaseController):
         super().__init__(path_to_config, session, owner)
 
     def create_character(
-        self, title: str = None, first_name: str = None,
-        middle_name: str = None, last_name: str = None,
-        honorific: str = None, nickname: str = None,
+        self, title: str = None, honorific: str = None, first_name: str = None,
+        middle_name: str = None, last_name: str = None, nickname: str = None,
         gender: str = None, sex: str = None, ethnicity: str = None,
         race: str = None, tribe_or_clan: str = None, nationality: str = None,
         religion: str = None, occupation: str = None, education: str = None,
@@ -238,13 +237,12 @@ class CharacterController(BaseController):
                 return character
 
     def update_character(
-        self, character_id: int = None, title: str = None,
+        self, character_id: int = None, title: str = None, honorific: str = None,
         first_name: str = None, middle_name: str = None, last_name: str = None,
-        honorific: str = None, nickname: str = None, gender: str = None,
-        sex: str = None, ethnicity: str = None, race: str = None,
-        tribe_or_clan: str = None, nationality: str = None,
-        religion: str = None, occupation: str = None, education: str = None,
-        marital_status: str = None, children: bool = None,
+        nickname: str = None, gender: str = None, sex: str = None,
+        ethnicity: str = None, race: str = None, tribe_or_clan: str = None,
+        nationality: str = None, religion: str = None, occupation: str = None,
+        education: str = None, marital_status: str = None, children: bool = None,
         date_of_birth: str = None, date_of_death: str = None,
         description: str = None, mbti: str = None, enneagram: str = None,
         wounds: str = None
