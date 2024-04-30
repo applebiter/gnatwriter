@@ -68,7 +68,7 @@ class Character(Base):
         description: str
             The character's description
         mbti: str
-            The MBTI type of the character
+            The Myers-Briggs Type Indicator of the character
         enneagram: str
             The Enneagram type of the character
         wounds: str
