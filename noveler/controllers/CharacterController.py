@@ -144,14 +144,14 @@ class CharacterController(BaseController):
         ----------
         title : str
             The title of the character, optional
+        honorific : str
+            The honorific of the character, optional
         first_name : str
             The first name of the character, optional
         middle_name : str
             The middle name of the character, optional
         last_name : str
             The last name of the character, optional
-        honorific : str
-            The honorific of the character, optional
         nickname : str
             The nickname of the character, optional
         gender: str
@@ -183,9 +183,9 @@ class CharacterController(BaseController):
         description
             The description of the character, optional
         mbti: str
-            The MBTI of the character, optional
+            The Myers-Briggs Type Indicator of the character, optional
         enneagram: str
-            The enneagram of the character, optional
+            The Enneagram type of the character, optional
         wounds: str
             The wounds of the character, optional
 
@@ -255,14 +255,14 @@ class CharacterController(BaseController):
             The id of the character to update
         title : str
             The title of the character
+        honorific : str
+            The honorific of the character
         first_name : str
             The first name of the character
         middle_name : str
             The middle name of the character
         last_name : str
             The last name of the character
-        honorific : str
-            The honorific of the character
         nickname : str
             The nickname of the character
         gender : str
@@ -294,9 +294,9 @@ class CharacterController(BaseController):
         description : str
             The description of the character
         mbti : str
-            The MBTI of the character
+            The Myers-Briggs Type Indicator of the character
         enneagram : str
-            The enneagram of the character
+            The Enneagram type of the character
         wounds : str
             The wounds of the character
 
@@ -319,10 +319,10 @@ class CharacterController(BaseController):
                     raise ValueError('Character not found.')
 
                 character.title = title
+                character.honorific = honorific
                 character.first_name = first_name
                 character.middle_name = middle_name
                 character.last_name = last_name
-                character.honorific = honorific
                 character.nickname = nickname
                 character.gender = gender
                 character.sex = sex
