@@ -13,7 +13,7 @@ class ChapterController(BaseController):
 
     Attributes
     ----------
-    _self : ChapterController
+    _instance : ChapterController
         The instance of the chapter controller
     _owner : User
         The current user of the chapter controller

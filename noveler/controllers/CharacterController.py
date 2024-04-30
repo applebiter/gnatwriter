@@ -22,11 +22,14 @@ class CharacterController(BaseController):
 
     Methods
     -------
-    create_character(title: str, first_name: str, middle_name: str, last_name: str, nickname: str, gender: str, \
-                     sex: str, description: str, date_of_birth: str, date_of_death: str)
+    create_character(title: str, first_name: str, middle_name: str, last_name: str, honorific: str, nickname: str, \
+                     gender: str, sex: str, ethnicity: str, race: str, tribe_or_clan: str, nationality: str, \
+                     date_of_birth: str, date_of_death: str, description: str, mbti: str, enneagram: str, wounds: str)
         Create a new character
-    update_character(character_id: int, title: str, first_name: str, middle_name: str, last_name: str, nickname: str, \
-                     gender: str, sex: str, description: str, date_of_birth: str, date_of_death: str)
+    update_character(character_id: int, title: str, first_name: str, middle_name: str, last_name: str, honorific: str, \
+                     nickname: str, gender: str, sex: str, ethnicity: str, race: str, tribe_or_clan: str, \
+                     nationality: str, date_of_birth: str, date_of_death: str, description: str, mbti: str, \
+                     enneagram: str, wounds: str)
         Update a character
     delete_character(character_id: int)
         Delete a character
@@ -123,9 +126,15 @@ class CharacterController(BaseController):
 
     def create_character(
         self, title: str = None, first_name: str = None,
-        middle_name: str = None, last_name: str = None, nickname: str = None,
-        gender: str = None, sex: str = None, date_of_birth: str = None,
-        date_of_death: str = None, description: str = None
+        middle_name: str = None, last_name: str = None,
+        honorific: str = None, nickname: str = None,
+        gender: str = None, sex: str = None, ethnicity: str = None,
+        race: str = None, tribe_or_clan: str = None, nationality: str = None,
+        religion: str = None, occupation: str = None, education: str = None,
+        marital_status: str = None, children: bool = None,
+        date_of_birth: str = None, date_of_death: str = None,
+        description: str = None, mbti: str = None, enneagram: str = None,
+        wounds: str = None
     ) -> Character:
         """Create a new character
 
@@ -142,18 +151,44 @@ class CharacterController(BaseController):
             The middle name of the character, optional
         last_name : str
             The last name of the character, optional
+        honorific : str
+            The honorific of the character, optional
         nickname : str
             The nickname of the character, optional
         gender: str
             The gender of the character, optional
         sex: str
             The sex of the character, optional
+        ethnicity: str
+            The ethnicity of the character, optional
+        race: str
+            The race of the character, optional
+        tribe_or_clan: str
+            The tribe or clan of the character, optional
+        nationality: str
+            The nationality of the character, optional
+        religion: str
+            The religion of the character, optional
+        occupation: str
+            The occupation of the character, optional
+        education: str
+            The education of the character, optional
+        marital_status: str
+            The marital status of the character, optional
+        children: bool
+            Whether the character has children, optional
         date_of_birth: str
             The date of birth of the character, optional
         date_of_death: str
             The date of death of the character, optional
         description
             The description of the character, optional
+        mbti: str
+            The MBTI of the character, optional
+        enneagram: str
+            The enneagram of the character, optional
+        wounds: str
+            The wounds of the character, optional
 
         Returns
         -------
@@ -175,9 +210,15 @@ class CharacterController(BaseController):
                 character = Character(
                     user_id=self._owner.id, title=title, first_name=first_name,
                     middle_name=middle_name, last_name=last_name,
-                    nickname=nickname, gender=gender, sex=sex,
-                    date_of_birth=date_of_birth, date_of_death=date_of_death,
-                    description=description, created=created, modified=modified
+                    honorific=honorific, nickname=nickname, gender=gender,
+                    sex=sex, ethnicity=ethnicity, race=race,
+                    tribe_or_clan=tribe_or_clan, nationality=nationality,
+                    religion=religion, occupation=occupation,
+                    education=education, marital_status=marital_status,
+                    children=children, date_of_birth=date_of_birth,
+                    date_of_death=date_of_death, description=description,
+                    mbti=mbti, enneagram=enneagram, wounds=wounds,
+                    created=created, modified=modified
                 )
 
                 activity = Activity(
@@ -197,11 +238,16 @@ class CharacterController(BaseController):
                 return character
 
     def update_character(
-            self, character_id: int = None, title: str = None,
-            first_name: str = None, middle_name: str = None,
-            last_name: str = None, nickname: str = None, gender: str = None,
-            sex: str = None, date_of_birth: str = None,
-            date_of_death: str = None, description: str = None
+        self, character_id: int = None, title: str = None,
+        first_name: str = None, middle_name: str = None, last_name: str = None,
+        honorific: str = None, nickname: str = None, gender: str = None,
+        sex: str = None, ethnicity: str = None, race: str = None,
+        tribe_or_clan: str = None, nationality: str = None,
+        religion: str = None, occupation: str = None, education: str = None,
+        marital_status: str = None, children: bool = None,
+        date_of_birth: str = None, date_of_death: str = None,
+        description: str = None, mbti: str = None, enneagram: str = None,
+        wounds: str = None
     ) -> Type[Character]:
         """Update a character
 
@@ -217,18 +263,44 @@ class CharacterController(BaseController):
             The middle name of the character
         last_name : str
             The last name of the character
+        honorific : str
+            The honorific of the character
         nickname : str
             The nickname of the character
         gender : str
             The gender of the character
         sex : str
             The sex of the character
+        ethnicity : str
+            The ethnicity of the character
+        race : str
+            The race of the character
+        tribe_or_clan : str
+            The tribe or clan of the character
+        nationality : str
+            The nationality of the character
+        religion : str
+            The religion of the character
+        occupation : str
+            The occupation of the character
+        education : str
+            The education of the character
+        marital_status : str
+            The marital status of the character
+        children : bool
+            Whether the character has children
         date_of_birth : str
             The date of birth of the character
         date_of_death : str
             The date of death of the character
         description : str
             The description of the character
+        mbti : str
+            The MBTI of the character
+        enneagram : str
+            The enneagram of the character
+        wounds : str
+            The wounds of the character
 
         Returns
         -------
@@ -252,12 +324,25 @@ class CharacterController(BaseController):
                 character.first_name = first_name
                 character.middle_name = middle_name
                 character.last_name = last_name
+                character.honorific = honorific
                 character.nickname = nickname
                 character.gender = gender
                 character.sex = sex
+                character.ethnicity = ethnicity
+                character.race = race
+                character.tribe_or_clan = tribe_or_clan
+                character.nationality = nationality
+                character.religion = religion
+                character.occupation = occupation
+                character.education = education
+                character.marital_status = marital_status
+                character.children = children
                 character.date_of_birth = date_of_birth
                 character.date_of_death = date_of_death
                 character.description = description
+                character.mbti = mbti
+                character.enneagram = enneagram
+                character.wounds = wounds
                 character.modified = datetime.now()
 
                 activity = Activity(

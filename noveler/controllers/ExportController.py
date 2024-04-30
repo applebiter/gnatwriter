@@ -305,11 +305,49 @@ class ExportController(BaseController):
                 if dict_character['description']:
                     output.write(f"\n\n{dict_character['description']}")
 
+                if dict_character['wounds']:
+                    output.write(f"\n\nThe character's wounds:\n{dict_character['wounds']}")
+
                 if dict_character["gender"]:
                     output.write(f"\n\nGender: {dict_character['gender']}")
 
                 if dict_character["sex"]:
                     output.write(f"\nSex: {dict_character['sex']}")
+
+                if dict_character["ethnicity"]:
+                    output.write(f"\nEthnicity: {dict_character['ethnicity']}")
+
+                if dict_character["race"]:
+                    output.write(f"\nRace: {dict_character['race']}")
+
+                if dict_character["tribe_or_clan"]:
+                    output.write(f"\nTribe or Clan: {dict_character['tribe_or_clan']}")
+
+                if dict_character["nationality"]:
+                    output.write(f"\nNationality: {dict_character['nationality']}")
+
+                if dict_character["religion"]:
+                    output.write(f"\nReligion: {dict_character['religion']}")
+
+                if dict_character["mbti"]:
+                    output.write(f"\nMyers-Briggs Type Indicator: {dict_character['mbti']}")
+
+                if dict_character["enneagram"]:
+                    output.write(f"\nEnneagram Type: {dict_character['enneagram']}")
+
+                if dict_character["occupation"]:
+                    output.write(f"\nOccupation: {dict_character['occupation']}")
+
+                if dict_character["education"]:
+                    output.write(f"\nEducation: {dict_character['education']}")
+
+                if dict_character["marital_status"]:
+                    output.write(f"\nMarital Status: {dict_character['marital_status']}")
+
+                if dict_character["children"]:
+                    output.write(f"\nThis character has or had children.")
+                else:
+                    output.write(f"\nThis character has no children.")
 
                 if dict_character["age"]:
                     output.write(f"\nAge: {dict_character['age']}")
