@@ -199,7 +199,7 @@ class Noveler:
         return self._controllers[args[0]]
 
     def __str__(self):
-        return "Noveler Application [Version 0.1.0]"
+        return "Noveler Application [Version 0.1.1]"
 
     def __repr__(self):
         return f"{self.__class__.__name__}()"
