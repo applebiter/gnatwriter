@@ -7,7 +7,7 @@ from validators import url as url_validator
 
 
 class Link(Base):
-    """The Link class represents a link in the system.
+    """The Link class represents a web link in the application.
 
     Attributes
     ----------

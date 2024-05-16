@@ -6,7 +6,7 @@ from noveler.models import User, EventLink, CharacterEvent, EventNote, EventLoca
 
 
 class Event(Base):
-    """The Event class represents an event in a story.
+    """The Event class represents an event that is referenced by one or more stories.
 
     Attributes
     ----------

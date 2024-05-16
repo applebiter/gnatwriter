@@ -6,7 +6,7 @@ from noveler.models import User, NoteStory, ChapterNote, NoteScene, CharacterNot
 
 
 class Note(Base):
-    """The Note class represents a note in the system.
+    """The Note class represents a note.
 
     Attributes
     ----------

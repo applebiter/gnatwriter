@@ -6,7 +6,7 @@ from noveler.models import SubmissionResultType, User, Story, Base
 
 
 class Submission(Base):
-    """The Submission class represents a submission in the system.
+    """The Submission class represents a submission of a story to some publisher or contest.
 
     Attributes
     ----------

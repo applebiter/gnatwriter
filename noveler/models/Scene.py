@@ -6,7 +6,7 @@ from noveler.models import Chapter, User, LinkScene, NoteScene, Base
 
 
 class Scene(Base):
-    """The Scene class represents a scene in the system.
+    """The Scene class represents a scene in a chapter of a story.
 
     Attributes
     ----------

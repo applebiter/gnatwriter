@@ -9,7 +9,7 @@ from validators import uuid as uuid_validator
 
 
 class User(Base):
-    """The User class represents a user in the system.
+    """The User class represents a user in the application or the system user.
 
     Attributes
     ----------

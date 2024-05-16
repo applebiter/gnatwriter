@@ -42,15 +42,19 @@ class BibliographyAuthor(Base):
             Validates the initials' length
     """
 
-    __tablename__ = 'bibliographies_authors'
+    __tablename__ = 'authors_bibliographies'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    bibliography_id: Mapped[int] = mapped_column(Integer, ForeignKey('bibliographies.id'))
+    bibliography_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('bibliographies.id')
+    )
     name: Mapped[str] = mapped_column(String(150), nullable=False)
     initials: Mapped[str] = mapped_column(String(10), nullable=True)
     created: Mapped[str] = mapped_column(DateTime, default=str(datetime.now()))
     user: Mapped["User"] = relationship("User")
-    reference: Mapped["Bibliography"] = relationship("Bibliography", back_populates="authors")
+    reference: Mapped["Bibliography"] = relationship(
+        "Bibliography", back_populates="authors"
+    )
 
     def __repr__(self):
         """Returns a string representation of the author.

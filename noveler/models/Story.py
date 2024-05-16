@@ -7,7 +7,7 @@ from noveler.models import User, Chapter, AuthorStory, Bibliography, Submission,
 
 
 class Story(Base):
-    """The Story class represents a story in the system.
+    """The Story class represents a story in the application.
 
     Attributes
     ----------

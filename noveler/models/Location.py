@@ -6,7 +6,7 @@ from noveler.models import User, ImageLocation, LinkLocation, EventLocation, Loc
 
 
 class Location(Base):
-    """The Location class represents a location in the system.
+    """The Location class represents a location associated with one or more stories.
 
     Attributes
     ----------

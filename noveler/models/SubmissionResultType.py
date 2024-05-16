@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class SubmissionResultType(Enum):
-    """The SubmissionResultType class represents the possible results of a submission.
+    """The SubmissionResultType class represents the possible results or status of a story submission.
 
     Attributes
     ----------

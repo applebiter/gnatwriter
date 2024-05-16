@@ -5,7 +5,7 @@ from noveler.models import User, Author, Story, Base
 
 
 class AuthorStory(Base):
-    """The AuthorStory class represents the relationship between an author and a story.
+    """The AuthorStory class represents the relationship between an Author and a Story.
 
     Attributes
     ----------

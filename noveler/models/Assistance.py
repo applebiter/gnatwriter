@@ -10,18 +10,18 @@ class Assistance(Base):
     Attributes
     ----------
     id: int
-        The assistance's id
+        The Assistance id
     user_id: int
         The id of the current user
     session_uuid: str
         The UUID of the session to be used when making the request. If other
-        messages in teh database have the same session_uuid value, they will be
+        messages in the database have the same session_uuid value, they will be
         loaded in order of their creation date, and the assistant will continue
         from the last message in the session.
     assistant: str
         The assistant to be used when making the request.
     model: str
-        The model to be used when making the request.
+        The language model to be used when making the request.
     priming: str
         The priming to be used when making the request.
     prompt: str
@@ -31,7 +31,7 @@ class Assistance(Base):
     seed: int
         The seed to be used when making the request.
     content: str
-        The message to be used when making the request.
+        The language model's response to the prompt.
     done: bool
         Whether the assistance is done or not
     total_duration: int

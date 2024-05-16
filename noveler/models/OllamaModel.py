@@ -5,7 +5,7 @@ from noveler.models import Base
 
 
 class OllamaModel(Base):
-    """OllamaTemplate stores the name of the model, a description of the model, the template, and an example of the
+    """OllamaModel stores the name of the model, a description of the model, the template, and an example of the
     model's use.
     """
 

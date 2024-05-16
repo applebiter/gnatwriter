@@ -6,7 +6,7 @@ from noveler.models import ImageMimeTypes, User, CharacterImage, ImageLocation, 
 
 
 class Image(Base):
-    """The Image class represents an image in the system.
+    """The Image class represents an image in the application.
 
     Attributes
     ----------

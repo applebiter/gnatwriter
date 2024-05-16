@@ -12,27 +12,31 @@ class Bibliography(Base):
     Attributes
     ----------
         id: int
-            The reference's id
+            The Bibliography ID
         user_id: int
-            The id of the owner of this entry
+            The ID of the user who created this Bibliography entry
         story_id: int
-            The story's id
+            The Story ID that this Bibliography references
         title: str
-            The reference's title
+            The referenced work's title
         pages: str
-            The reference's pages
+            The pertinent pages of the referenced work
+        publisher: str
+            The referenced work's publisher
         publication_date: str
-            The reference's publication date in date form: yyy-mm-dd
+            The referenced work's publication date in date form: yyy-mm-dd
+        editor: str
+            The referenced work's editor
         created: str
-            The reference's creation date in datetime form: yyy-mm-dd hh:mm:ss
+            The referenced work's creation date in datetime form: yyy-mm-dd hh:mm:ss
         modified: str
-            The reference's last modification date in datetime form: yyy-mm-dd hh:mm:ss
+            The referenced work's last modification date in datetime form: yyy-mm-dd hh:mm:ss
         user: User
-            The user who owns this entry
+            The user who created this Bibliography entry
         story: Story
-            The story that the reference refers to
+            The Story to which this Bibliography entry belongs
         authors: List[BibliographyAuthor]
-            The authors of the reference
+            The author(s) of the referenced work
 
     Methods
     -------

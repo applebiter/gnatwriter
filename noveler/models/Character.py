@@ -19,12 +19,12 @@ enneagram_types = [
 
 
 class Character(Base):
-    """The Character class represents a character in a story.
+    """The Character class represents a character in one or more stories.
 
     Attributes
     ----------
         id: int
-            The character's id
+            The Character ID
         user_id: int
             The id of the owner of this entry
         title: str
@@ -62,9 +62,9 @@ class Character(Base):
         children: bool
             Whether the character has children
         date_of_birth: str
-            The character's date of birth in date form: yyy-mm-dd
+            The character's date of birth in date form: yyyy-mm-dd
         date_of_death: str
-            The character's date of death in date form: yyy-mm-dd
+            The character's date of death in date form: yyyy-mm-dd
         description: str
             The character's description
         mbti: str
