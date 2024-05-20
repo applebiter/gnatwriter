@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 from sqlalchemy import Integer, ForeignKey, String, Text, Float, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
-from noveler.models import User, ImageLocation, LinkLocation, EventLocation, LocationNote, Base
+from noveler.models import User, ImageLocation, LinkLocation, LocationNote, Base
 
 
 class Location(Base):
@@ -97,9 +97,6 @@ class Location(Base):
         cascade="all, delete, delete-orphan")
     links: Mapped[Optional[List["LinkLocation"]]] = relationship(
         "LinkLocation", back_populates="location",
-        cascade="all, delete, delete-orphan", lazy="joined")
-    events: Mapped[Optional[List["EventLocation"]]] = relationship(
-        "EventLocation", back_populates="location",
         cascade="all, delete, delete-orphan", lazy="joined")
     notes: Mapped[Optional[List["LocationNote"]]] = relationship(
         "LocationNote", back_populates="location",

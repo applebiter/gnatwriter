@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 from sqlalchemy import Integer, ForeignKey, String, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
-from noveler.models import User, EventLink, CharacterEvent, EventNote, EventLocation, Base
+from noveler.models import User, EventLink, CharacterEvent, EventNote, Base
 
 
 class Event(Base):
@@ -77,9 +77,6 @@ class Event(Base):
         cascade="all, delete, delete-orphan")
     notes: Mapped[Optional[List["EventNote"]]] = relationship(
         "EventNote", back_populates="event", lazy="joined",
-        cascade="all, delete, delete-orphan")
-    locations: Mapped[Optional[List["EventLocation"]]] = relationship(
-        "EventLocation", back_populates="event", lazy="joined",
         cascade="all, delete, delete-orphan")
 
     def __repr__(self):

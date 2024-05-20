@@ -19,7 +19,6 @@ from noveler.models.CharacterStory import CharacterStory
 from noveler.models.CharacterTrait import CharacterTrait
 from noveler.models.Event import Event
 from noveler.models.EventLink import EventLink
-from noveler.models.EventLocation import EventLocation
 from noveler.models.EventNote import EventNote
 from noveler.models.Image import Image
 from noveler.models.ImageLocation import ImageLocation

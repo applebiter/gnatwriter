@@ -687,7 +687,7 @@ class Character(Base):
 
         config = ConfigParser()
         config.read("config.cfg")
-        date_format = config.get("datetime", "date_format")
+        date_format = config.get("formats", "date")
 
         if date_of_birth and bool(datetime.strptime(date_of_birth, date_format)) is False:
             raise ValueError("The date of birth must be in the format 'YYYY-MM-DD'.")
@@ -715,7 +715,7 @@ class Character(Base):
 
         config = ConfigParser()
         config.read("config.cfg")
-        date_format = config.get("datetime", "date_format")
+        date_format = config.get("formats", "date")
 
         if date_of_death and bool(datetime.strptime(date_of_death, date_format)) is False:
             raise ValueError("The date of death must be in the format 'YYYY-MM-DD'.")

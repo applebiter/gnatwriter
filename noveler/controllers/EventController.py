@@ -2,8 +2,7 @@ from datetime import datetime
 from typing import Type, List
 from sqlalchemy.orm import Session
 from noveler.controllers.BaseController import BaseController
-from noveler.models import User, Event, CharacterEvent, Character, Activity, EventLocation, Location, Link, EventLink, \
-    Note, EventNote
+from noveler.models import User, Event, CharacterEvent, Character, Activity, Location, Link, EventLink, Note, EventNote
 
 
 class EventController(BaseController):
@@ -34,10 +33,6 @@ class EventController(BaseController):
         Append characters to an event
     get_characters_by_event_id(event_id: int)
         Get all characters associated with an event
-    append_locations_to_event(event_id: int, locations: list)
-        Append locations to an event
-    get_locations_by_event_id(event_id: int)
-        Get all locations associated with an event
     append_links_to_event(event_id: int, links: list)
         Append links to an event
     get_links_by_event_id(event_id: int)
@@ -354,90 +349,6 @@ class EventController(BaseController):
                 yield session.query(Character).filter(
                     Character.id == character_event.character_id,
                     Character.user_id == self._owner.id
-                ).first()
-
-    def append_locations_to_event(
-        self, event_id: int, location_ids: list
-    ) -> Type[Event]:
-        """Append locations to an event
-
-        Parameters
-        ----------
-        event_id : int
-            The id of the event
-        location_ids : list
-            A list of location ids
-
-        Returns
-        -------
-        Event
-            The updated event object
-        """
-
-        with self._session as session:
-            try:
-                event = session.query(Event).filter(
-                    Event.id == event_id,
-                    Event.user_id == self._owner.id
-                ).first()
-
-                if not event:
-                    raise ValueError('Event not found.')
-
-                for location_id in location_ids:
-                    location = session.query(Location).filter(
-                        Location.id == location_id,
-                        Location.user_id == self._owner.id
-                    ).first()
-
-                    if not location:
-                        raise ValueError('Location not found.')
-
-                    event_location = EventLocation(
-                        user_id=self._owner.id, event_id=event_id,
-                        location_id=location_id, created=datetime.now()
-                    )
-
-                    activity = Activity(
-                        user_id=self._owner.id, summary=f'Location \
-                        {location.name[:50]} associated with event \
-                        {event.title[:50]} by {self._owner.username}',
-                        created=datetime.now()
-                    )
-
-                    session.add(event_location)
-                    session.add(activity)
-
-            except Exception as e:
-                session.rollback()
-                raise e
-
-            else:
-                session.commit()
-                return event
-
-    def get_locations_by_event_id(self, event_id: int) -> List[Type[Location]]:
-        """Get all locations associated with an event
-
-        Parameters
-        ----------
-        event_id : int
-            The id of the event
-
-        Returns
-        -------
-        list
-            A list of location objects
-        """
-
-        with self._session as session:
-            for event_location in session.query(EventLocation).filter(
-                EventLocation.event_id == event_id,
-                    EventLocation.user_id == self._owner.id
-            ).all():
-                yield session.query(Location).filter(
-                    Location.id == event_location.location_id,
-                    Location.user_id == self._owner.id
                 ).first()
 
     def append_links_to_event(
