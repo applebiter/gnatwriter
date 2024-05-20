@@ -670,62 +670,6 @@ class Character(Base):
 
         return marital_status
 
-    @validates("date_of_birth")
-    def validate_date_of_birth(self, key, date_of_birth: str) -> datetime | None:
-        """Validates the date of birth's format.
-
-        Parameters
-        ----------
-        date_of_birth: str
-            The character's date of birth in date form: yyy-mm-dd
-
-        Returns
-        -------
-        str
-            The validated date of birth
-        """
-
-        config = ConfigParser()
-        config.read("config.cfg")
-        date_format = config.get("formats", "date")
-
-        if date_of_birth and bool(datetime.strptime(date_of_birth, date_format)) is False:
-            raise ValueError("The date of birth must be in the format 'YYYY-MM-DD'.")
-
-        if date_of_birth:
-            return datetime.strptime(date_of_birth, date_format)
-
-        else:
-            return None
-
-    @validates("date_of_death")
-    def validate_date_of_death(self, key, date_of_death: str) -> datetime | None:
-        """Validates the date of death's format.
-
-        Parameters
-        ----------
-        date_of_death: str
-            The character's date of death in date form: yyy-mm-dd
-
-        Returns
-        -------
-        str
-            The validated date of death
-        """
-
-        config = ConfigParser()
-        config.read("config.cfg")
-        date_format = config.get("formats", "date")
-
-        if date_of_death and bool(datetime.strptime(date_of_death, date_format)) is False:
-            raise ValueError("The date of death must be in the format 'YYYY-MM-DD'.")
-
-        if date_of_death:
-            return datetime.strptime(date_of_death, date_format)
-
-        else:
-            return None
-
     @validates("description")
     def validate_description(self, key, description: str) -> str:
         """Validates the description's length.
