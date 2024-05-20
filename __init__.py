@@ -1,1 +1,1 @@
-from noveler import Noveler
+from fabulist import Fabulist
