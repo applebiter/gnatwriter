@@ -10,7 +10,7 @@ from gnatwriter.controllers import ActivityController, AuthorController, Bibliog
     CharacterController, EventController, ImageController, LinkController, AssistantController, \
     LocationController, NoteController, SceneController, StoryController, SubmissionController, UserController, \
     OllamaModelController, ExportController
-from v.models import Base, User
+from gnatwriter.models import Base, User
 
 
 def hash_password(password: str) -> str:
