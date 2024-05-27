@@ -1,1 +1,1 @@
-from fabulist import Fabulist
+from gnatwriter import GnatWriter
