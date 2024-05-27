@@ -4,7 +4,7 @@
 # port = 3306
 # user = root
 # password = password
-# database = write_thing
+# database = gnatwriter
 #
 # [default_database]
 # type = postgresql
@@ -12,11 +12,11 @@
 # port = 5432
 # user = postgres
 # password = password
-# database = write_thing
+# database = gnatwriter
 
 [default_database]
 type = sqlite
-database = write_thing.db
+database = gnatwriter.db
 
 [formats]
 datetime = "%Y-%m-%d %H:%M:%S.%f"
@@ -35,4 +35,4 @@ multimodal_context_window = 4096
 multimodal_memory_duration = 0
 
 [export]
-root = /path/to/write_thing/exports
+root = /path/to/gnatwriter/exports
