@@ -58,7 +58,7 @@ class Author(Base):
     user: Mapped["User"] = relationship("User", back_populates="authors")
     stories: Mapped[Optional[List["AuthorStory"]]] = relationship(
         "AuthorStory", back_populates="author",
-        cascade="all, delete, delete-orphan")
+        cascade="all, delete, delete-orphan", lazy="joined")
 
     def __repr__(self):
         """Returns a string representation of the author.
