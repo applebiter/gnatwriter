@@ -41,6 +41,8 @@ class StoryController(BaseController):
         Search for stories by title and description
     append_authors_to_story(story_id: int, author_ids: list)
         Append authors to a story
+    detach_authors_from_story(story_id:int, author_ids: list)
+        Detach authors from a story
     has_authors( story_id ) : bool
         Check if a story has authors
     get_authors_by_story_id(story_id: int)
@@ -373,6 +375,69 @@ class StoryController(BaseController):
                 )
 
                 session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return story
+
+    def detach_authors_from_story(
+        self, story_id: int, author_ids: list
+    ) -> Type[Story]:
+        """Detach authors from a story
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+        author_ids : list
+            The ids of the authors to detach
+
+        Returns
+        -------
+        Story
+            The updated story object
+        """
+
+        with self._session as session:
+            try:
+                story = session.query(Story).filter(
+                    Story.id == story_id,
+                    Story.user_id == self._owner.id
+                ).first()
+
+                if not story:
+                    raise ValueError('Story not found.')
+
+                for author_id in author_ids:
+                    author = session.query(Author).filter(
+                        Author.id == author_id,
+                        Author.user_id == self._owner.id
+                    ).first()
+
+                    if not author:
+                        raise ValueError('Author not found.')
+
+                    author_story = session.query(AuthorStory).filter(
+                        AuthorStory.user_id == self._owner.id,
+                        AuthorStory.author_id == author_id,
+                        AuthorStory.story_id == story_id
+                    ).first()
+
+                    if not author_story:
+                        raise ValueError('Author not found.')
+
+                    activity = Activity(
+                        user_id=self._owner.id, summary=f'Authors detached from \
+                        story {story.title[:50]} by {self._owner.username}',
+                        created=datetime.now()
+                    )
+
+                    session.delete(author_story)
+                    session.add(activity)
 
             except Exception as e:
                 session.rollback()
