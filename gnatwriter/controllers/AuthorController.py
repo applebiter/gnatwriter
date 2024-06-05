@@ -26,8 +26,6 @@ class AuthorController(BaseController):
         Create a new author
     update_author(author_id: int, name: str, initials: str)
         Update an author
-    change_pseudonym_status(author_id: int, is_pseudonym: bool)
-        Change the pseudonym status of an author
     delete_author(author_id: int)
         Delete an author
     get_author_by_id(author_id: int)
@@ -111,7 +109,8 @@ class AuthorController(BaseController):
                 return author
 
     def update_author(
-        self, author_id: int, name: str, initials: str = None
+        self, author_id: int, name: str, initials: str = None,
+        is_pseudonym: bool = False
     ) -> Type[Author]:
         """Update an author
 
@@ -123,6 +122,8 @@ class AuthorController(BaseController):
             The name of the author
         initials : str
             The initials of the author, optional
+        is_pseudonym : bool
+            Whether the author is a pseudonym, optional, default is False
 
         Returns
         -------
@@ -152,60 +153,12 @@ class AuthorController(BaseController):
 
                 author.name = name
                 author.initials = initials
-                author.modified = datetime.now()
-
-                activity = Activity(
-                    user_id=self._owner.id, summary=f'Author {author.name} \
-                    updated by {self._owner.username}', created=datetime.now()
-                )
-
-                session.add(activity)
-
-            except Exception as e:
-                session.rollback()
-                raise e
-
-            else:
-                session.commit()
-                return author
-
-    def change_pseudonym_status(
-        self, author_id: int, is_pseudonym: bool
-    ) -> Type[Author]:
-        """Change the pseudonym status of an author
-
-        Parameters
-        ----------
-        author_id : int
-            The id of the author to update
-        is_pseudonym : bool
-            Whether the author is a pseudonym
-
-        Returns
-        -------
-        Author
-            The updated author object
-        """
-
-        with self._session as session:
-
-            try:
-
-                author = session.query(Author).filter(
-                    Author.id == author_id,
-                    Author.user_id == self._owner.id
-                ).first()
-
-                if not author:
-                    raise ValueError('Author not found.')
-
                 author.is_pseudonym = is_pseudonym
                 author.modified = datetime.now()
 
                 activity = Activity(
                     user_id=self._owner.id, summary=f'Author {author.name} \
-                    pseudonym status changed by {self._owner.username}',
-                    created=datetime.now()
+                    updated by {self._owner.username}', created=datetime.now()
                 )
 
                 session.add(activity)
@@ -383,7 +336,13 @@ class AuthorController(BaseController):
                 Story.user_id == self._owner.id
             ).first()
 
-            return story.authors if story else None
+            authors = []
+
+            if story:
+                for author_story in story.authors:
+                    authors.append(author_story.author)
+
+            return authors if authors else None
 
     def search_authors(self, search: str) -> List[Type[Author]]:
         """Search for authors by name
