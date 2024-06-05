@@ -143,14 +143,6 @@ class AuthorController(BaseController):
                 if not author:
                     raise ValueError('Author not found.')
 
-                name_exists = session.query(Author).filter(
-                    Author.name == name,
-                    Author.user_id == self._owner.id
-                ).first()
-
-                if name_exists:
-                    raise Exception('That author already exists.')
-
                 author.name = name
                 author.initials = initials
                 author.is_pseudonym = is_pseudonym
