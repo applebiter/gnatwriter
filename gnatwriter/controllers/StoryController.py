@@ -362,19 +362,27 @@ class StoryController(BaseController):
                     if not author:
                         raise ValueError('Author not found.')
 
-                    author_story = AuthorStory(
-                        user_id=self._owner.id, author_id=author_id,
-                        story_id=story_id, created=datetime.now()
-                    )
-                    story.authors.append(author_story)
+                    author_story = session.query(AuthorStory).filter(
+                        AuthorStory.user_id == self._owner.id,
+                        AuthorStory.author_id == author_id,
+                        AuthorStory.story_id == story_id
+                    ).first()
 
-                activity = Activity(
-                    user_id=self._owner.id, summary=f'Authors appended to \
-                    story {story.title[:50]} by {self._owner.username}',
-                    created=datetime.now()
-                )
+                    if not author_story:
 
-                session.add(activity)
+                        author_story = AuthorStory(
+                            user_id=self._owner.id, author_id=author_id,
+                            story_id=story_id, created=datetime.now()
+                        )
+                        story.authors.append(author_story)
+
+                        activity = Activity(
+                            user_id=self._owner.id, summary=f'Authors appended to \
+                            story {story.title[:50]} by {self._owner.username}',
+                            created=datetime.now()
+                        )
+
+                        session.add(activity)
 
             except Exception as e:
                 session.rollback()
@@ -428,7 +436,7 @@ class StoryController(BaseController):
                     ).first()
 
                     if not author_story:
-                        raise ValueError('Author not found.')
+                        return story
 
                     activity = Activity(
                         user_id=self._owner.id, summary=f'Authors detached from \
