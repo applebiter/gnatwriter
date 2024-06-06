@@ -45,7 +45,9 @@ class SubmissionController(BaseController):
         super().__init__(path_to_config, session, owner)
 
     def create_submission(
-        self, story_id: int, submitted_to: str, date_sent: str = None
+        self, story_id: int, submitted_to: str, date_sent: str = None,
+        date_reply_received: str = None, date_published: str = None,
+        date_paid: str = None, result: str = None, amount: float = None
     ) -> Submission:
         """Create a new submission
 
@@ -57,6 +59,16 @@ class SubmissionController(BaseController):
             The entity the story was submitted to
         date_sent : str
             The date the story was submitted, optional
+        date_reply_received : str
+            The date the reply was received
+        date_published : str
+            The date the story was published
+        date_paid : str
+            The date on which the story was paid
+        result : str
+            The result of the submission
+        amount : float
+            The amount paid for the submission
 
         Returns
         -------
@@ -83,7 +95,10 @@ class SubmissionController(BaseController):
                 submission = Submission(
                     user_id=self._owner.id, story_id=story_id,
                     submitted_to=submitted_to, date_sent=date_sent,
-                    created=created, modified=modified
+                    date_reply_received=date_reply_received,
+                    date_published=date_published, date_paid=date_paid,
+                    result=result, amount=amount, created=created,
+                    modified=modified
                 )
 
                 activity = Activity(
@@ -104,9 +119,9 @@ class SubmissionController(BaseController):
                 return submission
 
     def update_submission(
-        self, submission_id: int, submitted_to: str, date_sent: str,
-        date_reply_received: str, date_published: str, date_paid: str,
-        result: str, amount: float
+        self, submission_id: int, submitted_to: str, date_sent: str = None,
+        date_reply_received: str = None, date_published: str = None,
+        date_paid: str = None, result: str = None, amount: float = None
     ) -> Type[Submission]:
         """Update a submission
 
@@ -123,7 +138,7 @@ class SubmissionController(BaseController):
         date_published : str
             The date the story was published
         date_paid : str
-            The date the story was paid
+            The date on which the story was paid
         result : str
             The result of the submission
         amount : float
