@@ -225,6 +225,26 @@ class SubmissionController(BaseController):
                 session.commit()
                 return True
 
+    def get_submission_by_id(self, submission_id: int) -> Type[Submission]:
+        """Get a submission by id
+
+        Parameters
+        ----------
+        submission_id : int
+            The id of the submission
+
+        Returns
+        -------
+        Submission
+            The submission object
+        """
+
+        with self._session as session:
+            return session.query(Submission).filter(
+                Submission.id == submission_id,
+                Submission.user_id == self._owner.id
+            ).first()
+
     def get_all_submissions(self) -> List[Type[Submission]]:
         """Get all submissions associated with an owner
 
