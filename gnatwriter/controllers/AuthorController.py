@@ -26,7 +26,7 @@ class AuthorController(BaseController):
         Create a new author
     update_author(author_id: int, name: str, initials: str)
         Update an author
-    delete_author(author_id: int)
+    delete_author_by_id(author_id: int)
         Delete an author
     get_author_by_id(author_id: int)
         Get an author by id
@@ -163,7 +163,7 @@ class AuthorController(BaseController):
                 session.commit()
                 return author
 
-    def delete_author(self, author_id: int) -> bool:
+    def delete_author_by_id(self, author_id: int) -> bool:
         """Delete an author
 
         Parameters
