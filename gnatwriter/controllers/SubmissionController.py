@@ -82,13 +82,6 @@ class SubmissionController(BaseController):
 
             try:
 
-                date_format = self._config.get("formats", "date")
-
-                if date_sent is not None:
-                    date_sent = datetime.strptime(date_sent, date_format)
-                else:
-                    datetime.strptime(str(date.today()), date_format)
-
                 created = datetime.now()
                 modified = created
 
