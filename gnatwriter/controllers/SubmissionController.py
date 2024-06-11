@@ -25,7 +25,7 @@ class SubmissionController(BaseController):
     update_submission(submission_id: int, submitted_to: str, date_sent: str, date_reply_received: str, \
                       date_published: str, date_paid: str, result: str, amount: float)
         Update a submission
-    delete_submission(submission_id: int)
+    delete_submission_by_id(submission_id: int)
         Delete a submission
     get_all_submissions()
         Get all submissions associated with an owner
@@ -184,7 +184,7 @@ class SubmissionController(BaseController):
                 session.commit()
                 return submission
 
-    def delete_submission(self, submission_id: int) -> bool:
+    def delete_submission_by_id(self, submission_id: int) -> bool:
         """Delete a submission
 
         Parameters
