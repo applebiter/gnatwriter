@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, List
 from sqlalchemy import func
@@ -13,8 +14,8 @@ class AuthorController(BaseController):
     ----------
     _instance : AuthorController
         The instance of the author controller
-    _path_to_config : str
-        The path to the configuration file
+    _config : ConfigParser
+        The configuration parser
     _session : Session
         The database session object
     _owner : User
@@ -45,11 +46,11 @@ class AuthorController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+            self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_author(
         self, name: str, initials: str = None, is_pseudonym: bool = False

@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, List
 from sqlalchemy.orm import Session
@@ -11,11 +12,11 @@ class OllamaModelController(BaseController):
     """
 
     def __init__(
-        self, path_to_config: str, session: Session, owner: Type[User]
+        self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_model(
         self, title: str, model: str, description: str = None,

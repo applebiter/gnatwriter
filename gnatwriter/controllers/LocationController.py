@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, List
 from sqlalchemy import or_, func
@@ -13,6 +14,8 @@ class LocationController(BaseController):
     ----------
     _instance : LocationController
         The instance of the location controller
+    _config: ConfigParser
+        The configuration parser
     _owner : User
         The current user of the location controller
     _session : Session
@@ -65,11 +68,11 @@ class LocationController(BaseController):
     """
 
     def __init__(
-        self, path_to_config: str, session: Session, owner: Type[User]
+        self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_location(
         self, title: str, description: str = None, address: str = None,

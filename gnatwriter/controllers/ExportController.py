@@ -14,17 +14,15 @@ class ExportController(BaseController):
     _export_root: str
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+            self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
         try:
 
-            config = ConfigParser()
-            config.read(path_to_config)
-            export_root = config.get("export", "root")
+            export_root = self._config.get("export", "root")
             self._export_root = export_root
 
         except Exception as e:

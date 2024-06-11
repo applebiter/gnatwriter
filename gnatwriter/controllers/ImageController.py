@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, List
 from sqlalchemy.orm import Session
@@ -12,6 +13,8 @@ class ImageController(BaseController):
     ----------
     _instance : ImageController
         The instance of the image controller
+    _config: ConfigParser
+        The configuration parser
     _owner : User
         The current user of the image controller
     _session : Session
@@ -42,11 +45,11 @@ class ImageController(BaseController):
     """
 
     def __init__(
-        self, path_to_config: str, session: Session, owner: Type[User]
+        self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_image(
         self, filename: str, dirname: str, size_in_bytes: int, mime_type: str,

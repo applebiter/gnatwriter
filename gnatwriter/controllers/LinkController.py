@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, List
 from sqlalchemy.orm import Session
@@ -12,6 +13,8 @@ class LinkController(BaseController):
     ----------
     _instance : LinkController
         The instance of the link controller
+    _config: ConfigParser
+        The configuration parser
     _owner : User
         The current user of the link controller
     _session : Session
@@ -36,11 +39,11 @@ class LinkController(BaseController):
     """
 
     def __init__(
-        self, path_to_config: str, session: Session, owner: Type[User]
+        self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_link(self, url: str, title: str) -> Link:
         """Create a new link

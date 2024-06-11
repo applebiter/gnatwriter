@@ -55,6 +55,8 @@ class GnatWriter:
         The database session
     _owner: User
         The owner of the application
+    _config: ConfigParser
+        The configuration parser
     database_type: str
         The type of database being used
     path_to_config: str
@@ -78,6 +80,7 @@ class GnatWriter:
     _engine: "Engine" = None
     _session: "Session" = None
     _owner: Type[User] = None
+    _config: ConfigParser = None
     database_type: str = None
     path_to_config: str = None
     
@@ -92,28 +95,28 @@ class GnatWriter:
     def __init__(self, path_to_config: str):
 
         self.path_to_config = path_to_config
-        config = ConfigParser()
-        config.read(self.path_to_config)
-        self.database_type = config.get("default_database", "type")
+        self._config = ConfigParser()
+        self._config.read(self.path_to_config)
+        self.database_type = self._config.get("default_database", "type")
 
         if self.database_type == "sqlite":
-            database = config.get("default_database", "database")
+            database = self._config.get("default_database", "database")
             self._engine = create_engine(f"sqlite:///{database}")
         elif self.database_type == "postgresql":
-            user = config.get("default_database", "user")
-            password = config.get("default_database", "password")
-            host = config.get("default_database", "host")
-            port = config.get("default_database", "port")
-            database = config.get("default_database", "database")
+            user = self._config.get("default_database", "user")
+            password = self._config.get("default_database", "password")
+            host = self._config.get("default_database", "host")
+            port = self._config.get("default_database", "port")
+            database = self._config.get("default_database", "database")
             self._engine = create_engine(
                 f"postgresql+psycopg://{user}:{password}@{host}:{port}/{database}"
             )
         elif self.database_type == "mysql":
-            user = config.get("default_database", "user")
-            password = config.get("default_database", "password")
-            host = config.get("default_database", "host")
-            port = config.get("default_database", "port")
-            database = config.get("default_database", "database")
+            user = self._config.get("default_database", "user")
+            password = self._config.get("default_database", "password")
+            host = self._config.get("default_database", "host")
+            port = self._config.get("default_database", "port")
+            database = self._config.get("default_database", "database")
             self._engine = create_engine(
                 f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}"
             )
@@ -143,55 +146,55 @@ class GnatWriter:
 
         self._controllers = {
             "activity": ActivityController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "assistant": AssistantController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "author": AuthorController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "bibliography": BibliographyController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "chapter": ChapterController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "character": CharacterController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "event": EventController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "export": ExportController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "image": ImageController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "link": LinkController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "location": LocationController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "note": NoteController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "ollama-model": OllamaModelController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "scene": SceneController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "story": StoryController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "submission": SubmissionController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             ),
             "user": UserController(
-                self.path_to_config, self._session, self._owner
+                self._config, self._session, self._owner
             )
         }
 
@@ -199,7 +202,7 @@ class GnatWriter:
         return self._controllers[args[0]]
 
     def __str__(self):
-        return "GnatWriter Application [Version 0.1.6]"
+        return "GnatWriter Application"
 
     def __repr__(self):
         return f"{self.__class__.__name__}()"

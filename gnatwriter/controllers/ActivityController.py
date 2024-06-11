@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from typing import Type, List
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -12,7 +13,7 @@ class ActivityController(BaseController):
     ----------
     _instance : ActivityController
         The instance of the activity controller
-    _path_to_config : str
+    _config : configParser
         The path to the configuration file
     _session : Session
         The database session object
@@ -37,11 +38,11 @@ class ActivityController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+            self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def get_activity_by_id(self, activity_id: int) -> Type[Activity] | None:
         """Get an activity by id

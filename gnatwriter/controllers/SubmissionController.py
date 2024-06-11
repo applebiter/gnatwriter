@@ -13,6 +13,8 @@ class SubmissionController(BaseController):
     ----------
     _instance : SubmissionController
         The instance of the submission controller
+    _config: ConfigParser
+        The configuration parser
     _owner : User
         The current user of the submission controller
     _session : Session
@@ -38,11 +40,11 @@ class SubmissionController(BaseController):
     """
 
     def __init__(
-        self, path_to_config: str, session: Session, owner: Type[User]
+        self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_submission(
         self, story_id: int, submitted_to: str, date_sent: str = None,
@@ -80,9 +82,7 @@ class SubmissionController(BaseController):
 
             try:
 
-                config = ConfigParser()
-                config.read("config.cfg")
-                date_format = config.get("formats", "date")
+                date_format = self._config.get("formats", "date")
 
                 if date_sent is not None:
                     date_sent = datetime.strptime(date_sent, date_format)

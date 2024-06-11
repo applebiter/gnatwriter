@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, List
 from sqlalchemy import func
@@ -11,8 +12,8 @@ class BibliographyController(BaseController):
 
     Attributes
     ----------
-    _instance : BibliographyController
-        The instance of the bibliography controller
+    _config : ConfigParser
+        The configuration parser
     _owner : User
         The current user of the bibliography controller
     _session : Session
@@ -48,11 +49,11 @@ class BibliographyController(BaseController):
     """
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+            self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_bibliography(
         self, story_id: int, title: str, pages: str = None,

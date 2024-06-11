@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from typing import Type
 from sqlalchemy.orm import Session
 from gnatwriter.models import User
@@ -10,17 +11,19 @@ class BaseController:
     ----------
     _instance : BaseController
         The instance of the base controller
+    _config : ConfigParser
+        The configuration parser
     _owner : User
         The current user of the base controller
     _session : Session
         The database session
     """
     _instance = None
-    _path_to_config = None
+    _config = None
     _owner = None
     _session = None
 
-    def __new__(cls, path_to_config: str, session: Session, owner: Type[User]):
+    def __new__(cls, config: ConfigParser, session: Session, owner: Type[User]):
         """Enforce Singleton pattern"""
 
         if cls._instance is None:
@@ -29,10 +32,10 @@ class BaseController:
         return cls._instance
 
     def __init__(
-        self, path_to_config: str, session: Session, owner: Type[User]
+        self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        self._path_to_config = path_to_config
+        self._config = config
         self._session = session
         self._owner = owner

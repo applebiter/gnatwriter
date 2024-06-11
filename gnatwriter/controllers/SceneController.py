@@ -15,6 +15,8 @@ class SceneController(BaseController):
     ----------
     _instance : SceneController
         The instance of the scene controller
+    _config: ConfigParser
+        The configuration parser
     _owner : User
         The current user of the scene controller
     _session : Session
@@ -59,11 +61,11 @@ class SceneController(BaseController):
     """
 
     def __init__(
-        self, path_to_config: str, session: Session, owner: Type[User]
+        self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_scene(
         self, story_id: int, chapter_id: int, title: str,
@@ -286,10 +288,6 @@ class SceneController(BaseController):
             True on success
         """
 
-        config = ConfigParser()
-        project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        config.read(f"{project_root}/config.cfg")
-
         with self._session as session:
             try:
                 scene = session.query(Scene).filter(
@@ -310,7 +308,7 @@ class SceneController(BaseController):
                     sibling.position -= 1
                     sibling.created = datetime.strptime(
                         str(sibling.created),
-                        config.get("formats", "datetime")
+                        self._config.get("formats", "datetime")
                     )
                     sibling.modified = datetime.now()
 

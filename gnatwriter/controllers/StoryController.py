@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, List
 from sqlalchemy import or_
@@ -14,6 +15,8 @@ class StoryController(BaseController):
     ----------
     _instance : StoryController
         The instance of the story controller
+    _config: ConfigParser
+        The configuration parser
     _owner : User
         The current user of the story controller
     _session : Session
@@ -76,11 +79,11 @@ class StoryController(BaseController):
     """
 
     def __init__(
-        self, path_to_config: str, session: Session, owner: Type[User]
+        self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_story(self, title: str, description: str = None) -> Story:
         """Create a new story

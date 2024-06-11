@@ -15,6 +15,8 @@ class CharacterController(BaseController):
     ----------
     _instance : CharacterController
         The instance of the characters controller
+    _config: ConfigParser
+        The configuration parser
     _owner : User
         The current user of the characters controller
     _session : Session
@@ -118,11 +120,11 @@ class CharacterController(BaseController):
     """
 
     def __init__(
-        self, path_to_config: str, session: Session, owner: Type[User]
+        self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
     def create_character(
         self, title: str = None, honorific: str = None, first_name: str = None,

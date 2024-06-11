@@ -21,6 +21,8 @@ class AssistantController(BaseController):
 
     Attributes
     ----------
+    _config : ConfigParser
+        The configuration parser.
     _session_uuid : str
         The UUID of the session.
     _client : OllamaClient
@@ -85,11 +87,11 @@ class AssistantController(BaseController):
     _templates = {}
 
     def __init__(
-            self, path_to_config: str, session: Session, owner: Type[User]
+            self, config: ConfigParser, session: Session, owner: Type[User]
     ):
         """Initialize the class"""
 
-        super().__init__(path_to_config, session, owner)
+        super().__init__(config, session, owner)
 
         uuid4 = str(uuid.uuid4())
         uuid_exists = session.query(Assistance).filter(
@@ -102,9 +104,7 @@ class AssistantController(BaseController):
                 Assistance.session_uuid == uuid4
             ).first()
 
-        config = ConfigParser()
-        config.read(self._path_to_config)
-        ollama_url = config.read("ollama", "url")
+        ollama_url = self._config.read("ollama", "url")
 
         self._client = Client(host=ollama_url)  # If I make this a string instead of a bytearray, the ollama code breaks
         self._session_uuid = uuid4
