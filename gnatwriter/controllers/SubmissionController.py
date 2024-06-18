@@ -82,6 +82,34 @@ class SubmissionController(BaseController):
 
             try:
 
+                if date_sent:
+                    date_sent = datetime.strptime(date_sent, '%Y-%m-%d').date()
+                else:
+                    date_sent = None
+
+                if date_reply_received:
+                    date_reply_received = datetime.strptime(date_reply_received, '%Y-%m-%d').date()
+                else:
+                    date_reply_received = None
+
+                if date_published:
+                    date_published = datetime.strptime(date_published, '%Y-%m-%d').date()
+                else:
+                    date_published = None
+
+                if date_paid:
+                    date_paid = datetime.strptime(date_paid, '%Y-%m-%d').date()
+                else:
+                    date_paid = None
+
+                result_states = [
+                    'Pending', 'Rewrite Requested', 'Ignored', 'Withdrawn',
+                    'Rejected', 'Accepted'
+                ]
+
+                if result not in result_states:
+                    raise ValueError('Invalid submission result.')
+
                 created = datetime.now()
                 modified = created
 
@@ -156,26 +184,22 @@ class SubmissionController(BaseController):
                 submission.submitted_to = submitted_to
 
                 if date_sent:
-                    date_sent_date = datetime.strptime(date_sent, '%Y-%m-%d').date()
-                    submission.date_sent = date_sent_date
+                    submission.date_sent = datetime.strptime(date_sent, '%Y-%m-%d').date()
                 else:
                     submission.date_sent = None
 
                 if date_reply_received:
-                    date_reply_received_date = datetime.strptime(date_reply_received, '%Y-%m-%d').date()
-                    submission.date_reply_received = date_reply_received_date
+                    submission.date_reply_received = datetime.strptime(date_reply_received, '%Y-%m-%d').date()
                 else:
                     submission.date_reply_received = None
 
                 if date_published:
-                    date_published_date = datetime.strptime(date_published, '%Y-%m-%d').date()
-                    submission.date_published = date_published_date
+                    submission.date_published = datetime.strptime(date_published, '%Y-%m-%d').date()
                 else:
                     submission.date_published = None
 
                 if date_paid:
-                    date_paid_date = datetime.strptime(date_paid, '%Y-%m-%d').date()
-                    submission.date_paid = date_paid_date
+                    submission.date_paid = datetime.strptime(date_paid, '%Y-%m-%d').date()
                 else:
                     submission.date_paid = None
 
