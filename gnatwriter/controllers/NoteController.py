@@ -1,6 +1,10 @@
 from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, List
+
+from gnatwriter.models.NoteStory import NoteStory
+
+from gnatwriter.models.Story import Story
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from gnatwriter.controllers.BaseController import BaseController
@@ -27,7 +31,7 @@ class NoteController(BaseController):
         Create a new note
     update_note(note_id: int, title: str, content: str)
         Update a note
-    delete_note(note_id: int)
+    delete_note_by_id(note_id: int)
         Delete a note
     get_all_notes()
         Get all notes associated with an owner
@@ -138,7 +142,7 @@ class NoteController(BaseController):
                 session.commit()
                 return note
 
-    def delete_note(self, note_id: int) -> bool:
+    def delete_note_by_id(self, note_id: int) -> bool:
         """Delete a note
 
         Parameters
@@ -272,10 +276,19 @@ class NoteController(BaseController):
         """
 
         with self._session as session:
-            return session.query(Note).filter(
-                Note.story_id == story_id,
-                Note.user_id == self._owner.id
-            ).order_by(Note.created).all()
+            note_stories = session.query(NoteStory).filter(
+                NoteStory.story_id == story_id
+            ).all()
+
+            if not note_stories:
+                return []
+
+            notes = []
+
+            for note_story in note_stories:
+                notes.append(note_story.note)
+
+            return notes
 
     def get_notes_by_story_id_page(self, story_id: int, page: int, per_page: int) -> List[Type[Note]]:
         """Get a single page of notes associated with a story from the database
@@ -297,7 +310,16 @@ class NoteController(BaseController):
 
         with self._session as session:
             offset = (page - 1) * per_page
-            return session.query(Note).filter(
-                Note.story_id == story_id,
-                Note.user_id == self._owner.id
+            note_stories = session.query(NoteStory).filter(
+                NoteStory.story_id == story_id
             ).offset(offset).limit(per_page).all()
+
+            if not note_stories:
+                return []
+
+            notes = []
+
+            for note_story in note_stories:
+                notes.append(note_story.note)
+
+            return notes
