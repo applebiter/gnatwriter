@@ -35,6 +35,10 @@ class NoteController(BaseController):
         Get a single page of notes associated with an owner from the database
     search_notes(search: str)
         Search for notes by title and content
+    get_notes_by_story_id(story_id: int)
+        Get all notes associated with a story
+    get_notes_by_story_id_page(story_id: int, page: int, per_page: int)
+        Get a single page of notes associated with a story from the database
     """
 
     def __init__(
@@ -252,3 +256,48 @@ class NoteController(BaseController):
                 ),
                 Note.user_id == self._owner.id
             ).all()
+
+    def get_notes_by_story_id(self, story_id: int) -> List[Type[Note]]:
+        """Get all notes associated with a story
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+
+        Returns
+        -------
+        list
+            A list of note objects
+        """
+
+        with self._session as session:
+            return session.query(Note).filter(
+                Note.story_id == story_id,
+                Note.user_id == self._owner.id
+            ).order_by(Note.created).all()
+
+    def get_notes_by_story_id_page(self, story_id: int, page: int, per_page: int) -> List[Type[Note]]:
+        """Get a single page of notes associated with a story from the database
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+        page : int
+            The page number
+        per_page : int
+            The number of rows per page
+
+        Returns
+        -------
+        list
+            A list of note objects
+        """
+
+        with self._session as session:
+            offset = (page - 1) * per_page
+            return session.query(Note).filter(
+                Note.story_id == story_id,
+                Note.user_id == self._owner.id
+            ).offset(offset).limit(per_page).all()
