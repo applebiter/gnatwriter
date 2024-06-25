@@ -41,7 +41,7 @@ class NoteController(BaseController):
         Search for notes by title and content
     get_notes_by_story_id(story_id: int)
         Get all notes associated with a story
-    get_notes_by_story_id_page(story_id: int, page: int, per_page: int)
+    get_notes_page_by_story_id(story_id: int, page: int, per_page: int)
         Get a single page of notes associated with a story from the database
     """
 
@@ -276,21 +276,13 @@ class NoteController(BaseController):
         """
 
         with self._session as session:
-            note_stories = session.query(NoteStory).filter(
-                NoteStory.story_id == story_id
+
+            return session.query(Note).join(NoteStory).filter(
+                NoteStory.story_id == story_id,
+                NoteStory.user_id == self._owner.id
             ).all()
 
-            if not note_stories:
-                return []
-
-            notes = []
-
-            for note_story in note_stories:
-                notes.append(note_story.note)
-
-            return notes
-
-    def get_notes_by_story_id_page(self, story_id: int, page: int, per_page: int) -> List[Type[Note]]:
+    def get_notes_page_by_story_id(self, story_id: int, page: int, per_page: int) -> List[Type[Note]]:
         """Get a single page of notes associated with a story from the database
 
         Parameters
@@ -309,17 +301,10 @@ class NoteController(BaseController):
         """
 
         with self._session as session:
+
             offset = (page - 1) * per_page
-            note_stories = session.query(NoteStory).filter(
-                NoteStory.story_id == story_id
+
+            return session.query(Note).join(NoteStory).filter(
+                NoteStory.story_id == story_id,
+                NoteStory.user_id == self._owner.id
             ).offset(offset).limit(per_page).all()
-
-            if not note_stories:
-                return []
-
-            notes = []
-
-            for note_story in note_stories:
-                notes.append(note_story.note)
-
-            return notes

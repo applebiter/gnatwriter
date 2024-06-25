@@ -26,10 +26,14 @@ class LinkController(BaseController):
         Create a new link
     update_link(link_id: int, url: str, title: str)
         Update a link
-    delete_link(link_id: int)
+    delete_link_by_id(link_id: int)
         Delete a link
     get_link_by_id(link_id: int)
         Get a link by id
+    get_links_by_story_id(story_id: int)
+        Get all links associated with a story
+    get_links_page_by_story_id(story_id: int, page: int, per_page: int)
+        Get a single page of links associated with a story from the database
     get_all_links()
         Get all links associated with a user
     get_all_links_page(page: int, per_page: int)
@@ -134,7 +138,7 @@ class LinkController(BaseController):
                 session.commit()
                 return link
 
-    def delete_link(self, link_id: int) -> bool:
+    def delete_link_by_id(self, link_id: int) -> bool:
         """Delete a link
 
         Parameters
@@ -212,10 +216,38 @@ class LinkController(BaseController):
         """
 
         with self._session as session:
+
             return session.query(Link).join(LinkStory).filter(
                 LinkStory.story_id == story_id,
                 LinkStory.user_id == self._owner.id
             ).all()
+
+    def get_links_page_by_story_id(self, story_id: int, page: int, per_page: int) -> List[Type[Link]]:
+        """Get a single page of links associated with a story from the database
+
+        Parameters
+        ----------
+        story_id : int
+            The id of the story
+        page : int
+            The page number
+        per_page : int
+            The number of rows per page
+
+        Returns
+        -------
+        list
+            A list of link objects
+        """
+
+        with self._session as session:
+
+            offset = (page - 1) * per_page
+
+            return session.query(Link).join(LinkStory).filter(
+                LinkStory.story_id == story_id,
+                LinkStory.user_id == self._owner.id
+            ).offset(offset).limit(per_page).all()
 
     def get_all_links(self) -> List[Type[Link]]:
         """Get all links associated with an owner
