@@ -148,9 +148,9 @@ class GnatWriter:
             "activity": ActivityController(
                 self._config, self._session, self._owner
             ),
-            "assistant": AssistantController(
-                self._config, self._session, self._owner
-            ),
+            # "assistant": AssistantController(
+            #     self._config, self._session, self._owner
+            # ),
             "author": AuthorController(
                 self._config, self._session, self._owner
             ),

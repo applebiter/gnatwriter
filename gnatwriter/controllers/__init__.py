@@ -1,6 +1,6 @@
 from gnatwriter.controllers.BaseController import BaseController
 from gnatwriter.controllers.ActivityController import ActivityController
-from gnatwriter.controllers.AssistantController import AssistantController
+# from gnatwriter.controllers.AssistantController import AssistantController
 from gnatwriter.controllers.AuthorController import AuthorController
 from gnatwriter.controllers.BibliographyController import BibliographyController
 from gnatwriter.controllers.ChapterController import ChapterController
