@@ -1,10 +1,12 @@
 from configparser import ConfigParser
 from datetime import datetime
 from typing import Type, List
+
+from gnatwriter.models.BibliographyAuthor import BibliographyAuthor
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from gnatwriter.controllers.BaseController import BaseController
-from gnatwriter.models import User, Bibliography, Activity
+from gnatwriter.models import User, Bibliography, Activity, BibliographyAuthor
 
 
 class BibliographyController(BaseController):
@@ -12,6 +14,8 @@ class BibliographyController(BaseController):
 
     Attributes
     ----------
+    _instance : BibliographyController
+        The instance of the bibliography controller
     _config : ConfigParser
         The configuration parser
     _owner : User
@@ -46,6 +50,10 @@ class BibliographyController(BaseController):
         Search for bibliographies by title associated with a user
     search_bibliographies_by_story_id(story_id: int, search: str)
         Search for bibliographies by title associated with a story
+    add_author(bibliography_id: int, name: str, initials: str)
+        Add a new author to the bibliographical reference
+    remove_author(author_id: int)
+        Remove an author from the bibliographical reference
     """
 
     def __init__(
@@ -444,3 +452,91 @@ class BibliographyController(BaseController):
                 Bibliography.title.like(f'%{search}%'),
                 Bibliography.user_id == self._owner.id
             ).all()
+
+    def add_author(
+        self, bibliography_id: int, name: str, initials: str
+    ) -> BibliographyAuthor:
+        """Add a new author to the bibliographical reference
+
+        Parameters
+        ----------
+        bibliography_id : int
+            The id of the bibliography
+        name : str
+            The name of the author
+        initials : str
+            The initials of the author
+
+        Returns
+        -------
+        BibliographyAuthor
+            The new author object
+        """
+
+        with self._session as session:
+
+            try:
+
+                author = BibliographyAuthor(
+                    bibliography_id=bibliography_id, name=name,
+                    initials=initials, created=datetime.now()
+                )
+
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Author {author.name} \
+                    added to bibliography {bibliography_id} by \
+                    {self._owner.username}', created=datetime.now()
+                )
+
+                session.add(author)
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return author
+
+    def remove_author(self, author_id: int) -> bool:
+        """Remove an author from the bibliographical reference
+
+        Parameters
+        ----------
+        author_id : int
+            The id of the author to remove
+
+        Returns
+        -------
+        bool
+            True if the author was removed, False if not
+        """
+
+        with self._session as session:
+
+            try:
+
+                author = session.query(BibliographyAuthor).filter(
+                    BibliographyAuthor.id == author_id
+                ).first()
+
+                if not author:
+                    raise ValueError('Author not found.')
+
+                activity = Activity(
+                    user_id=self._owner.id, summary=f'Author {author.name} \
+                    removed from bibliography {author.bibliography_id} by \
+                    {self._owner.username}', created=datetime.now()
+                )
+
+                session.delete(author)
+                session.add(activity)
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+            else:
+                session.commit()
+                return True
