@@ -54,6 +54,8 @@ class BibliographyController(BaseController):
         Add a new author to the bibliographical reference
     remove_author(author_id: int)
         Remove an author from the bibliographical reference
+    get_bibliography_authors(bibliography_id: int)
+        Get all authors associated with a bibliography
     """
 
     def __init__(
@@ -540,3 +542,28 @@ class BibliographyController(BaseController):
             else:
                 session.commit()
                 return True
+
+    def get_bibliography_authors(
+        self, bibliography_id: int
+    ) -> List[Type[BibliographyAuthor]]:
+        """Get all authors associated with a bibliography
+
+        Parameters
+        ----------
+        bibliography_id : int
+            The id of the bibliography
+
+        Returns
+        -------
+        list
+            A list of author objects
+        """
+
+        with self._session as session:
+
+            authors = session.query(BibliographyAuthor).filter(
+                BibliographyAuthor.bibliography_id == bibliography_id,
+                BibliographyAuthor.user_id == self._owner.id
+            ).all()
+
+            return authors if authors else None
