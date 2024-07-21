@@ -192,25 +192,6 @@ class Bibliography(Base):
 
         return publisher
 
-    @validates("publication_date")
-    def validate_publication_date(self, key, publication_date: str) -> str | None:
-        """Validates the publication date's format.
-
-        Returns
-        -------
-        str
-            The validated publication date
-        """
-
-        config = ConfigParser()
-        config.read("config.cfg")
-        date_format = config.get("formats", "date")
-
-        if publication_date is not None and bool(datetime.strptime(publication_date, date_format)) is False:
-            raise ValueError("Reference publication date must be in the format 'YYYY-MM-DD'.")
-
-        return publication_date
-
     @validates("editor")
     def validate_editor(self, key, editor: str) -> str:
         """Validates the editor's length.
