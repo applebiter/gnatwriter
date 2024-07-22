@@ -114,6 +114,8 @@ class Bibliography(Base):
             'title': self.title,
             'pages': self.pages,
             'publication_date': str(self.publication_date),
+            'publisher': self.publisher,
+            'editor': self.editor,
             'created': str(self.created),
             'modified': str(self.modified),
         }
@@ -134,6 +136,8 @@ class Bibliography(Base):
         self.title = data.get('title', self.title)
         self.pages = data.get('pages', self.pages)
         self.publication_date = data.get('publication_date', self.publication_date)
+        self.publisher = data.get('publisher', self.publisher)
+        self.editor = data.get('editor', self.editor)
         self.created = data.get('created', self.created)
         self.modified = data.get('modified', self.modified)
 
