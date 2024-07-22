@@ -67,7 +67,7 @@ class BibliographyController(BaseController):
 
     def create_bibliography(
         self, story_id: int, title: str, pages: str = None,
-        publication_date: str = None, other_text: str = None
+        publication_date: str = None, publisher: str = None, editor: str = None
     ) -> Bibliography:
         """Create a new bibliography
 
@@ -81,8 +81,10 @@ class BibliographyController(BaseController):
             The pages of the referenced work, optional
         publication_date : str
             The publication date of the referenced work, optional
-        other_text : str
-            Other text, optional
+        publisher : str
+            Publisher, optional
+        editor : str
+            Editor, optional
 
         Returns
         -------
@@ -110,7 +112,8 @@ class BibliographyController(BaseController):
                 bibliography = Bibliography(
                     user_id=self._owner.id, story_id=story_id, title=title,
                     pages=pages, publication_date=publication_date,
-                    other_text=other_text, created=created, modified=modified
+                    publisher=publisher, editor=editor, created=created,
+                    modified=modified
                 )
 
                 activity = Activity(
@@ -132,7 +135,8 @@ class BibliographyController(BaseController):
 
     def update_bibliography(
         self, bibliography_id: int, story_id: int, title: str,
-        pages: str = None, publication_date: str = None, other_text: str = None
+        pages: str = None, publication_date: str = None, publisher: str = None,
+        editor: str = None
     ) -> Type[Bibliography]:
         """Update a bibliography
 
@@ -148,8 +152,10 @@ class BibliographyController(BaseController):
             The pages of the referenced work, optional
         publication_date : str
             The publication date of the referenced work, optional
-        other_text : str
-            Other text, optional
+        publisher : str
+            Publisher, optional
+        editor : str
+            Editor, optional
 
         Returns
         -------
@@ -182,7 +188,8 @@ class BibliographyController(BaseController):
                 bibliography.title = title
                 bibliography.pages = pages
                 bibliography.publication_date = publication_date
-                bibliography.other_text = other_text
+                bibliography.publisher = publisher
+                bibliography.editor = editor
                 bibliography.modified = datetime.now()
 
                 activity = Activity(
